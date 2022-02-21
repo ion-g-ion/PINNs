@@ -5,6 +5,8 @@ from jax.example_libraries import stax, optimizers
 import matplotlib.pyplot as plt
 import pinns 
 import datetime
+import jax.scipy.optimize
+import jax.flatten_util
 
 Phi_ref = lambda x:  np.exp(2*x[:,0])*np.sin(2*x[:,1])/8
 Rhs = lambda x: 0
@@ -48,9 +50,9 @@ for w in weights:
         
 @jax.jit
 def loss(weights):
-    lbd = jnp.linalg.norm((nn_apply(weights, pts_bd)[:,0] - bd_vals)**2)
-    lpde = jnp.linalg.norm((pinns.operators.laplace(lambda x: nn_apply(weights, x))(pts_inside)[:,0] - Rhs(pts_inside))**2)
-    
+    lbd = jnp.sum((nn_apply(weights, pts_bd)[:,0] - bd_vals)**2)
+    lpde = jnp.sum((pinns.operators.laplace(lambda x: nn_apply(weights, x))(pts_inside)[:,0] - Rhs(pts_inside))**2)
+   
     return lbd + 0.1*lpde
 
 N_epochs = 100000
@@ -61,16 +63,45 @@ def update(params, step_size = 0.001):
     grads = jax.grad(loss)(params)
     return [() if wb==() else (wb[0] - step_size * dwdb[0], wb[1] - step_size * dwdb[1]) for wb, dwdb in zip(params, grads)]
   
-for epoch in range(N_epochs):
-    tme = datetime.datetime.now()
-    weights = update(weights, 0.001)
-    tme = datetime.datetime.now() - tme
-    print()
-    print('time ',tme)
-    print(loss(weights))
+weights_vector, weights_unravel = jax.flatten_util.ravel_pytree(weights)
+
+@jax.jit
+def loss_handle(w):
+    ws = weights_unravel(w)
+    l = loss(ws)
+    return l
+
+@jax.jit
+def lossgrad_handle(w):
+    ws = weights_unravel(w)
+    
+    l = loss(ws)
+    gr = jax.grad(loss)(ws)
+    gr,_ = jax.flatten_util.ravel_pytree(gr)
+    return l,gr
+
+print('Starting optimization')
+# results = jax.scipy.optimize.minimize(loss_interface, x0 = weights_vector, method = 'bfgs', options = {'maxiter': 10})
+print('Ready')
+# for epoch in range(N_epochs):
+#     tme = datetime.datetime.now()
+#     weights = update(weights, 0.0005)
+#     tme = datetime.datetime.now() - tme
+#     print()
+#     print('Iteration ',epoch+1,' time ',tme, ' loss ', loss(weights))
+   
     
 x,y = np.meshgrid(np.linspace(-1,1,100),np.linspace(-1,1,100))
 xy = np.concatenate((x.flatten()[:,None],y.flatten()[:,None]),1)
 
 plt.figure()
 plt.contourf(x,y,nn_apply(weights,xy).reshape(x.shape))
+plt.colorbar()
+
+plt.figure()
+plt.contourf(x,y,Phi_ref(xy).reshape(x.shape))
+plt.colorbar()
+
+plt.figure()
+plt.contourf(x,y,nn_apply(weights,xy).reshape(x.shape) - Phi_ref(xy).reshape(x.shape))
+plt.colorbar()
