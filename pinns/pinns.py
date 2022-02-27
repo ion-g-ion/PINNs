@@ -70,7 +70,7 @@ import numpy as np
 class PINN():
     
     def __init__(self):
-        
+         
         pass
     
     def train(self, method = 'ADAM'):
