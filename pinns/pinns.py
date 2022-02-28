@@ -73,8 +73,11 @@ class PINN():
          
         pass
     
-    def train(self, method = 'ADAM'):
-        
+    def loss(self,w):
         pass
+    
+    def train(self, method = 'ADAM'):
+        pass
+
         
         

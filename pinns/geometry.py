@@ -99,7 +99,7 @@ class PatchNURBS(Patch):
     
     def _eval_omega(self,y):
         lst = []
-        for d in self.d:
+        for d in range(self.d):
             lst.append(self._eval_derivative(y,d)[:,None,:])
 
         return np.concatenate(tuple(lst),1)
@@ -113,8 +113,12 @@ class PatchNURBS(Patch):
 
         Gys = self.__call__(ys)
 
+        DGys = self._eval_omega(ys)
+         
+        det = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
         
-
+        return Gys, det
+    
     def sample_inside(self, N, pdf=None):
         
         if pdf is None:
