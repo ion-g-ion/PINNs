@@ -20,3 +20,11 @@ def laplace(func):
 def curl2d(func):
     J = jax.vmap(jax.jacfwd(func))
     return lambda x: _aux_curd_2d(J,x)
+
+def jacobian(func):
+    J = jax.vmap(jax.jacfwd(func))
+    return J
+
+def jacobian_modified(func,Mat):
+    J = jax.vmap(jax.jacfwd(func))
+    return lambda x: (J(x)@Mat)[...,0,:]

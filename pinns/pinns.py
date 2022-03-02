@@ -1,83 +1,54 @@
-# import torch as tn
-# import functorch 
-# import torch.nn as nn
-# import numpy as np
-# 
-# 
-# def gradient(func):
-#     J = functorch.vmap(functorch.jacfwd(func))
-#     return lambda x: J(x)[...,0,:]
-#     
-# def divergence(func):
-#     J = functorch.vmap(functorch.jacfwd(func))
-#     return lambda x: tn.sum(tn.diagonal(J(x),dim1=1,dim2=2),1, keepdims=True)
-# 
-# def laplace(func):
-#     H = functorch.vmap(functorch.hessian(func))
-#     return lambda x: tn.sum(tn.diagonal(H(x)[...,0,:,:],dim1=1,dim2=2),1, keepdims=True)
-# 
-# 
-# model = nn.Sequential(nn.Linear(2,22),nn.Sigmoid(),nn.Linear(22,32),nn.Sigmoid(),nn.Linear(32,32),nn.Sigmoid(), nn.Linear(32,2))
-# 
-# 
-# Phi_ref = lambda x:  tn.exp(2*x[:,0])*tn.sin(2*x[:,1])/8
-# Rhs = lambda x: 0
-# N_in = 5000
-# N_bd = 500
-# pts_inside = tn.tensor(np.random.rand(N_in,2)*2-1).to(dtype=tn.float32)
-# 
-# tmp1 = np.random.randint(0, high=2, size=(N_bd,1))
-# tmp2 = np.random.randint(0, high=2, size=(N_bd,1))
-# xbd_train = (np.random.rand(N_bd,1)*2-1)*tmp1 + (1 - tmp1)*(tmp2*(-1)+(1-tmp2)*1)
-# tmp2 = np.random.randint(0, high=2, size=(N_bd,1))
-# ybd_train = (np.random.rand(N_bd,1)*2-1)*(1-tmp1) + tmp1*(tmp2*(-1)+(1-tmp2)*1)
-# pts_bd = tn.tensor(np.concatenate((xbd_train[:],ybd_train[:]),1)).to(dtype=tn.float32)
-# bd_vals = Phi_ref(pts_bd).to(dtype=tn.float32)
-# 
-# @tn.jit.script
-# def loss(pts_inside, pts_bd, bd_vals):
-#     lbd = tn.sum((model(pts_bd)[:,0]-bd_vals)**2)
-#     lpde = tn.sum(laplace(model)(pts_inside)**2)
-#     return lbd+0.1*lpde
-# 
-# 
-# N_iterations = 4000
-# # trainer 
-# optimizer = tn.optim.LBFGS(model.parameters(), max_iter=N_iterations)
-# 
-# 
-# def loss_closure():
-#     optimizer.zero_grad()
-#     lv = loss(pts_inside, pts_bd, bd_vals)
-#     lv.backward()
-#     return lv
-#     
-# for i in range(N_iterations):
-#     
-# 
-# 
-#     optimizer.step(loss_closure)
-#     
-#     print('iteration ',i,' loss ',loss(pts_inside, pts_bd, bd_vals))
-#     
-#     
-#     
-# 
 import jax
 import jax.numpy as jnp
 import numpy as np
+from jax.example_libraries import stax, optimizers
+import matplotlib.pyplot as plt
+import datetime
+import jax.scipy.optimize
+import jax.flatten_util
 
 class PINN():
     
     def __init__(self):
-         
+        self.neural_networks = {}
+        self.neural_networks_initializers = {}
+        self.weights = {}
         pass
     
+    def add_neural_network(self, name, ann, input_shape):
+        
+        self.neural_networks[name] = ann[1]
+        self.neural_networks_initializers[name] = ann[0]
+        self.weights[name] = ann[0](self.key, input_shape)[1]
+       
+    def init_unravel(self):
+        
+        weights_vector, weights_unravel = jax.flatten_util.ravel_pytree(self.weights)
+        self.weights_unravel = weights_unravel
+        return weights_vector
+         
     def loss(self,w):
         pass
     
     def train(self, method = 'ADAM'):
         pass
+
+  
+    def loss_handle(self, w):
+        ws = self.weights_unravel(w)
+        l = self.loss(ws)
+        return l
+
+
+    def lossgrad_handle(self, w):
+        ws = self.weights_unravel(w)
+        
+        l = self.loss(ws)
+        gr = jax.grad(self.loss)(ws)
+        
+        gr,_ = jax.flatten_util.ravel_pytree(gr)
+        return l, gr
+
 
         
         
