@@ -164,7 +164,9 @@ class BSplineBasis:
                  return self.dspl[i](x)
             else:
                 return self.spl[i](x)
-            
+    def __repr__(self) -> str:
+        return 'B-Spline basis of degree '+str(self.deg)+' and dimension '+str(self.N)
+     
     def greville(self):
         return np.array([np.sum(self.knots[i+1:i+self.deg+1]) for i in range(self.N)])/(self.deg)
         # return np.array([np.sum(self.knots[i+2:i+self.deg+2]) for i in range(self.N)])/(self.deg-1)

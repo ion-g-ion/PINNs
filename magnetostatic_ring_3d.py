@@ -123,3 +123,13 @@ tme = datetime.datetime.now() - tme
 
 print()
 print('Elapsed time', tme)
+
+x,y,z = np.meshgrid(np.linspace(0,1,3),np.linspace(0,1,100),np.linspace(0,1,8))
+xyz = geom(np.concatenate((x.flatten()[:,None],y.flatten()[:,None],z.flatten()[:,None]),1))
+
+B = model.neural_networks['B'](weights['B'], xyz)
+
+fig = plt.figure()
+ax = plt.axes(projection ="3d")
+ax.quiver(xyz[:,0].flatten(), xyz[:,1].flatten(), xyz[:,2].flatten(),B[:,0].flatten(), B[:,1].flatten(), B[:,2].flatten(),colors = plt.get_cmap()(np.sqrt(np.sum(B**2,-1))))
+plt.savefig('3dplot.jpg')

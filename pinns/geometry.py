@@ -79,6 +79,24 @@ class PatchNURBS(Patch):
 
         return np.einsum('...i,...->...i',xs,1/den)
 
+    def __repr__(self):
+        if self.d == 1:
+            s = 'NURBS curve'
+        elif self.d == 2:
+            s = 'NURBS surface'
+        elif self.d == 3:
+            s = 'NURBS volume'
+        else: 
+            s = 'NURBS instance'
+        
+        s += ' embedded in a '+str(self.dembedding)+'D space.\n'
+        s += 'Basis:\n' 
+        for b in self.basis:
+            s+=str(b)+'\n'
+        
+        return s
+        
+        
     def _eval_derivative(self, y, dim):
         Bs = [b(y[:,i], derivative = False) for i,b in enumerate(self.basis)]
         dBs = [b(y[:,i], derivative = (dim ==i)) for i,b in enumerate(self.basis)]

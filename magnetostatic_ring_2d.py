@@ -91,7 +91,7 @@ tme = datetime.datetime.now() - tme
 print()
 print('Elapsed time', tme)
 
-x,y = np.meshgrid(np.linspace(0,1,100),np.linspace(0,1,100))
+x,y = np.meshgrid(np.linspace(0,1,10),np.linspace(0,1,100))
 xy = geom(np.concatenate((x.flatten()[:,None],y.flatten()[:,None]),1))
 
 Az = model.neural_networks['Az'](weights['Az'], xy).reshape(x.shape)
