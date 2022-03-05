@@ -55,6 +55,7 @@ plt.scatter(pts[:,0],pts[:,1],s=1)
 plt.scatter(knots[:,:,0][:],knots[:,:,1][:])
 
 S = np.pi*R*R/4-np.pi*r*r/4
+Sc = np.sum(ws)/ws.size
 
 Ia = np.pi*(R-r)/2
 Ic = np.sum((1/np.sqrt(pts[:,0]**2+pts[:,1]**2))*ws)/ws.size

@@ -6,9 +6,14 @@ def tangent2normal_2d(tangents):
     rotation = np.array([[0,-1],[1,0]])
     return np.einsum('ij,mnj->mni',rotation,tangents)
 
+def tangent2normal_3d(tangents):
 
+    result1 = tangents[...,0,1]*tangents[...,1,2]-tangents[...,0,2]*tangents[...,1,1]
+    result2 = tangents[...,0,2]*tangents[...,1,0]-tangents[...,0,0]*tangents[...,1,2]
+    result3 = tangents[...,0,0]*tangents[...,1,1]-tangents[...,0,1]*tangents[...,1,0]
+    return np.concatenate((result1[...,None], result2[...,None], result3[...,None]),-1)
 
-
+    
 class Patch():
 
     def __init__(self, rand_key) -> None:
@@ -58,6 +63,7 @@ class PatchNURBS(Patch):
         self.basis = basis
         self.knots = knots 
         self.weights = weights
+        self.dembedding = self.d
 
     def __call__(self,y):
           
@@ -98,11 +104,21 @@ class PatchNURBS(Patch):
         return (Dxs*den-xs*Dden)/(den**2)
     
     def _eval_omega(self,y):
+        """
+        Evaluate the derivative of the parametrization (jacobian).
+        y[...,i,j] = \partial_y
+        
+        Args:
+            y (numpy.array): the points
+
+        Returns:
+            numpy.array: _description_
+        """
         lst = []
         for d in range(self.d):
-            lst.append(self._eval_derivative(y,d)[:,None,:])
+            lst.append(self._eval_derivative(y,d)[:,:,None])
 
-        return np.concatenate(tuple(lst),1)
+        return np.concatenate(tuple(lst),-1)
 
     def importance_sampling_2d(self, N, pdf = None):
         
@@ -118,6 +134,23 @@ class PatchNURBS(Patch):
         det = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
         
         return Gys, det
+
+    def importance_sampling_3d(self, N, pdf = None, bounds = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+        if bounds ==None:
+            bounds = ((0,1),(0,1),(0,1))
+            
+        ys = np.random.rand(N,self.d)*np.array([bounds[0][1]-bounds[0][0],bounds[1][1]-bounds[1][0],bounds[2][1]-bounds[2][0]]) + np.array([bounds[0][0],bounds[1][0],bounds[2][0]])       
+        Gys = self.__call__(ys)
+
+        DGys = self._eval_omega(ys)
+         
+        det = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
+        det = det/det.size*(bounds[0][1]-bounds[0][0])*(bounds[1][1]-bounds[1][0])*(bounds[2][1]-bounds[2][0])
+        
+        return Gys, det
     
     def sample_inside(self, N, pdf=None):
         
@@ -129,8 +162,29 @@ class PatchNURBS(Patch):
             pass
             # Gy = self.__call__(ys)
         return xs
+    
+    def surface_integral_importance(self, N, bounds):
+        
+        y = np.random.rand(N,self.d)
+        y[:,d] = end
+        Bs = [b(y[:,i]) for i,b in enumerate(self.basis)]
+        dBs = [b(y[:,i], derivative  = True) for i,b in enumerate(self.basis)]
 
-    def sample_boundary(self, d, end, N, tangent=False, normal=False, pdf=None):
+        pts = self.__call__(y)
+        pts_tangent = []
+        for i in range(self.d):
+            if i!=d:
+                ds = [False]*self.d
+                ds[i] = True
+                
+                v = self._eval_derivative(y, i)
+                v = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+                pts_tangent += [v[:,None,:]]
+        #v = self._eval_derivative(y, d)
+        #norm = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+        return pts, np.concatenate(tuple(pts_tangent),1)#, norm
+    
+    def sample_boundary(self, d, end, N, normalize=True, pdf=None):
         
         if pdf == None:
             y = np.random.rand(N,self.d)
@@ -146,7 +200,8 @@ class PatchNURBS(Patch):
                     ds[i] = True
                     
                     v = self._eval_derivative(y, i)
-                    v = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+                    if normalize:
+                        v = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
                     pts_tangent += [v[:,None,:]]
             #v = self._eval_derivative(y, d)
             #norm = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)

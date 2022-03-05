@@ -59,5 +59,17 @@ class TestOperators(unittest.TestCase):
         error = jnp.linalg.norm(cc-cr)
         self.assertLess(error.to_py(),1e-13,"pinns.operators.curl2d error: wrong curl.")
 
+    def test_curl3d(self):
+        
+        func = lambda x: jnp.concatenate( ( (x[...,0]+x[...,1]**2)[...,None] , (x[...,1]+x[...,2]**2)[...,None] , (x[...,2]+x[...,0]**2)[...,None] ) , -1)
+        curl3d_reference = lambda x: np.concatenate( (-2*x[...,2][...,None],-2*x[...,0][...,None],-2*x[...,1][...,None]) ,-1)
+        
+        curl3d_computed = pinns.operators.curl3d(func)
+        x = jnp.array(np.random.rand(128,3))
+        cr = curl3d_reference(x)
+        cc = curl3d_computed(x)
+        error = jnp.linalg.norm(cc-cr)
+        self.assertLess(error.to_py(),1e-13,"pinns.operators.curl3d error: wrong curl.")
+        
 if __name__ == '__main__':
     unittest.main()

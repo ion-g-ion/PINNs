@@ -15,6 +15,7 @@ config.update("jax_enable_x64", True)
 
 R = 0.5
 re = 0.2
+h = R*2
 knots = np.array([ [[1-R,0],[1,0]] , [[1-R,1-R-re],[1,1-re]] , [[1-R,1-R],[1,1]] , [[1-R-re,1-R],[1-re,1]] , [[-1+R+re,1-R],[-1+re,1]] , [[-1+R,1-R],[-1,1]] , [[-1+R,1-R-re],[-1,1-re]] , [[-1+R,-1+R+re],[-1,-1+re]] , [[-1+R,-1+R],[-1,-1]] , [[-1+R+re,-1+R],[-1+re,-1]] , [[1-R-re,-1+R],[1-re,-1]] , [[1-R,-1+R],[1,-1]] , [[1-R,-1+R+re],[1,-1+re]] , [[1-R,0],[1,0]] ])
 weights = np.ones([knots.shape[0],knots.shape[1]])
 weights[2,:] = 1/np.sqrt(2)
@@ -31,9 +32,9 @@ geom = pinns.geometry.PatchNURBS([basis1, basis2], knots, weights, None)
 plt.figure()
 plt.scatter(knots[:,:,0].flatten(),knots[:,:,1].flatten())
 
-x_in = geom.sample_inside(10000)
-x_bd1,_ = geom.sample_boundary(1,0,10*250)
-x_bd2,_ = geom.sample_boundary(1,1,10*250)
+x_in = geom.sample_inside(6000)
+x_bd1,_ = geom.sample_boundary(1,0,1000)
+x_bd2,_ = geom.sample_boundary(1,1,1000)
 
 plt.figure()
 plt.scatter(x_in[:,0],x_in[:,1],s=1,c='b')
@@ -45,10 +46,12 @@ class Model(pinns.PINN):
         super().__init__()
         self.key = rand_key
         self.points = points
-        self.add_neural_network('Az', stax.serial(stax.Dense(15), stax.Tanh, stax.Dense(15), stax.Tanh, stax.Dense(15), stax.Tanh, stax.Dense(10), stax.Tanh, stax.Dense(1)), (-1,2))
-        self.add_neural_network('H', stax.serial(stax.Dense(15), stax.Tanh, stax.Dense(15), stax.Tanh, stax.Dense(15), stax.Tanh, stax.Dense(10), stax.Tanh, stax.Dense(2)), (-1,2))
-
-        
+        nl = 32
+        block = stax.serial(stax.FanOut(2),stax.parallel(stax.serial(stax.Dense(nl), stax.Tanh, stax.Dense(nl), stax.Tanh),stax.Dense(nl)),stax.FanInSum)
+        #self.add_neural_network('Az', stax.serial(stax.Dense(10), stax.Tanh, stax.Dense(10), stax.Tanh, stax.Dense(10), stax.Tanh, stax.Dense(10), stax.Tanh, stax.Dense(1)), (-1,2))
+        #self.add_neural_network('H', stax.serial(stax.Dense(10), stax.Tanh, stax.Dense(10), stax.Tanh, stax.Dense(10), stax.Tanh, stax.Dense(10), stax.Tanh, stax.Dense(2)), (-1,2))
+        self.add_neural_network('Az',stax.serial(block,block,block,block,block,block,stax.Tanh,stax.Dense(1)),(-1,2))
+        self.add_neural_network('H',stax.serial(block,block,block,block,block,block,stax.Tanh,stax.Dense(2)),(-1,2))
         
     def loss(self, ws):
         
@@ -78,10 +81,15 @@ def loss_grad(w):
     return np.array(l.to_py()), np.array(gr.to_py()) 
 
 print('Starting optimization')
+tme = datetime.datetime.now()
 #results = jax.scipy.optimize.minimize(loss_grad, x0 = weights_vector, method = 'bfgs', options = {'maxiter': 10})
 # result = scipy.optimize.minimize(loss_grad, x0 = w0.to_py(), method = 'BFGS', jac = True, tol = 1e-8, options = {'disp' : True, 'maxiter' : 400}, callback = lambda x: print(loss_compiled(x)))
-result = scipy.optimize.minimize(loss_grad, x0 = w0.to_py(), method = 'L-BFGS-B', jac = True, tol = 1e-9, options = {'disp' : True, 'maxiter' : 1000, 'iprint': 1})
+result = scipy.optimize.minimize(loss_grad, x0 = w0.to_py(), method = 'L-BFGS-B', jac = True, tol = 1e-9, options = {'disp' : True, 'maxiter' : 2000, 'iprint': 1})
 weights = model.weights_unravel(jnp.array(result.x))
+tme = datetime.datetime.now() - tme
+
+print()
+print('Elapsed time', tme)
 
 x,y = np.meshgrid(np.linspace(0,1,100),np.linspace(0,1,100))
 xy = geom(np.concatenate((x.flatten()[:,None],y.flatten()[:,None]),1))
