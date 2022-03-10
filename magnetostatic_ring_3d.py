@@ -43,29 +43,34 @@ ax = plt.axes(projection ="3d")
 ax.scatter3D(knots[...,0].flatten(), knots[...,1].flatten(), knots[...,2].flatten())
  
 x_in = geom.sample_inside(12000)
-x_bd1, x_bdt1 = geom.sample_boundary(0,0,5000)
-x_bd2, x_bdt2 = geom.sample_boundary(0,1,5000)
-x_bd3, x_bdt3 = geom.sample_boundary(2,0,5000)
-x_bd4, x_bdt4 = geom.sample_boundary(2,1,5000)
+x_bd1, x_bdt1 = geom.sample_boundary(0,0,9000, normalize = True)
+x_bd2, x_bdt2 = geom.sample_boundary(0,1,9000, normalize = True)
+x_bd3, x_bdt3 = geom.sample_boundary(2,0,9000, normalize = True)
+x_bd4, x_bdt4 = geom.sample_boundary(2,1,9000, normalize = True)
 x_bdn1 = pinns.geometry.tangent2normal_3d(x_bdt1)
 x_bdn2 = pinns.geometry.tangent2normal_3d(x_bdt2)
 x_bdn3 = pinns.geometry.tangent2normal_3d(x_bdt3)
 x_bdn4 = pinns.geometry.tangent2normal_3d(x_bdt4)
 x_bd = np.concatenate((x_bd1, x_bd2, x_bd3, x_bd4), 0)
 x_bdn = np.concatenate((x_bdn1, x_bdn2, x_bdn3, x_bdn4), 0)
-xflux, x_bdtf = geom.sample_boundary(1,0,8000, normalize = False)
+xflux, x_bdtf = geom.sample_boundary(1,0,12000, normalize = False)
 vflux = pinns.geometry.tangent2normal_3d(x_bdtf)/xflux.shape[0]
 
+geom1 = geom[0.1,:,1.0]
 fig = plt.figure()
 ax = plt.axes(projection ="3d")
-# ax.scatter3D(x_in[...,0].flatten(), x_in[...,1].flatten(), x_in[...,2].flatten(),s=2)
+ax.scatter3D(x_in[...,0].flatten(), x_in[...,1].flatten(), x_in[...,2].flatten(),s=2)
 # ax.scatter3D(x_bd1[...,0].flatten(), x_bd1[...,1].flatten(), x_bd1[...,2].flatten(),s=2, c='r')
 # ax.scatter3D(x_bd2[...,0].flatten(), x_bd2[...,1].flatten(), x_bd2[...,2].flatten(),s=2, c='g')
 # ax.scatter3D(x_bd3[...,0].flatten(), x_bd3[...,1].flatten(), x_bd3[...,2].flatten(),s=2, c='b')
 # ax.scatter3D(x_bd4[...,0].flatten(), x_bd4[...,1].flatten(), x_bd4[...,2].flatten(),s=2, c='y')
-ax.quiver(x_bd3[...,0].flatten(), x_bd3[...,1].flatten(), x_bd3[...,2].flatten(),x_bdn3[...,0].flatten(), x_bdn3[...,1].flatten(), x_bdn3[...,2].flatten(), length = 0.2, normalize = True)
+# ax.quiver(x_bd3[...,0].flatten(), x_bd3[...,1].flatten(), x_bd3[...,2].flatten(),x_bdn3[...,0].flatten(), x_bdn3[...,1].flatten(), x_bdn3[...,2].flatten(), length = 0.2, normalize = True)
+Ps = geom1(np.linspace(0,1,100)[:,None])
+ax.plot(Ps[:,0],Ps[:,1],Ps[:,2],'r')
 ax.view_init(90,0)
 plt.savefig('3dplot.jpg')
+
+
 
 xint, wint = geom.importance_sampling_3d(40000)
 
@@ -74,31 +79,32 @@ class Model(pinns.PINN):
         super().__init__()
         self.key = rand_key
         self.points = points
-        nl = 32
-        block = stax.serial(stax.FanOut(2),stax.parallel(stax.serial(stax.Dense(nl), stax.Tanh, stax.Dense(nl), stax.Tanh),stax.Dense(nl)),stax.FanInSum)
+        nl = 16
+        activation = stax.Tanh #  stax.elementwise(lambda x: jnp.tanh(x)*x)
+        block = stax.serial(stax.FanOut(2),stax.parallel(stax.serial(stax.Dense(nl), activation, stax.Dense(nl), activation),stax.Dense(nl)),stax.FanInSum)
         #self.add_neural_network('Az', stax.serial(stax.Dense(10), stax.Tanh, stax.Dense(10), stax.Tanh, stax.Dense(10), stax.Tanh, stax.Dense(10), stax.Tanh, stax.Dense(1)), (-1,2))
         #self.add_neural_network('H', stax.serial(stax.Dense(10), stax.Tanh, stax.Dense(10), stax.Tanh, stax.Dense(10), stax.Tanh, stax.Dense(10), stax.Tanh, stax.Dense(2)), (-1,2))
-        self.add_neural_network('B',stax.serial(block,block,block,block,block,block,stax.Tanh,stax.Dense(3)),(-1,3))
-        self.add_neural_network('H',stax.serial(block,block,block,block,block,block,stax.Tanh,stax.Dense(3)),(-1,3))
+        self.add_neural_network('B',stax.serial(block,block,block,block,block,block,block,block,block,block,block,block,stax.Dense(nl), activation,stax.Dense(3)),(-1,3))
+        #self.add_neural_network('H',stax.serial(stax.Dense(nl), stax.Tanh,block,block,block,block,block,block,stax.Dense(nl), stax.Tanh,stax.Dense(nl), stax.Tanh, stax.Dense(nl), stax.Tanh,stax.Dense(3)),(-1,3))
         
     def loss(self, ws):
         
         Bbd = jnp.sum(self.neural_networks['B'](ws['B'],self.points['pts_bd'])*self.points['normals'], -1)
-        Hbd = jnp.sum(self.neural_networks['H'](ws['H'],self.points['pts_bd'])*self.points['normals'], -1)
-        lbd_H = jnp.mean(Bbd**2)
-        lbd_B = jnp.mean(Hbd**2)
+        # Hbd = jnp.sum(self.neural_networks['H'](ws['H'],self.points['pts_bd'])*self.points['normals'], -1)
+        lbd_B = jnp.mean(Bbd**2)
+        # lbd_H = jnp.mean(Hbd**2)
         
-        mu = 10
-        Mat = jnp.array([[0.0,1.0],[-1.0,0.0]])
-        B = self.neural_networks['B'](ws['B'],self.points['pts_in'])
-        H = self.neural_networks['H'](ws['H'],self.points['pts_in'])
-        lmaterial = jnp.mean((B-mu*H)**2)
+        mu = 1
+        # Mat = jnp.array([[0.0,1.0],[-1.0,0.0]])
+        # B = self.neural_networks['B'](ws['B'],self.points['pts_in'])
+        # H = self.neural_networks['H'](ws['H'],self.points['pts_in'])
+        # lmaterial = jnp.mean((B-mu*H)**2)
         
-        lpde1 = jnp.mean((pinns.operators.curl3d(lambda x: self.neural_networks['H'](ws['H'],x))(model.points['pts_in']))**2)
+        lpde1 = jnp.mean((pinns.operators.curl3d(lambda x: (1/mu)*self.neural_networks['B'](ws['B'],x))(model.points['pts_in']))**2)
         lpde2 = jnp.mean((pinns.operators.divergence(lambda x: self.neural_networks['B'](ws['B'],x))(model.points['pts_in']))**2)
         
         lflux = (jnp.sum(self.neural_networks['B'](ws['B'],self.points['pts_flux'])*self.points['nflux'])-0.1)**2
-        return 0.1*(lpde1+lpde2)+lmaterial+10*lbd_H+10*lbd_B+lflux 
+        return 1*(lpde1+lpde2)+10*lbd_B+10*lflux 
 
 rnd_key = jax.random.PRNGKey(123)
 
@@ -116,20 +122,37 @@ def loss_grad(w):
 print('Starting optimization')
 tme = datetime.datetime.now()
 #results = jax.scipy.optimize.minimize(loss_grad, x0 = weights_vector, method = 'bfgs', options = {'maxiter': 10})
-# result = scipy.optimize.minimize(loss_grad, x0 = w0.to_py(), method = 'BFGS', jac = True, tol = 1e-8, options = {'disp' : True, 'maxiter' : 400}, callback = lambda x: print(loss_compiled(x)))
+#result = scipy.optimize.minimize(loss_grad, x0 = w0.to_py(), method = 'BFGS', jac = True, tol = 1e-8, options = {'disp' : True, 'maxiter' : 4000}, callback = lambda x: print(loss_compiled(x)))
 result = scipy.optimize.minimize(loss_grad, x0 = w0.to_py(), method = 'L-BFGS-B', jac = True, tol = 1e-9, options = {'disp' : True, 'maxiter' : 4000, 'iprint': 1})
 weights = model.weights_unravel(jnp.array(result.x))
 tme = datetime.datetime.now() - tme
 
+# opt_init, opt_update, get_params = optimizers.sgd(0.0025)
+# opt_state = opt_init(model.weights)
+# 
+# loss = jax.jit(model.loss)
+# for i in range(10000):
+#     value, grads = jax.value_and_grad(loss)(get_params(opt_state))
+#     opt_state = opt_update(i, grads, opt_state)
+#     print(i,value)
 print()
 print('Elapsed time', tme)
 
-x,y,z = np.meshgrid(np.linspace(0,1,3),np.linspace(0,1,100),np.linspace(0,1,8))
+x,y,z = np.meshgrid(np.linspace(0,1,5),np.linspace(0,1,40),np.linspace(0,1,4))
 xyz = geom(np.concatenate((x.flatten()[:,None],y.flatten()[:,None],z.flatten()[:,None]),1))
 
 B = model.neural_networks['B'](weights['B'], xyz)
 
 fig = plt.figure()
 ax = plt.axes(projection ="3d")
-ax.quiver(xyz[:,0].flatten(), xyz[:,1].flatten(), xyz[:,2].flatten(),B[:,0].flatten(), B[:,1].flatten(), B[:,2].flatten(),colors = plt.get_cmap()(np.sqrt(np.sum(B**2,-1))))
+ax.quiver(xyz[:,0].flatten(), xyz[:,1].flatten(), xyz[:,2].flatten(),B[:,0].flatten(), B[:,1].flatten(), B[:,2].flatten(),colors = plt.cm.jet(np.sqrt(np.sum(B**2,-1))),normalize = True, length = 0.1)
 plt.savefig('3dplot.jpg')
+
+x,y,z = np.meshgrid(np.array([0.5]),np.linspace(0,1,80),np.linspace(0,1,4))
+xyz = geom(np.concatenate((x.flatten()[:,None],y.flatten()[:,None],z.flatten()[:,None]),1))
+
+B = model.neural_networks['B'](weights['B'], xyz)
+
+fig = plt.figure()
+plt.quiver(xyz[:,0].flatten(), xyz[:,1].flatten(),B[:,0].flatten(), B[:,1].flatten(),(np.sqrt(np.sum(B**2,-1))))
+

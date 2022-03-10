@@ -1,12 +1,13 @@
+from ast import arguments
 import jax
 import jax.numpy as jnp
 
-def _aux_curl_2d(J,x):
-    j = J(x)
+def _aux_curl_2d(J,*x):
+    j = J(*x)
     return (j[...,1,0]-j[...,0,1])[...,None]
 
-def _aux_curl_3d(J,x):
-    j = J(x)
+def _aux_curl_3d(J,*x):
+    j = J(*x)
     h1 = 1
     h2 = 1
     h3 = 1
@@ -15,25 +16,25 @@ def _aux_curl_3d(J,x):
     C3 = (j[...,1,0]-j[...,0,1])/(h1*h2)
     return jnp.concatenate((C1[...,None],C2[...,None],C3[...,None]), -1)
 
-def gradient(func):
-    J = jax.vmap(jax.jacfwd(func))
-    return lambda x: J(x)[...,0,:]
+def gradient(func, arg = 0):
+    J = jax.vmap(jax.jacfwd(func, argnums=arg))
+    return lambda *x: J(*x)[...,0,:]
     
-def divergence(func):
-    J = jax.vmap(jax.jacfwd(lambda x: func(x)))
-    return lambda x: jnp.sum(jnp.diagonal(J(x), axis1 = 1, axis2=2), -1, keepdims=True)
+def divergence(func, arg = 0):
+    J = jax.vmap(jax.jacfwd(func, argnums=arg))
+    return lambda *arguments: jnp.sum(jnp.diagonal(J(*arguments), axis1 = 1, axis2=2), -1, keepdims=True)
 
-def laplace(func):
-    H = jax.vmap(jax.hessian(func))
-    return lambda x: jnp.sum(jnp.diagonal(H(x)[:,0,:,:],axis1=1,axis2=2),1)[...,None]
+def laplace(func, arg = 0):
+    H = jax.vmap(jax.hessian(func, argnums=arg))
+    return lambda *x: jnp.sum(jnp.diagonal(H(*x)[:,0,:,:],axis1=1,axis2=2),1)[...,None]
 
-def curl2d(func):
-    J = jax.vmap(jax.jacfwd(func))
-    return lambda x: _aux_curl_2d(J,x)
+def curl2d(func, arg = 0):
+    J = jax.vmap(jax.jacfwd(func, argnums=arg))
+    return lambda *x: _aux_curl_2d(J,*x)
 
-def curl3d(func):
-    J = jax.vmap(jax.jacfwd(func))
-    return lambda x: _aux_curl_3d(J,x)
+def curl3d(func, arg = 0):
+    J = jax.vmap(jax.jacfwd(func, argnums=arg))
+    return lambda *x: _aux_curl_3d(J,*x)
 
 def jacobian(func):
     J = jax.vmap(jax.jacfwd(func))

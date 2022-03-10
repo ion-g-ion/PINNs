@@ -63,7 +63,7 @@ class PatchNURBS(Patch):
         self.basis = basis
         self.knots = knots 
         self.weights = weights
-        self.dembedding = self.d
+        self.dembedding = self.knots.shape[-1]
 
     def __call__(self,y):
           
@@ -96,6 +96,40 @@ class PatchNURBS(Patch):
         
         return s
         
+    def __getitem__(self, key):
+        
+        if len(key) != self.d:
+            raise Exception('Invalid number of dimensions.')
+        
+        basis_new = []
+        knots = self.knots.copy()
+        weights = self.weights.copy()
+        
+        axes = [] 
+        for k, id in enumerate(key):
+            if isinstance(id,int) or isinstance(id,float):
+                if 0<=id and id<=1:
+                    axes.append(k)
+                    
+                    B = self.basis[k](id).flatten()
+                    s = tuple([None]*k+[slice(None,None,None)]+[None]*(self.d-k-1))
+                    B = B[s]
+                    weights = weights*B
+                    
+                else:
+                    raise Exception("Value must me between 0 and 1.")
+            elif isinstance(id,slice):
+                basis_new.append(self.basis[k])
+                
+            else:
+                raise Exception("Only slices and scalars are permitted")
+
+        weights_new = np.sum(weights,axis=tuple(axes))
+        knots_new = np.sum(self.knots*weights[...,None], axis=tuple(axes))
+        knots_new = knots_new/weights_new[...,None]
+        
+               
+        return PatchNURBS(basis_new,knots_new, weights_new, self.rand_key)
         
     def _eval_derivative(self, y, dim):
         Bs = [b(y[:,i], derivative = False) for i,b in enumerate(self.basis)]
@@ -152,6 +186,8 @@ class PatchNURBS(Patch):
         det = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
         
         return Gys, det
+    
+    
 
     def importance_sampling_3d(self, N, pdf = None, bounds = None):
         

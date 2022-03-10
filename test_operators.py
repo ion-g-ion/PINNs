@@ -22,7 +22,27 @@ class TestOperators(unittest.TestCase):
         error = jnp.linalg.norm(gc-gr)
         self.assertLess(error.to_py(),1e-13,"pinns.operators.gradient error: wrong gradient.")
 
+    def test_gradient2(self):
 
+        func_scalar = lambda x,y : 1/jnp.sum(x**2,-1)[...,None] + jnp.sum(y**2,-1)[...,None]
+        grad_referencex = lambda x,y: -2*x/jnp.tile(jnp.sum(x**2,-1)[...,None],x.shape[1])**2
+        grad_referencey = lambda x,y: 2*y
+        
+        grad_computedx = pinns.operators.gradient(func_scalar)
+        grad_computedy = pinns.operators.gradient(func_scalar, arg=1)
+        
+        x = jnp.array(np.random.rand(100,8))
+        y = jnp.array(np.random.rand(100,8))
+        gc = grad_computedx(x,y)
+        gr = grad_referencex(x,y)
+        error = jnp.linalg.norm(gc-gr)
+        self.assertLess(error.to_py(),1e-13,"pinns.operators.gradient error: wrong gradient for 2 arguments (first wrong).")
+        
+        gc = grad_computedy(x,y)
+        gr = grad_referencey(x,y)
+        error = jnp.linalg.norm(gc-gr)
+        self.assertLess(error.to_py(),1e-13,"pinns.operators.gradient error: wrong gradient for 2 arguments (second wrong).")
+        
     def test_laplace(self):
 
         func_scalar = lambda x: (x[...,0]**2+x[...,1]**2+x[...,2]**2+jnp.sin(x[...,1]))[...,None]
@@ -35,6 +55,28 @@ class TestOperators(unittest.TestCase):
         error = jnp.linalg.norm(lc-lr)
         self.assertLess(error.to_py(),1e-13,"pinns.operators.lapalce error: wrong laplace.")
 
+    def test_lapalce2(self):
+
+        func_scalar = lambda x,y: (x[...,0]**2*y[...,0]**2+x[...,1]**2*y[...,0]**2+x[...,2]**2*y[...,0]**2+jnp.sin(x[...,1]))[...,None]
+        laplace_referencex = lambda x,y: (6*y[...,0]**2-jnp.sin(x[:,1]))[...,None]
+        laplace_referencey = lambda x,y: (2*(x[...,0]**2+x[...,1]**2+x[...,2]**2))[...,None]
+        
+        laplace_computedx = pinns.operators.laplace(func_scalar)
+        laplace_computedy = pinns.operators.laplace(func_scalar, arg=1)
+        
+        x = jnp.array(np.random.rand(100,3))
+        y = jnp.array(np.random.rand(100,3))
+        
+        lr = laplace_referencex(x,y)
+        lc = laplace_computedx(x,y)
+        error = jnp.linalg.norm(lc-lr)
+        self.assertLess(error.to_py(),1e-13,"pinns.operators.lapalce error: wrong laplace for 2 arguments (first wrong).")
+        
+        lr = laplace_referencey(x,y)
+        lc = laplace_computedy(x,y)
+        error = jnp.linalg.norm(lc-lr)
+        self.assertLess(error.to_py(),1e-13,"pinns.operators.lapalce error: wrong laplace for 2 arguments (second wrong).")
+        
     def test_divergence(self):
 
         func = lambda x: jnp.concatenate((jnp.sin(x[...,0])[...,None],jnp.exp(2*x[...,1])[...,None]), -1)
