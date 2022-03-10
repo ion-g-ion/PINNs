@@ -8,9 +8,9 @@ def tangent2normal_2d(tangents):
 
 def tangent2normal_3d(tangents):
 
-    result1 = tangents[...,0,1]*tangents[...,1,2]-tangents[...,0,2]*tangents[...,1,1]
-    result2 = tangents[...,0,2]*tangents[...,1,0]-tangents[...,0,0]*tangents[...,1,2]
-    result3 = tangents[...,0,0]*tangents[...,1,1]-tangents[...,0,1]*tangents[...,1,0]
+    result1 = tangents[...,1,0]*tangents[...,2,1]-tangents[...,2,0]*tangents[...,1,1]
+    result2 = tangents[...,2,0]*tangents[...,0,1]-tangents[...,0,0]*tangents[...,2,1]
+    result3 = tangents[...,0,0]*tangents[...,1,1]-tangents[...,1,0]*tangents[...,0,1]
     return np.concatenate((result1[...,None], result2[...,None], result3[...,None]),-1)
 
     
@@ -57,14 +57,18 @@ class PatchParametrized(Patch):
 
 class PatchNURBS(Patch):
 
-    def __init__(self, basis, knots, weights, rand_key):
+    def __init__(self, basis, knots, weights, rand_key, bounds = None):
         super(PatchNURBS, self).__init__(rand_key)
         self.d = len(basis)
         self.basis = basis
         self.knots = knots 
         self.weights = weights
         self.dembedding = self.knots.shape[-1]
-
+        if bounds == None:
+            self.bounds = [(0.0,1.0)]*self.d
+        else:
+            self.bounds = bounds
+            
     def __call__(self,y):
           
         Bs = [b(y[:,i]) for i,b in enumerate(self.basis)]
@@ -102,6 +106,7 @@ class PatchNURBS(Patch):
             raise Exception('Invalid number of dimensions.')
         
         basis_new = []
+        bounds_new = []
         knots = self.knots.copy()
         weights = self.weights.copy()
         
@@ -120,7 +125,9 @@ class PatchNURBS(Patch):
                     raise Exception("Value must me between 0 and 1.")
             elif isinstance(id,slice):
                 basis_new.append(self.basis[k])
-                
+                start = id.start if id.start!=None else 0
+                stop = id.stop if id.stop!=None else 1
+                bounds_new.append((start,stop))
             else:
                 raise Exception("Only slices and scalars are permitted")
 
@@ -129,7 +136,7 @@ class PatchNURBS(Patch):
         knots_new = knots_new/weights_new[...,None]
         
                
-        return PatchNURBS(basis_new,knots_new, weights_new, self.rand_key)
+        return PatchNURBS(basis_new,knots_new, weights_new, self.rand_key, bounds=bounds_new)
         
     def _eval_derivative(self, y, dim):
         Bs = [b(y[:,i], derivative = False) for i,b in enumerate(self.basis)]
@@ -138,12 +145,12 @@ class PatchNURBS(Patch):
         den = np.einsum('im,i...->m...',Bs[0],self.weights)
         for i in range(1,self.d):
             den = np.einsum('im,mi...->m...',Bs[i],den)
-        den = np.tile(den[...,None],self.d)
+        den = np.tile(den[...,None],self.dembedding)
 
         Dden = np.einsum('im,i...->m...',dBs[0],self.weights)
         for i in range(1,self.d):
             Dden = np.einsum('im,mi...->m...',dBs[i],Dden)
-        Dden = np.tile(Dden[...,None],self.d)
+        Dden = np.tile(Dden[...,None],self.dembedding)
 
         xs = np.einsum('im,i...->m...',Bs[0],np.einsum('...i,...->...i',self.knots,self.weights))
         for i in range(1,self.d):
@@ -172,6 +179,32 @@ class PatchNURBS(Patch):
 
         return np.concatenate(tuple(lst),-1)
 
+    def importance_sampling(self, N, pdf = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+            
+        vol_ref = 1.0
+        for i  in self.bounds:
+            vol_ref *= i[1]-i[0]
+            
+        ys = np.random.rand(N,self.d)*np.array([i[1]-i[0] for i in self.bounds]) + np.array([i[0] for i in self.bounds])       
+        Gys = self.__call__(ys)
+        
+        DGys = self._eval_omega(ys)
+        
+        if self.d == 3 and self.dembedding == 3:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
+        elif self.d==2 and self.dembedding == 2:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
+        elif self.d==2 and self.dembedding==3:
+            diff = tangent2normal_3d(DGys)
+        elif self.d==1:
+            diff = DGys[...,:,0] 
+        else:
+            diff = DGys
+        return Gys, diff*vol_ref/N
+        
     def importance_sampling_2d(self, N, pdf = None):
         
         if pdf is None:
@@ -204,6 +237,8 @@ class PatchNURBS(Patch):
         det = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
         det = det/det.size*(bounds[0][1]-bounds[0][0])*(bounds[1][1]-bounds[1][0])*(bounds[2][1]-bounds[2][0])
         
+
+            
         return Gys, det
     
     def sample_inside(self, N, pdf=None):
@@ -217,26 +252,7 @@ class PatchNURBS(Patch):
             # Gy = self.__call__(ys)
         return xs
     
-    def surface_integral_importance(self, N, bounds):
-        
-        y = np.random.rand(N,self.d)
-        y[:,d] = end
-        Bs = [b(y[:,i]) for i,b in enumerate(self.basis)]
-        dBs = [b(y[:,i], derivative  = True) for i,b in enumerate(self.basis)]
-
-        pts = self.__call__(y)
-        pts_tangent = []
-        for i in range(self.d):
-            if i!=d:
-                ds = [False]*self.d
-                ds[i] = True
-                
-                v = self._eval_derivative(y, i)
-                v = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
-                pts_tangent += [v[:,None,:]]
-        #v = self._eval_derivative(y, d)
-        #norm = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
-        return pts, np.concatenate(tuple(pts_tangent),1)#, norm
+    
     
     def sample_boundary(self, d, end, N, normalize=True, pdf=None):
         
