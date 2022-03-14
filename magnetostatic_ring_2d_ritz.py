@@ -32,9 +32,9 @@ geom = pinns.geometry.PatchNURBS([basis1, basis2], knots, weights, None)
 plt.figure()
 plt.scatter(knots[:,:,0].flatten(),knots[:,:,1].flatten())
 
-x_in = geom.sample_inside(2000)
-x_bd1,_ = geom.sample_boundary(1,0,500)
-x_bd2,_ = geom.sample_boundary(1,1,500)
+x_in, ws_in = geom.importance_sampling(10000)
+x_bd1,_ = geom[:,0].importance_sampling(500)
+x_bd2,_ = geom[:,1].importance_sampling(500)
 
 plt.figure()
 plt.scatter(x_in[:,0],x_in[:,1],s=1,c='b')
@@ -53,7 +53,7 @@ class Model(pinns.PINN):
         #self.add_neural_network('Az', stax.serial(stax.Dense(nl), stax.Tanh, stax.Dense(nl), stax.Tanh, stax.Dense(nl), stax.Tanh, stax.Dense(nl), stax.Tanh, stax.Dense(1)), (-1,2))
         #self.add_neural_network('H', stax.serial(stax.Dense(nl), stax.Tanh, stax.Dense(nl), stax.Tanh, stax.Dense(nl), stax.Tanh, stax.Dense(nl), stax.Tanh, stax.Dense(2)), (-1,2))
         self.add_neural_network('Az',stax.serial(block(),block(),block(),block(),block(),block(),block(),block(),block(),block(),block(),block(),stax.Tanh,stax.Dense(1)),(-1,2))
-        self.add_neural_network('H',stax.serial(block(),block(),block(),block(),block(),block(),block(),block(),block(),block(),block(),block(),stax.Tanh,stax.Dense(2)),(-1,2))
+        # self.add_neural_network('H',stax.serial(block(),block(),block(),block(),block(),block(),block(),block(),block(),block(),block(),block(),stax.Tanh,stax.Dense(2)),(-1,2))
     
     def nu(self, B):
         x = B[:,0]**2+B[:,1]**2
@@ -65,21 +65,18 @@ class Model(pinns.PINN):
 
     def loss(self, ws):
         
-        lbd_in = (jnp.mean((self.neural_networks['Az'](ws['Az'], model.points['pts_bd_in'])[:,0] - 0)**2))
-        lbd_out = (jnp.mean((self.neural_networks['Az'](ws['Az'], model.points['pts_bd_out'])[:,0] - 1.0)**2))
+        lbd_in = (jnp.mean((self.neural_networks['Az'](ws['Az'], self.points['pts_bd_in'])[:,0] - 0)**2))
+        lbd_out = (jnp.mean((self.neural_networks['Az'](ws['Az'], self.points['pts_bd_out'])[:,0] - 1.0)**2))
         
+        grad = pinns.operators.gradient(lambda x : self.neural_networks['Az'](ws['Az'],x))(self.points['pts_in'])
+        nu = 1/3
+        lpde = 0.5*nu*jnp.sum(jnp.sum(grad*grad,-1)*self.points['ws_in'])
 
-        Mat = jnp.array([[0.0,1.0],[-1.0,0.0]])
-        B = pinns.operators.jacobian_modified(lambda x: self.neural_networks['Az'](ws['Az'],x),Mat)(model.points['pts_inside'])
-        lmaterial = jnp.mean((self.nu(B)*B-self.neural_networks['H'](ws['H'], model.points['pts_inside']))**2)
-        
-        lpde = jnp.mean((pinns.operators.curl2d(lambda x: self.neural_networks['H'](ws['H'],x))(model.points['pts_inside']))**2)
-        
-        return 1*lpde+lmaterial+10*lbd_in+10*lbd_out
+        return 1*lpde+10*lbd_in+10*lbd_out
 
 rnd_key = jax.random.PRNGKey(123)
 
-model = Model(rnd_key, {'pts_bd_in' : x_bd1, 'pts_bd_out' : x_bd2, 'pts_inside' : x_in})
+model = Model(rnd_key, {'pts_bd_in' : x_bd1, 'pts_bd_out' : x_bd2, 'pts_in' : x_in, 'ws_in' : ws_in})
 
 w0 = model.init_unravel()
 

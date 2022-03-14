@@ -13,6 +13,20 @@ def tangent2normal_3d(tangents):
     result3 = tangents[...,0,0]*tangents[...,1,1]-tangents[...,1,0]*tangents[...,0,1]
     return np.concatenate((result1[...,None], result2[...,None], result3[...,None]),-1)
 
+def normalize(vectors):
+    norms = np.linalg.norm(vectors,axis=-1)
+    return vectors / np.tile(norms[...,None],vectors.shape[-1])
+    
+class AffineTransformation():
+    def __init__(self, Mat, offset):
+        self.Mat = Mat
+        self.offset = offset
+    
+    def __call__(self,points):
+        return np.einsum('...j,ij->...i',points, self.Mat)+self.offset
+    
+    def metric_coefficients(self):
+        pass    
     
 class Patch():
 
