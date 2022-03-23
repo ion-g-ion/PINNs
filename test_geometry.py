@@ -48,14 +48,14 @@ weights = np.array([[1,1],[1/np.sqrt(2),1/np.sqrt(2)],[1,1]])
 
 geom3 = pinns.geometry.PatchNURBS([pinns.bspline.BSplineBasis(np.linspace(0,1,2),2), pinns.bspline.BSplineBasis(np.linspace(0,1,2),1)],knots,weights,key)
 
-pts, ws = geom3.importance_sampling_2d(100000)
+pts, ws = geom3.importance_sampling(32000)
 
 plt.figure()
 plt.scatter(pts[:,0],pts[:,1],s=1)
 plt.scatter(knots[:,:,0][:],knots[:,:,1][:])
 
 S = np.pi*R*R/4-np.pi*r*r/4
-Sc = np.sum(ws)/ws.size
+Sc = np.sum(ws)
 
 Ia = np.pi*(R-r)/2
-Ic = np.sum((1/np.sqrt(pts[:,0]**2+pts[:,1]**2))*ws)/ws.size
+Ic = np.sum((1/np.sqrt(pts[:,0]**2+pts[:,1]**2))*ws)

@@ -164,6 +164,7 @@ class BSplineBasis:
                  return self.dspl[i](x)
             else:
                 return self.spl[i](x)
+            
     def __repr__(self) -> str:
         return 'B-Spline basis of degree '+str(self.deg)+' and dimension '+str(self.N)
      
@@ -178,6 +179,7 @@ class BSplineBasis:
         
     def abscissae(self):
         return self.greville()
+
     def collocation_points(self,mult = 1):
         pts = []
         ws = []
@@ -215,3 +217,18 @@ class BSplineBasis:
                 BI[i,j] = np.sum( self.eval_single(i,pts)*self.eval_single(j,pts)*ws*(b-a)/2 )
                 BI[j,i] = BI[i,j]
         return BII,BI
+    
+import jax.numpy as jnp
+
+class JaxPiecewiseLinear():
+    
+    def __init__(self, knots):
+        self.N = knots.size
+        self.knots = knots
+        
+    def __call__(self, x, dofs):
+        
+        ret = 0*x
+        for i in range(self.N-1):
+            idx = jnp.logical_and(x>=self.konts[i],x<self.knots[i+1])
+            ret = ret.at[idx].set( 1 )

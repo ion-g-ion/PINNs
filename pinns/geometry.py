@@ -79,11 +79,11 @@ class PatchNURBS(Patch):
         self.weights = weights
         self.dembedding = self.knots.shape[-1]
         if bounds == None:
-            self.bounds = [(0.0,1.0)]*self.d
+            self.bounds = [(b.knots[0],b.knots[-1]) for b in self.basis]
         else:
             self.bounds = bounds
             
-    def __call__(self,y):
+    def __call__(self, y, differential=False):
           
         Bs = [b(y[:,i]) for i,b in enumerate(self.basis)]
 
@@ -95,7 +95,27 @@ class PatchNURBS(Patch):
         for i in range(1,self.d):
             xs = np.einsum('im,mi...->m...',Bs[i],xs)
 
-        return np.einsum('...i,...->...i',xs,1/den)
+        Gys = np.einsum('...i,...->...i',xs,1/den)
+        
+        if differential:
+            DGys = self._eval_omega(y)
+            Weights = 1
+            if self.d == 3 and self.dembedding == 3:
+                diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )*Weights
+            elif self.d==2 and self.dembedding == 2:
+                diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])*Weights
+            elif self.d==2 and self.dembedding==3:
+                diff = np.einsum('ij,i->ij',tangent2normal_3d(DGys),Weights)
+            elif self.d==1:
+                diff = DGys[...,:,0]*Weights
+            else:
+                diff = np.einsum('ij,i->ij',DGys,Weights)
+            
+        if differential:
+            return Gys, diff   
+        else: return Gys
+    
+         
 
     def __repr__(self):
         if self.d == 1:
@@ -127,7 +147,7 @@ class PatchNURBS(Patch):
         axes = [] 
         for k, id in enumerate(key):
             if isinstance(id,int) or isinstance(id,float):
-                if 0<=id and id<=1:
+                if self.bounds[k][0]<=id and id<=self.bounds[k][1]:
                     axes.append(k)
                     
                     B = self.basis[k](id).flatten()
@@ -136,11 +156,11 @@ class PatchNURBS(Patch):
                     weights = weights*B
                     
                 else:
-                    raise Exception("Value must me between 0 and 1.")
+                    raise Exception("Value must be inside the domain of the BSpline basis.")
             elif isinstance(id,slice):
                 basis_new.append(self.basis[k])
-                start = id.start if id.start!=None else 0
-                stop = id.stop if id.stop!=None else 1
+                start = id.start if id.start!=None else self.bounds[k][0]
+                stop = id.stop if id.stop!=None else self.bounds[k][1]
                 bounds_new.append((start,stop))
             else:
                 raise Exception("Only slices and scalars are permitted")
@@ -218,7 +238,37 @@ class PatchNURBS(Patch):
         else:
             diff = DGys
         return Gys, diff*vol_ref/N
+     
+    def quadrature(self, N = 32, knots = 'leg'):
         
+       
+       
+            
+        Knots = [(np.polynomial.legendre.leggauss(N)[0]+1)*0.5*(self.bounds[i][1]-self.bounds[i][0])+self.bounds[i][0] for i in range(self.d)]
+        Ws = [np.polynomial.legendre.leggauss(N)[1]*0.5*(self.bounds[i][1]-self.bounds[i][0]) for i in range(self.d)]
+        Knots = np.meshgrid(*Knots)
+        ys = np.concatenate(tuple([k.flatten()[:,None] for k in Knots]),-1)
+        
+        Weights = Ws[0]
+        for i in range(1,self.d):
+            Weights = np.kron(Weights, Ws[i])
+                   
+        Gys = self.__call__(ys)
+        
+        DGys = self._eval_omega(ys)
+        
+        if self.d == 3 and self.dembedding == 3:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )*Weights
+        elif self.d==2 and self.dembedding == 2:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])*Weights
+        elif self.d==2 and self.dembedding==3:
+            diff = np.einsum('ij,i->ij',tangent2normal_3d(DGys),Weights)
+        elif self.d==1:
+            diff = DGys[...,:,0]*Weights
+        else:
+            diff = np.einsum('ij,i->ij',DGys,Weights)
+        return Gys, diff   
+    
     def importance_sampling_2d(self, N, pdf = None):
         
         if pdf is None:

@@ -67,8 +67,7 @@ class Model(pinns.PINN):
         
         lbd_in = (jnp.mean((self.neural_networks['Az'](ws['Az'], model.points['pts_bd_in'])[:,0] - 0)**2))
         lbd_out = (jnp.mean((self.neural_networks['Az'](ws['Az'], model.points['pts_bd_out'])[:,0] - 1.0)**2))
-        
-
+         
         Mat = jnp.array([[0.0,1.0],[-1.0,0.0]])
         B = pinns.operators.jacobian_modified(lambda x: self.neural_networks['Az'](ws['Az'],x),Mat)(model.points['pts_inside'])
         lmaterial = jnp.mean((self.nu(B)*B-self.neural_networks['H'](ws['H'], model.points['pts_inside']))**2)
