@@ -78,8 +78,8 @@ class Model(pinns.PINN):
         u = self.neural_networks['u'](ws['u'],x)
         # v = (jnp.cos(np.pi/2*x[...,0])**2 * jnp.cos(np.pi/2*x[...,1])**2)[...,None]
         v = ((x[...,0] - 1)*(x[...,0] + 0)*(x[...,1] - 1)*(x[...,1] + 0))[...,None]
-        # v = ((x[...,1] - 1)*(x[...,1] + 0))[...,None]
-        w = 0#(x[...,1][...,None])
+        v = ((x[...,1] - 1)*(x[...,1] + 0))[...,None]
+        w = (x[...,1][...,None])
         return u*v+w
     
     def loss_pde(self, ws):
@@ -87,7 +87,7 @@ class Model(pinns.PINN):
         nu = 1/3
         fval = (lambda x : self.solution(ws,x))(self.points['ys']) 
         
-        lpde = 0.5*nu*jnp.dot(jnp.einsum('mi,mij,mj->m',grad,self.points['K'],grad), self.points['ws'])  - jnp.dot(1.0*fval.flatten()*self.points['omega'].flatten(), self.points['ws'])
+        lpde = 0.5*nu*jnp.dot(jnp.einsum('mi,mij,mj->m',grad,self.points['K'],grad), self.points['ws'])  - jnp.dot(0.0*fval.flatten()*self.points['omega'].flatten(), self.points['ws'])
 
         return lpde
 
@@ -98,6 +98,14 @@ class Model(pinns.PINN):
         return lpde#+0*lbd
 
 
+def interface_function2d(nd, endpositive, endzero, nn):
+
+    faux = lambda x: (x-endzero)**2/(endpositive-endzero)**2
+    if nd == 0:
+        fret = lambda ws, x: nn(ws, x[:,1])*faux(x[:,0])
+    else:
+        fret = lambda ws, x: nn(ws, x[:,0])*faux(x[:,1])
+    return fret
 
 rnd_key = jax.random.PRNGKey(123)
 
@@ -173,3 +181,13 @@ plt.figure()
 plt.contourf(xy[:,0].reshape(x.shape), xy[:,1].reshape(x.shape), DGys, levels = 12)
 plt.scatter(xy[:,0],xy[:,1],s=1 , c='r')
 plt.colorbar()
+
+
+t = np.linspace(0,1,1000)
+xy = geom(np.concatenate((t[:,None]*0,t[:,None]),1))
+
+uline = model.solution(weights,np.concatenate((t[:,None]*0+0.5,t[:,None]),1)).flatten()
+
+plt.figure()
+plt.plot(xy[:,0],uline)
+plt.plot(xy[:,0],np.log(xy[:,0]/R)/np.log(r/R))
