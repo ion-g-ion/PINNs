@@ -17,6 +17,16 @@ def _aux_curl_3d(J,*x):
     return jnp.concatenate((C1[...,None],C2[...,None],C3[...,None]), -1)
 
 def gradient(func, arg = 0):
+    """
+    
+
+    Args:
+        func (Callable): function that should be differentiated. The argument that is differentiated with respect to should have the shape 
+        arg (int, optional): the position of the argument that is used for differentiation. Defaults to 0.
+
+    Returns:
+        _type_: _description_
+    """
     J = jax.vmap(jax.jacfwd(func, argnums=arg))
     return lambda *x: J(*x)[...,0,:]
     

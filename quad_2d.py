@@ -147,16 +147,16 @@ class Model(pinns.PINN):
         
     def solution1(self, ws, x):
         # iron
-        u = self.neural_networks['u1'](ws['u1'],x)*0
+        u = self.neural_networks['u1'](ws['u1'],x)
         v = ((x[...,0] - 1)*(x[...,0] + 0)*(x[...,1] - 1))[...,None]
-        w =  self.interface12(ws['u12'],x)
+        w =  self.interface12(ws['u12'],x)*(x[...,0] - 1)[...,None]*(x[...,0] + 0)[...,None] 
         return u*v+w
     
     def solution2(self, ws, x):
         
-        u = self.neural_networks['u2'](ws['u2'],x)*0
+        u = self.neural_networks['u2'](ws['u2'],x)
         v = ((x[...,1] - 1)*(x[...,1] + 0)*(x[...,0] -1))[...,None]
-        w = self.interface21(ws['u12'],x) #+self.interface23(ws['u23'],x)
+        w = self.interface21(ws['u12'],x)*(x[...,1] - 1)[...,None]*(x[...,1] + 0)[...,None] #+ self.interface23(ws['u23'],x)
         return u*v+w
     
     def solution3(self, ws, x):
@@ -198,19 +198,39 @@ u3 = model.solution3(weights, ys).reshape(x.shape)
 
 fig = plt.figure()
 ax = plt.axes(projection ='3d')
-ax.plot_surface(xy1[:,0].reshape(x.shape), xy1[:,1].reshape(x.shape), u1, cmap ='viridis', vmin = -0.3, vmax = 0.3, edgecolor =None)
-ax.plot_surface(xy2[:,0].reshape(x.shape), xy2[:,1].reshape(x.shape), u2, cmap ='viridis', vmin = -0.3, vmax = 0.3, edgecolor =None)
-#ax.plot_surface(xy3[:,0].reshape(x.shape), xy3[:,1].reshape(x.shape), u3, cmap ='viridis', vmin = -0.2, vmax = 0.2, edgecolor =None)
+ax.plot_surface(xy1[:,0].reshape(x.shape), xy1[:,1].reshape(x.shape), u1, cmap ='viridis', vmin = min([u1.min(),u2.min(),u3.min()]), vmax = max([u1.max(),u2.max(),u3.max()]), edgecolor =None)
+ax.plot_surface(xy2[:,0].reshape(x.shape), xy2[:,1].reshape(x.shape), u2, cmap ='viridis', vmin = min([u1.min(),u2.min(),u3.min()]), vmax = max([u1.max(),u2.max(),u3.max()]), edgecolor =None)
+ax.plot_surface(xy3[:,0].reshape(x.shape), xy3[:,1].reshape(x.shape), u3, cmap ='viridis', vmin = min([u1.min(),u2.min(),u3.min()]), vmax = max([u1.max(),u2.max(),u3.max()]), edgecolor =None)
 plt.show()
 
-x1,_ = geom3[0,:].importance_sampling(1000)
-x2,_ = geom3[:,0].importance_sampling(1000)
-x3,_ = geom3[1,:].importance_sampling(1000)
-x4,_ = geom3[:,1].importance_sampling(1000)
+x1,_ = geom2[0,:].importance_sampling(1000)
+x2,_ = geom2[:,0].importance_sampling(1000)
+x3,_ = geom2[1,:].importance_sampling(1000)
+x4,_ = geom2[:,1].importance_sampling(1000)
 
 
 plt.figure()
-plt.scatter(x1[:,0],x1[:,1])
-plt.scatter(x2[:,0],x2[:,1])
-plt.scatter(x3[:,0],x3[:,1])
-plt.scatter(x4[:,0],x4[:,1])
+plt.scatter(x1[:,0],x1[:,1],s=1)
+plt.scatter(x2[:,0],x2[:,1],s=1)
+plt.scatter(x3[:,0],x3[:,1],s=1)
+plt.scatter(x4[:,0],x4[:,1],s=1)
+plt.text(geom2(np.array([[0,0]]))[0,0],geom2(np.array([[0,0]]))[0,1],"(0,0)")
+plt.text(geom2(np.array([[0,1]]))[0,0],geom2(np.array([[0,1]]))[0,1],"(0,1)")
+plt.text(geom2(np.array([[1,0]]))[0,0],geom2(np.array([[1,0]]))[0,1],"(1,0)")
+plt.text(geom2(np.array([[1,1]]))[0,0],geom2(np.array([[1,1]]))[0,1],"(1,1)")
+
+x1,_ = geom1[0,:].importance_sampling(1000)
+x2,_ = geom1[:,0].importance_sampling(1000)
+x3,_ = geom1[1,:].importance_sampling(1000)
+x4,_ = geom1[:,1].importance_sampling(1000)
+
+
+plt.scatter(x1[:,0],x1[:,1],s=1,c='k')
+plt.scatter(x2[:,0],x2[:,1],s=1,c='k')
+plt.scatter(x3[:,0],x3[:,1],s=1,c='k')
+plt.scatter(x4[:,0],x4[:,1],s=1,c='k')
+plt.text(geom1(np.array([[0,0]]))[0,0],geom1(np.array([[0,0]]))[0,1],"(0,0)")
+plt.text(geom1(np.array([[0,1]]))[0,0],geom1(np.array([[0,1]]))[0,1],"(0,1)")
+plt.text(geom1(np.array([[1,0]]))[0,0],geom1(np.array([[1,0]]))[0,1],"(1,0)")
+plt.text(geom1(np.array([[1,1]]))[0,0],geom1(np.array([[1,1]]))[0,1],"(1,1)")
+plt.show()

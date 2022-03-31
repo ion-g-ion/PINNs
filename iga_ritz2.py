@@ -60,7 +60,7 @@ class Model(pinns.PINN):
         
         self.eps1 = 1/1000
         self.eps2 = 1/2
-        self.U = 100
+        self.U = 1
         
     def init_points(self, N):
         
@@ -142,17 +142,17 @@ def loss_grad(w):
 
 tme = datetime.datetime.now()
 #results = jax.scipy.optimize.minimize(loss_grad, x0 = weights_vector, method = 'bfgs', options = {'maxiter': 10})
-# result = scipy.optimize.minimize(loss_grad, x0 = w0.to_py(), method = 'BFGS', jac = True, tol = 1e-8, options = {'disp' : True, 'maxiter' : 400}, callback = lambda x: print(loss_compiled(x)))
-result = scipy.optimize.minimize(loss_grad, x0 = weights.to_py(), method = 'L-BFGS-B', jac = True, tol = 1e-9, options = {'disp' : True, 'maxiter' : 1000, 'iprint': 1})
+result = scipy.optimize.minimize(loss_grad, x0 = w0.to_py(), method = 'BFGS', jac = True, tol = 1e-8, options = {'disp' : True, 'maxiter' : 400}, callback = None)
+# result = scipy.optimize.minimize(loss_grad, x0 = weights.to_py(), method = 'L-BFGS-B', jac = True, tol = 1e-9, options = {'disp' : False, 'maxiter' : 1000, 'iprint': 1})
 tme = datetime.datetime.now() - tme
 
 weights = model.weights_unravel(jnp.array(result.x))
-
+model.weights = weights
 print()
 print('Elapsed time', tme)
 
 
-# opt_init, opt_update, get_params = optimizers.sgd(0.0025)
+# opt_init, opt_update, get_params = optimizers.sgd(0.00025)
 # opt_state = opt_init(model.weights)
 # 
 # loss = jax.jit(model.loss)
