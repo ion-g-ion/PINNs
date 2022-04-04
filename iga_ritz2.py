@@ -23,16 +23,16 @@ r = 0.2
 knots = np.array([ [[R,0],[0.5*(R+r),0],[r,0]] , [[R,R],[0.5*(R+r),0.5*(R+r)],[r,r]] , [[0,R],[0,0.5*(R+r)],[0,r]]  ])
 weights = np.array([[1,1,1],[1/np.sqrt(2),1/np.sqrt(2),1/np.sqrt(2)],[1,1,1]])
 
-geom1 = pinns.geometry.PatchNURBS([pinns.bspline.BSplineBasis(np.linspace(0,1,2),2), pinns.bspline.BSplineBasis(np.linspace(0,1,2),2)],knots,weights,key)
+geom1 = pinns.geometry.PatchNURBS([pinns.bspline.BSplineBasis(np.linspace(-1,1,2),2), pinns.bspline.BSplineBasis(np.linspace(-1,1,2),2)],knots,weights,key)
 
 knots = np.array([ [[Ro,0],[0.5*(Ro+R),0],[R,0]] , [[Ro,Ro],[0.5*(Ro+R),0.5*(Ro+R)],[R,R]] , [[0,Ro],[0,0.5*(Ro+R)],[0,R]]  ])
 weights = np.array([[1,1,1],[1/np.sqrt(2),1/np.sqrt(2),1/np.sqrt(2)],[1,1,1]])
-geom2 = pinns.geometry.PatchNURBS([pinns.bspline.BSplineBasis(np.linspace(0,1,2),2), pinns.bspline.BSplineBasis(np.linspace(0,1,2),2)],knots,weights,key)
+geom2 = pinns.geometry.PatchNURBS([pinns.bspline.BSplineBasis(np.linspace(-1,1,2),2), pinns.bspline.BSplineBasis(np.linspace(-1,1,2),2)],knots,weights,key)
 
 
 def interface_function2d(nd, endpositive, endzero, nn):
 
-    faux = lambda x: ((x-endzero)**2/(endpositive-endzero)**2)
+    faux = lambda x: ((x-endzero)**1/(endpositive-endzero)**1)
     if nd == 0:
         fret = lambda ws, x: (nn(ws, x[...,1][...,None]).flatten()*faux(x[...,0]))[...,None]
     else:
@@ -44,8 +44,8 @@ class Model(pinns.PINN):
         super().__init__()
         self.key = rand_key
 
-        N = [64,64]
-        nl = 8
+        N = [100,100]
+        nl = 64
         
         block = stax.serial(stax.FanOut(2),stax.parallel(stax.serial(stax.Dense(nl), stax.Tanh, stax.Dense(nl), stax.Tanh),stax.Dense(nl)),stax.FanInSum)
     
@@ -55,18 +55,19 @@ class Model(pinns.PINN):
         # self.add_neural_network('u',stax.serial(stax.Dense(nl), stax.Tanh, stax.Dense(nl), stax.Tanh,stax.Dense(nl), stax.Tanh, stax.Dense(nl), stax.Tanh,stax.Dense(nl), stax.Tanh, stax.Dense(nl), stax.Tanh,stax.Dense(1)),(-1,2))
         self.init_points(N)
         
-        self.interface12 = interface_function2d(1,0.0,1.0,self.neural_networks['u12'])
-        self.interface21 = interface_function2d(1,1.0,0.0,self.neural_networks['u12'])
+        self.interface12 = interface_function2d(1,-1.0,1.0,self.neural_networks['u12'])
+        self.interface21 = interface_function2d(1,1.0,-1.0,self.neural_networks['u12'])
         
         self.eps1 = 1/1000
         self.eps2 = 1/2
         self.U = 1
+        self.pow = 1.0 
         
     def init_points(self, N):
         
-        Knots = np.meshgrid(np.polynomial.legendre.leggauss(N[0])[0]*0.5+0.5, np.polynomial.legendre.leggauss(N[1])[0]*0.5+0.5)
+        Knots = np.meshgrid(np.polynomial.legendre.leggauss(N[0])[0]*1+0, np.polynomial.legendre.leggauss(N[1])[0]*1+0)
         ys = np.concatenate(tuple([k.flatten()[:,None] for k in Knots]),-1)
-        Weights = np.kron(np.polynomial.legendre.leggauss(N[0])[1]*0.5, np.polynomial.legendre.leggauss(N[1])[1]*0.5)
+        Weights = np.kron(np.polynomial.legendre.leggauss(N[0])[1]*1, np.polynomial.legendre.leggauss(N[1])[1]*1)
         # ys = np.random.rand(5000,2)*2-1
         # Weights = np.ones((5000))/5000*4
         
@@ -89,7 +90,7 @@ class Model(pinns.PINN):
         u = self.neural_networks['u1'](ws['u1'],x)
         # v = (jnp.cos(np.pi/2*x[...,0])**2 * jnp.cos(np.pi/2*x[...,1])**2)[...,None]
         #v = ((x[...,0] - 1)*(x[...,0] + 0)*(x[...,1] - 1)*(x[...,1] + 0))[...,None]
-        v = ((x[...,1] - 1)*(x[...,1] + 0))[...,None]
+        v = ((1-x[...,1] )*(x[...,1] + 1))[...,None]**(1/self.pow)
         
         w =  self.interface12(ws['u12'],x)
         
@@ -100,8 +101,8 @@ class Model(pinns.PINN):
         u = self.neural_networks['u2'](ws['u2'],x)
         # v = (jnp.cos(np.pi/2*x[...,0])**2 * jnp.cos(np.pi/2*x[...,1])**2)[...,None]
         #v = ((x[...,0] - 1)*(x[...,0] + 0)*(x[...,1] - 1)*(x[...,1] + 0))[...,None]
-        v = ((x[...,1] - 1)*(x[...,1] + 0))[...,None]
-        w = self.interface21(ws['u12'],x) + (1-x[...,1][...,None])*self.U
+        v = ((1-x[...,1] )*(x[...,1] + 1))[...,None]**(1/self.pow)
+        w = self.interface21(ws['u12'],x) + 0.5*(1-x[...,1][...,None])** self.pow *self.U
         return u*v+w
     
     
@@ -142,8 +143,8 @@ def loss_grad(w):
 
 tme = datetime.datetime.now()
 #results = jax.scipy.optimize.minimize(loss_grad, x0 = weights_vector, method = 'bfgs', options = {'maxiter': 10})
-result = scipy.optimize.minimize(loss_grad, x0 = w0.to_py(), method = 'BFGS', jac = True, tol = 1e-8, options = {'disp' : True, 'maxiter' : 400}, callback = None)
-# result = scipy.optimize.minimize(loss_grad, x0 = weights.to_py(), method = 'L-BFGS-B', jac = True, tol = 1e-9, options = {'disp' : False, 'maxiter' : 1000, 'iprint': 1})
+# result = scipy.optimize.minimize(loss_grad, x0 = w0.to_py(), method = 'BFGS', jac = True, tol = 1e-8, options = {'disp' : True, 'maxiter' : 4000}, callback = None)
+result = scipy.optimize.minimize(loss_grad, x0 = weights.to_py(), method = 'L-BFGS-B', jac = True, tol = 1e-9, options = {'disp' : True, 'maxiter' : 1000, 'iprint': 1})
 tme = datetime.datetime.now() - tme
 
 weights = model.weights_unravel(jnp.array(result.x))
@@ -164,7 +165,7 @@ print('Elapsed time', tme)
 # weights = get_params(opt_state)
 # weights = model.weights
 
-x,y = np.meshgrid(np.linspace(0,1,100),np.linspace(0,1,100))
+x,y = np.meshgrid(np.linspace(-1,1,100),np.linspace(-1,1,100))
 ys = np.concatenate((x.flatten()[:,None],y.flatten()[:,None]),1)
 xy1 = geom1(ys)
 xy2 = geom2(ys)
@@ -179,7 +180,7 @@ ax.plot_surface(xy2[:,0].reshape(x.shape), xy2[:,1].reshape(x.shape), u2, cmap =
 plt.show()
 
 
-t = np.linspace(0,1,1000)
+t = np.linspace(-1,1,1000)
 xy1 = geom1(np.concatenate((t[:,None]*0,t[:,None]),1))
 xy2 = geom2(np.concatenate((t[:,None]*0,t[:,None]),1))
 

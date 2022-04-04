@@ -32,7 +32,7 @@ geom2 = pinns.geometry.PatchNURBS([pinns.bspline.BSplineBasis(np.linspace(0,1,2)
 
 def interface_function2d(nd, endpositive, endzero, nn):
 
-    faux = lambda x: ((x-endzero)**2/(endpositive-endzero)**2)
+    faux = lambda x: ((x-endzero)**1/(endpositive-endzero)**1)
     if nd == 0:
         fret = lambda ws, x: (nn(ws, x[...,1][...,None]).flatten()*faux(x[...,0]))[...,None]
     else:
@@ -60,7 +60,8 @@ class Model(pinns.PINN):
         self.eps1 = 1/100
         self.eps2 = 1/2
         self.U = 10
-        
+        self.pow = 1
+
     def init_points(self, N):
         
         Knots = np.meshgrid(np.polynomial.legendre.leggauss(N[0])[0]*0.5+0.5, np.polynomial.legendre.leggauss(N[1])[0]*0.5+0.5)
@@ -92,7 +93,7 @@ class Model(pinns.PINN):
         
         w =  self.interface12(ws['u12'],x)
         
-        return u*v+w
+        return u*v**(1/self.pow)+w
     
     def solution2(self, ws, x):
         
@@ -101,7 +102,7 @@ class Model(pinns.PINN):
         #v = ((x[...,0] - 1)*(x[...,0] + 0)*(x[...,1] - 1)*(x[...,1] + 0))[...,None]
         v = ((x[...,1] - 1)*(x[...,1] + 0))[...,None]
         w = self.interface21(ws['u12'],x) + (1-x[...,1][...,None])*self.U
-        return u*v+w
+        return u*v**(1/self.pow)+w
     
     
     def loss_pde(self, ws):
@@ -123,7 +124,7 @@ class Model(pinns.PINN):
 rnd_key = jax.random.PRNGKey(123)
 
 
-def simmulation( nl = 16, N = [64,64], num_blocks = 2):
+def simmulation( nl = 16, N = [64,64], num_blocks = 1):
     print('Width ',nl,' blocks ',num_blocks)
     results = {'width' : nl, 'blocks' : num_blocks, 'integration_grid_size': N}
     model = Model(rnd_key, nl = nl, N = N, num_blocks = num_blocks)
@@ -144,7 +145,7 @@ def simmulation( nl = 16, N = [64,64], num_blocks = 2):
 
     tme = datetime.datetime.now()
     #results = jax.scipy.optimize.minimize(loss_grad, x0 = weights_vector, method = 'bfgs', options = {'maxiter': 10})
-    result = scipy.optimize.minimize(loss_grad, x0 = w0.to_py(), method = 'BFGS', jac = True, tol = 1e-8, options = {'disp' : True, 'maxiter' : 400}, callback = lambda x: print(loss_compiled(x)))
+    result = scipy.optimize.minimize(loss_grad, x0 = w0.to_py(), method = 'BFGS', jac = True, tol = 1e-8, options = {'disp' : False, 'maxiter' : 400}, callback = lambda x: 1 )
     # result = scipy.optimize.minimize(loss_grad, x0 = weights.to_py(), method = 'L-BFGS-B', jac = True, tol = 1e-11, options = {'disp' : False, 'maxiter' : 4000, 'iprint': 0})
     tme = datetime.datetime.now() - tme
 
