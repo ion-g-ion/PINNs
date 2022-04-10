@@ -78,16 +78,16 @@ class Model(pinns.PINN):
         u = self.neural_networks['u'](ws['u'],x)
         # v = (jnp.cos(np.pi/2*x[...,0])**2 * jnp.cos(np.pi/2*x[...,1])**2)[...,None]
         v = ((x[...,0] - 1)*(x[...,0] + 0)*(x[...,1] - 1)*(x[...,1] + 0))[...,None]
-        v = ((x[...,1] - 1)*(x[...,1] + 0))[...,None]
+        # v = ((x[...,1] - 1)*(x[...,1] + 0))[...,None]
         w = (x[...,1][...,None])
-        return u*v+w
+        return u*v#+w
     
     def loss_pde(self, ws):
         grad = pinns.operators.gradient(lambda x : self.solution(ws,x))(self.points['ys'])
         nu = 1/3
         fval = (lambda x : self.solution(ws,x))(self.points['ys']) 
         
-        lpde = 0.5*nu*jnp.dot(jnp.einsum('mi,mij,mj->m',grad,self.points['K'],grad), self.points['ws'])  - jnp.dot(0.0*fval.flatten()*self.points['omega'].flatten(), self.points['ws'])
+        lpde = 0.5*nu*jnp.dot(jnp.einsum('mi,mij,mj->m',grad,self.points['K'],grad), self.points['ws'])  + jnp.dot(10.0*fval.flatten()*self.points['omega'].flatten(), self.points['ws'])
 
         return lpde
 

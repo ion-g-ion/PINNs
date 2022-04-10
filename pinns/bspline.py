@@ -95,10 +95,18 @@ from scipy.interpolate import BSpline
 import scipy.interpolate
 import numpy as np
 
+
 class BSplineBasis:
     
     def __init__(self,knots,deg,ends = (True,True)):
-        
+        """
+        Univariate BSpline basis class.
+
+        Args:
+            knots (numpy.array): _description_
+            deg (int): _description_
+            ends (tuple, optional): _description_. Defaults to (True,True).
+        """
         self.N=knots.size+deg-1
         self.deg=deg
         self.knots=np.hstack( ( np.ones(deg)*knots[0] , knots , np.ones(deg)*knots[-1] ) )
@@ -180,7 +188,7 @@ class BSplineBasis:
     def abscissae(self):
         return self.greville()
 
-    def collocation_points(self,mult = 1):
+    def quadrature_points(self,mult = 1):
         pts = []
         ws = []
         Pts, Ws = np.polynomial.legendre.leggauss(mult*(self.deg+1))
@@ -217,7 +225,8 @@ class BSplineBasis:
                 BI[i,j] = np.sum( self.eval_single(i,pts)*self.eval_single(j,pts)*ws*(b-a)/2 )
                 BI[j,i] = BI[i,j]
         return BII,BI
-    
+
+
 import jax.numpy as jnp
 
 class JaxPiecewiseLinear():

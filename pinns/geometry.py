@@ -17,6 +17,15 @@ def normalize(vectors):
     norms = np.linalg.norm(vectors,axis=-1)
     return vectors / np.tile(norms[...,None],vectors.shape[-1])
     
+def tensor_product_integration(bases, N):
+    Ks = [b.quadrature_points(n)[0] for b,n in zip(bases,N)]
+    Ws = [b.quadrature_points(n)[1] for b,n in zip(bases,N)]
+    Knots = np.meshgrid(*Ks)
+    points = np.concatenate(tuple([k.flatten()[:,None] for k in Knots]),-1)
+    weights = np.ones((1,))
+    for w in Ws:
+        weights = np.kron(weights,w)
+    return points, weights
 class AffineTransformation():
     def __init__(self, Mat, offset):
         self.Mat = Mat
@@ -243,7 +252,7 @@ class PatchNURBS(Patch):
         
        
        
-            
+        
         Knots = [(np.polynomial.legendre.leggauss(N)[0]+1)*0.5*(self.bounds[i][1]-self.bounds[i][0])+self.bounds[i][0] for i in range(self.d)]
         Ws = [np.polynomial.legendre.leggauss(N)[1]*0.5*(self.bounds[i][1]-self.bounds[i][0]) for i in range(self.d)]
         Knots = np.meshgrid(*Knots)
