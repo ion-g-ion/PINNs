@@ -1,5 +1,3 @@
-from base64 import b16decode
-from sunau import AUDIO_FILE_ENCODING_ADPCM_G721
 import numpy as np
 import jax
 import jax.numpy as jnp
@@ -116,8 +114,8 @@ class Model(pinns.PINN):
         super().__init__()
         self.key = rand_key
 
-        N = [25,25]
-        nl = 4
+        N = [32,32]
+        nl = 8
         acti = stax.Tanh #stax.elementwise(lambda x: jax.nn.relu(x)**2)
         block = stax.serial(stax.FanOut(2),stax.parallel(stax.serial(stax.Dense(nl), acti, stax.Dense(nl), acti),stax.Dense(nl)),stax.FanInSum)
     
@@ -239,7 +237,7 @@ class Model(pinns.PINN):
 
     
 
-rnd_key = jax.random.PRNGKey(123)
+rnd_key = jax.random.PRNGKey(1235)
 model = Model(rnd_key)
 w0 = model.init_unravel()
 weights = model.weights 
@@ -255,7 +253,7 @@ def loss_grad(w):
 
 tme = datetime.datetime.now()
 #results = jax.scipy.optimize.minimize(loss_grad, x0 = weights_vector, method = 'bfgs', options = {'maxiter': 10})
-#result = scipy.optimize.minimize(loss_grad, x0 = w0.to_py(), method = 'BFGS', jac = True, tol = 1e-8, options = {'disp' : True, 'maxiter' : 4000}, callback = None)
+# result = scipy.optimize.minimize(loss_grad, x0 = w0.to_py(), method = 'BFGS', jac = True, tol = 1e-8, options = {'disp' : True, 'maxiter' : 4000}, callback = None)
 result = scipy.optimize.minimize(loss_grad, x0 = w0.to_py(), method = 'L-BFGS-B', jac = True, tol = 1e-9, options = {'disp' : True, 'maxiter' : 2500, 'iprint': 1})
 tme = datetime.datetime.now() - tme
 

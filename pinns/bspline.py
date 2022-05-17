@@ -191,7 +191,7 @@ class BSplineBasis:
     def quadrature_points(self,mult = 1):
         pts = []
         ws = []
-        Pts, Ws = np.polynomial.legendre.leggauss(mult*(self.deg+1))
+        Pts, Ws = np.polynomial.legendre.leggauss(mult)
         for k in range(self.knots.size-1):
             if self.knots[k+1]>self.knots[k]:
                 pts += list(self.knots[k]+(Pts+1)*0.5*(self.knots[k+1]-self.knots[k]))

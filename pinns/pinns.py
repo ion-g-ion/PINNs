@@ -23,7 +23,7 @@ class PINN():
 
     def add_trainable_parameter(self, name, shape):
 
-        self.weights[name] = jax.random.uniform(self.key, shape)
+        self.weights[name] = jax.random.normal(self.key, shape)
 
     def init_unravel(self):
         
@@ -44,11 +44,11 @@ class PINN():
         return l
 
 
-    def lossgrad_handle(self, w):
+    def lossgrad_handle(self, w, *args):
         ws = self.weights_unravel(w)
         
-        l = self.loss(ws)
-        gr = jax.grad(self.loss)(ws)
+        l = self.loss(ws, *args)
+        gr = jax.grad(self.loss)(ws, *args)
         
         gr,_ = jax.flatten_util.ravel_pytree(gr)
         return l, gr
