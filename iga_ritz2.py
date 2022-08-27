@@ -58,7 +58,7 @@ class Model(pinns.PINN):
         self.interface12 = interface_function2d(1,-1.0,1.0,self.neural_networks['u12'])
         self.interface21 = interface_function2d(1,1.0,-1.0,self.neural_networks['u12'])
         
-        self.eps1 = 1/1000
+        self.eps1 = 1/10
         self.eps2 = 1/2
         self.U = 1
         self.pow = 1.0 

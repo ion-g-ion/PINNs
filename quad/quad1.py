@@ -11,7 +11,7 @@ Created on Thu Sep 17 22:17:32 2020
 
 
 from fenics import *
-from mshr import *
+# from mshr import *
 import numpy as np
 import matplotlib.pyplot as plt
 from dolfin_utils.meshconvert import meshconvert
