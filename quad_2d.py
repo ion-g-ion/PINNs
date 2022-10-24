@@ -109,6 +109,15 @@ def interface_function2d(nd, endpositive, endzero, nn):
         fret = lambda ws, x: (nn(ws, x[...,0][...,None]).flatten()*faux(x[...,1]))[...,None]
     return fret
 
+def jump_function2d(nd, pos_y, nn):
+
+    faux = lambda x: jnp.abs(x-pos_y)
+    if nd == 1:
+        fret = lambda ws, x: (nn(ws, x[...,1][...,None]).flatten()*faux(x[...,0]))[...,None]
+    else:
+        fret = lambda ws, x: (nn(ws, x[...,0][...,None]).flatten()*faux(x[...,1]))[...,None]
+    return fret
+
 class Model(pinns.PINN):
     def __init__(self, rand_key):
         super().__init__()
@@ -128,6 +137,9 @@ class Model(pinns.PINN):
         self.add_neural_network('u23',stax.serial(block, block, block, stax.Dense(1)),(-1,1))
         self.add_neural_network('u14',stax.serial(block, block, block, stax.Dense(1)),(-1,1))
         self.add_neural_network('u34',stax.serial(block, block, block, stax.Dense(1)),(-1,1))
+        self.add_neural_network('u1_0.3',stax.serial(block, block, block, stax.Dense(1)),(-1,1))
+        self.add_neural_network('u1_0.7',stax.serial(block, block, block, stax.Dense(1)),(-1,1))
+        
         self.add_trainable_parameter('u123',(1,))
         self.add_trainable_parameter('u134',(1,))
         self.init_points(N)
@@ -142,6 +154,10 @@ class Model(pinns.PINN):
         self.interface41 = interface_function2d(1,1.0,0.0,self.neural_networks['u14'])
         self.interface34 = interface_function2d(1,0.0,1.0,self.neural_networks['u34'])
         self.interface43 = interface_function2d(0,1.0,0.0,self.neural_networks['u34'])
+        
+        self.jump1 = jump_function2d(0, 0.3, self.neural_networks['u1_0.3'])
+        self.jump2 = jump_function2d(0, 0.7, self.neural_networks['u1_0.7'])
+         
         self.mu0 = 1.0
         self.mur = 1/100
         self.J0 = 1000
@@ -188,7 +204,7 @@ class Model(pinns.PINN):
 
     def solution1(self, ws, x):
         # iron
-        u = self.neural_networks['u1'](ws['u1'],x)
+        u = self.neural_networks['u1'](ws['u1'],x) + self.jump1(ws['u1_0.3'], x) + self.jump2(ws['u1_0.7'], x)
         v = ((1-x[...,0])*(x[...,0] + 0)*(1-x[...,1])*(x[...,1]+0))[...,None]
         w =  self.interface12(ws['u12'],x)*((1-x[...,0])*(x[...,0] + 0))[...,None] + self.interface13(ws['u13'],x)*(1-x[...,1])[...,None]*(x[...,1] + 0)[...,None] +  self.interface14(ws['u14'],x) * ((1-x[...,0])*(x[...,0] + 0))[...,None]
         w = w + ws['u123']*( x[...,0] * x[...,1] )[...,None] + ws['u134'] *  ( (x[...,0] - 0)*(1-x[...,1]) )[...,None]
