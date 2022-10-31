@@ -26,6 +26,7 @@ def tensor_product_integration(bases, N):
     for w in Ws:
         weights = np.kron(weights,w)
     return points, weights
+    
 class AffineTransformation():
     def __init__(self, Mat, offset):
         self.Mat = Mat
