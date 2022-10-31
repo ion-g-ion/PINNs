@@ -24,7 +24,7 @@ def tensor_product_integration(bases, N):
     points = np.concatenate(tuple([k.flatten()[:,None] for k in Knots]),-1)
     weights = np.ones((1,))
     for w in Ws:
-        weights = np.kron(weights,w)
+        weights = np.kron(w,weights)
     return points, weights
     
 class AffineTransformation():

@@ -9,6 +9,7 @@ import jax.scipy.optimize
 import jax.flatten_util
 import scipy
 import scipy.optimize
+import chaospy as cp 
 
 from jax.config import config
 config.update("jax_enable_x64", True)
@@ -121,7 +122,7 @@ class Model(pinns.PINN):
         super().__init__()
         self.key = rand_key
 
-        N = [64,64]
+        N = [32,32]
         nl = 8
         acti = stax.Tanh #stax.elementwise(lambda x: jax.nn.relu(x)**2)
         block = stax.serial(stax.FanOut(2),stax.parallel(stax.serial(stax.Dense(nl), acti, stax.Dense(nl), acti),stax.Dense(nl)),stax.FanInSum)
@@ -163,8 +164,12 @@ class Model(pinns.PINN):
     def init_points(self, N):        
 
         self.points = {}
+        ys,Weights = cp.quadrature.sparse_grid(10,cp.J(cp.Uniform(-1,1),cp.Uniform(-1,1)),rule=["fejer_2", "fejer_2"])
 
-        ys, Weights = pinns.geometry.tensor_product_integration(geom1.basis, N)
+        Weights = Weights*4
+        ys = np.transpose(ys)
+
+        # ys, Weights = pinns.geometry.tensor_product_integration(geom1.basis, N)
         self.points['ys1'] = ys
         self.points['ws1'] = Weights
         DGys = geom1._eval_omega(ys)
@@ -173,7 +178,7 @@ class Model(pinns.PINN):
         self.points['K1'] = np.einsum('mij,mjk,m->mik',Inv,np.transpose(Inv,[0,2,1]),det)
         self.points['omega1'] = det
        
-        ys, Weights = pinns.geometry.tensor_product_integration(geom2.basis, N)
+        # ys, Weights = pinns.geometry.tensor_product_integration(geom2.basis, N)
         self.points['ys2'] = ys
         self.points['ws2'] = Weights
         DGys = geom2._eval_omega(ys)
@@ -182,7 +187,7 @@ class Model(pinns.PINN):
         self.points['K2'] = np.einsum('mij,mjk,m->mik',Inv,np.transpose(Inv,[0,2,1]),det)
         self.points['omega2'] = det
         
-        ys, Weights = pinns.geometry.tensor_product_integration(geom3.basis, N)
+        # ys, Weights = pinns.geometry.tensor_product_integration(geom3.basis, N)
         self.points['ys3'] = ys
         self.points['ws3'] = Weights
         DGys = geom3._eval_omega(ys)
@@ -191,7 +196,7 @@ class Model(pinns.PINN):
         self.points['K3'] = np.einsum('mij,mjk,m->mik',Inv,np.transpose(Inv,[0,2,1]),det)
         self.points['omega3'] = det
        
-        ys, Weights = pinns.geometry.tensor_product_integration(geom4.basis, N)
+        # ys, Weights = pinns.geometry.tensor_product_integration(geom4.basis, N)
         self.points['ys4'] = ys
         self.points['ws4'] = Weights
         DGys = geom4._eval_omega(ys)
@@ -462,7 +467,7 @@ class FEM():
         CG = fn.FunctionSpace(mesh, 'CG', 1) # Continuous Galerkin
         
         # Define boundary condition
-        bc = fn.DirichletBC(CG, fn.Constant(0.0), boundaries,1)
+        bc = fn.DirichletBC(CG, fn.Constant(0.0), boundaries,16)
         
         # Define subdomain markers and integration measure
         dx = fn.Measure('dx', domain=mesh, subdomain_data=domains)
@@ -543,6 +548,7 @@ class FEM():
     
 fem = FEM(mu0=model.mu0,mur=model.mur,J0 = model.J0,meshsize = 0.00025)
 
+print('Copper IGA area: ',np.sum(model.points['ws3']*model.points['omega3']))
 u1_ref = fem.call_A(xy1[:,0],xy1[:,1]).reshape(x.shape)
 u2_ref = fem.call_A(xy2[:,0],xy2[:,1]).reshape(x.shape)
 u3_ref = fem.call_A(xy3[:,0],xy3[:,1]).reshape(x.shape)
