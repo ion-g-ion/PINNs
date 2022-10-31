@@ -52,6 +52,7 @@ def create_geometry(key, scale = 1):
     geom1 = pinns.geometry.PatchNURBS([basis1, basis2], knots, weights, key)
    
     knots2 = np.array([ [ [Dc,0],[Dc+blc,0],[Di-bli,0],[Di,0] ] , [[Dc,hc],[Dc+blc,hi],[Di-bli,hi],[Di,hi-bli]] ]) 
+    print(knots2)
     knots2 = knots2[:,::-1,:]
     weights = np.ones(knots2.shape[:2])
     
@@ -90,15 +91,12 @@ plt.scatter(pts[:,0], pts[:,1], s = 1)
 
 pts = geom2.sample_inside(10000)
 plt.scatter(pts[:,0],pts[:,1], s = 1)
-plt.show()
 
 pts = geom3.sample_inside(10000)
 plt.scatter(pts[:,0],pts[:,1], s = 1)
-plt.show()
 
 pts = geom4.sample_inside(10000)
 plt.scatter(pts[:,0],pts[:,1], s = 1)
-plt.show()
 
 def interface_function2d(nd, endpositive, endzero, nn):
 
@@ -123,7 +121,7 @@ class Model(pinns.PINN):
         super().__init__()
         self.key = rand_key
 
-        N = [32,32]
+        N = [64,64]
         nl = 8
         acti = stax.Tanh #stax.elementwise(lambda x: jax.nn.relu(x)**2)
         block = stax.serial(stax.FanOut(2),stax.parallel(stax.serial(stax.Dense(nl), acti, stax.Dense(nl), acti),stax.Dense(nl)),stax.FanInSum)
@@ -159,7 +157,7 @@ class Model(pinns.PINN):
         self.jump2 = jump_function2d(0, 0.7, self.neural_networks['u1_0.7'])
          
         self.mu0 = 1.0
-        self.mur = 1/100
+        self.mur = 100
         self.J0 = 1000
 
     def init_points(self, N):        
@@ -204,7 +202,7 @@ class Model(pinns.PINN):
 
     def solution1(self, ws, x):
         # iron
-        u = self.neural_networks['u1'](ws['u1'],x) + self.jump1(ws['u1_0.3'], x) + self.jump2(ws['u1_0.7'], x)
+        u = self.neural_networks['u1'](ws['u1'],x) # + self.jump1(ws['u1_0.3'], x) + self.jump2(ws['u1_0.7'], x)
         v = ((1-x[...,0])*(x[...,0] + 0)*(1-x[...,1])*(x[...,1]+0))[...,None]
         w =  self.interface12(ws['u12'],x)*((1-x[...,0])*(x[...,0] + 0))[...,None] + self.interface13(ws['u13'],x)*(1-x[...,1])[...,None]*(x[...,1] + 0)[...,None] +  self.interface14(ws['u14'],x) * ((1-x[...,0])*(x[...,0] + 0))[...,None]
         w = w + ws['u123']*( x[...,0] * x[...,1] )[...,None] + ws['u134'] *  ( (x[...,0] - 0)*(1-x[...,1]) )[...,None]
@@ -240,10 +238,10 @@ class Model(pinns.PINN):
         grad4 = pinns.operators.gradient(lambda x : self.solution4(ws,x))(self.points['ys4'])[...,0,:]
         
         
-        lpde1 = 0.5*(self.mu0*self.mur)*jnp.dot(jnp.einsum('mi,mij,mj->m',grad1,self.points['K1'],grad1), self.points['ws1']) 
-        lpde2 = 0.5*self.mu0*jnp.dot(jnp.einsum('mi,mij,mj->m',grad2,self.points['K2'],grad2), self.points['ws2'])  
-        lpde3 = 0.5*self.mu0*jnp.dot(jnp.einsum('mi,mij,mj->m',grad3,self.points['K3'],grad3), self.points['ws3'])  - jnp.dot(self.J0*self.solution3(ws,self.points['ys3']).flatten()*self.points['omega3']  ,self.points['ws3'])
-        lpde4 = 0.5*(self.mu0*self.mur)*jnp.dot(jnp.einsum('mi,mij,mj->m',grad4,self.points['K4'],grad4), self.points['ws4']) 
+        lpde1 = 0.5*1/(self.mu0*self.mur)*jnp.dot(jnp.einsum('mi,mij,mj->m',grad1,self.points['K1'],grad1), self.points['ws1']) 
+        lpde2 = 0.5*1/self.mu0*jnp.dot(jnp.einsum('mi,mij,mj->m',grad2,self.points['K2'],grad2), self.points['ws2'])  
+        lpde3 = 0.5*1/self.mu0*jnp.dot(jnp.einsum('mi,mij,mj->m',grad3,self.points['K3'],grad3), self.points['ws3'])  - jnp.dot(self.J0*self.solution3(ws,self.points['ys3']).flatten()*self.points['omega3']  ,self.points['ws3'])
+        lpde4 = 0.5*1/(self.mu0*self.mur)*jnp.dot(jnp.einsum('mi,mij,mj->m',grad4,self.points['K4'],grad4), self.points['ws4']) 
         return lpde1+lpde2+lpde3+lpde4
 
     def loss(self, ws):
@@ -266,6 +264,11 @@ print('Starting optimization')
 def loss_grad(w):
     l, gr = lossgrad_compiled(jnp.array(w))
     return np.array( l.to_py() ), np.array( gr.to_py() ) 
+
+tme = datetime.datetime.now()
+loss_grad(w0)
+tme = datetime.datetime.now() - tme 
+print('Compile time ', tme)
 
 tme = datetime.datetime.now()
 #results = jax.scipy.optimize.minimize(loss_grad, x0 = weights_vector, method = 'bfgs', options = {'maxiter': 10})
@@ -310,7 +313,6 @@ ax.plot_surface(xy2[:,0].reshape(x.shape), xy2[:,1].reshape(x.shape), u2, cmap =
 ax.plot_surface(xy3[:,0].reshape(x.shape), xy3[:,1].reshape(x.shape), u3, cmap ='viridis', vmin = min([u1.min(),u2.min(),u3.min(),u4.min()]), vmax = max([u1.max(),u2.max(),u3.max(),u4.max()]), edgecolor =None)
 ax.plot_surface(xy4[:,0].reshape(x.shape), xy4[:,1].reshape(x.shape), u4, cmap ='viridis', vmin = min([u1.min(),u2.min(),u3.min(),u4.min()]), vmax = max([u1.max(),u2.max(),u3.max(),u4.max()]), edgecolor =None)
 ax.view_init(90,0)
-plt.show()
 
 plt.figure()
 ax = plt.gca()
@@ -318,7 +320,6 @@ ax.contourf(xy1[:,0].reshape(x.shape), xy1[:,1].reshape(x.shape), u1, levels = 1
 ax.contourf(xy2[:,0].reshape(x.shape), xy2[:,1].reshape(x.shape), u2, levels = 100, vmin = min([u1.min(),u2.min(),u3.min(),u4.min()]), vmax = max([u1.max(),u2.max(),u3.max(),u4.max()]))
 ax.contourf(xy3[:,0].reshape(x.shape), xy3[:,1].reshape(x.shape), u3, levels = 100, vmin = min([u1.min(),u2.min(),u3.min(),u4.min()]), vmax = max([u1.max(),u2.max(),u3.max(),u4.max()]))
 ax.contourf(xy4[:,0].reshape(x.shape), xy4[:,1].reshape(x.shape), u4, levels = 100, vmin = min([u1.min(),u2.min(),u3.min(),u4.min()]), vmax = max([u1.max(),u2.max(),u3.max(),u4.max()]))
-
 
 
 x1,_ = geom2[0,:].importance_sampling(1000)
@@ -351,7 +352,6 @@ plt.text(geom1(np.array([[0,0]]))[0,0],geom1(np.array([[0,0]]))[0,1],"(0,0)")
 plt.text(geom1(np.array([[0,1]]))[0,0],geom1(np.array([[0,1]]))[0,1],"(0,1)")
 plt.text(geom1(np.array([[1,0]]))[0,0],geom1(np.array([[1,0]]))[0,1],"(1,0)")
 plt.text(geom1(np.array([[1,1]]))[0,0],geom1(np.array([[1,1]]))[0,1],"(1,1)")
-plt.show()
 
 x1,_ = geom3[0,:].importance_sampling(1000)
 x2,_ = geom3[:,0].importance_sampling(1000)
@@ -367,7 +367,6 @@ plt.text(geom3(np.array([[0,0]]))[0,0],geom3(np.array([[0,0]]))[0,1],"(0,0)")
 plt.text(geom3(np.array([[0,1]]))[0,0],geom3(np.array([[0,1]]))[0,1],"(0,1)")
 plt.text(geom3(np.array([[1,0]]))[0,0],geom3(np.array([[1,0]]))[0,1],"(1,0)")
 plt.text(geom3(np.array([[1,1]]))[0,0],geom3(np.array([[1,1]]))[0,1],"(1,1)")
-plt.show()
 
 x1,_ = geom4[0,:].importance_sampling(1000)
 x2,_ = geom4[:,0].importance_sampling(1000)
@@ -383,4 +382,194 @@ plt.text(geom4(np.array([[0,0]]))[0,0],geom4(np.array([[0,0]]))[0,1],"(0,0)")
 plt.text(geom4(np.array([[0,1]]))[0,0],geom4(np.array([[0,1]]))[0,1],"(0,1)")
 plt.text(geom4(np.array([[1,0]]))[0,0],geom4(np.array([[1,0]]))[0,1],"(1,0)")
 plt.text(geom4(np.array([[1,1]]))[0,0],geom4(np.array([[1,1]]))[0,1],"(1,1)")
-plt.show()
+
+
+#%% Fenics
+
+import fenics as fn
+import matplotlib.pyplot as plt
+from dolfin_utils.meshconvert import meshconvert
+import os
+from subprocess import call
+
+def curl2D(v):
+    return fn.as_vector((v.dx(1),-v.dx(0)))
+
+class FEM():
+            
+    def __init__(self,J0=1000.0,mu0=1.0,mur=10.0, k1=0.001, k2=1.65, k3 = 0.5, meshsize = 0.001, verb = False):
+        path='./quad/'
+        
+        with open(path + 'quad.geo', 'r') as file:
+            data = file.read()
+            
+        s = "meshsize=%.18f;\n"%(meshsize)
+        
+        s = s + data
+        
+        with  open(path+"tmp.geo", "w") as file:
+            file.write(s)
+            file.close()
+        if verb: print('geo file created',flush = True)
+        
+        if verb:
+            os.system('gmsh %stmp.geo -nt 20 -3 -o %stmp.msh -format msh2 '%(path,path))
+        else:
+            os.system('gmsh %stmp.geo -nt 20 -3 -o %stmp.msh -format msh2 >/dev/null 2>&1'%(path,path))
+        if verb: print('mesh file created',flush=True)
+
+        if verb:
+            os.system('dolfin-convert %stmp.msh %stmp.xml'%(path,path))
+        else:
+            os.system('dolfin-convert %stmp.msh %stmp.xml >/dev/null 2>&1'%(path,path))
+        
+        if verb: print('mesh file converted in fenics format',flush=True) 
+
+        mesh = fn.Mesh(path+'tmp.xml')
+        domains = fn.MeshFunction("size_t", mesh, path+'tmp_physical_region.xml')
+        boundaries = fn.MeshFunction('size_t', mesh, path+'tmp_facet_region.xml')
+
+        self.mesh = mesh
+        ncells = [  mesh.num_vertices(), mesh.num_edges(), mesh.num_faces(), mesh.num_facets(), mesh.num_cells() ]
+        
+        def nu_lin(az):
+            return 1/(mu0*mur)
+        def nonlin_nu(az):
+            tmp =  k1*fn.exp(k2*fn.dot(az.dx(1),az.dx(1)))+k3
+            return tmp
+        
+        def nu_Bauer(B):
+            x = fn.dot(B,B)
+            return k1*fn.exp(k2*x)+k3
+        
+        # Coil
+        def setup_coil(mesh,subdomains):
+            DG = fn.FunctionSpace(mesh,"DG",0)
+            J = fn.Function(DG)
+            idx = []
+            for cell_no in range(len(subdomains.array())):
+                subdomain_no = subdomains.array()[cell_no]
+                if subdomain_no == 3:
+                    idx.append(cell_no)
+            J.vector()[:] = 0
+            J.vector()[idx] = J0
+            return J
+        
+    
+        
+        """ define function space and boundary conditions"""
+        
+        CG = fn.FunctionSpace(mesh, 'CG', 1) # Continuous Galerkin
+        
+        # Define boundary condition
+        bc = fn.DirichletBC(CG, fn.Constant(0.0), boundaries,1)
+        
+        # Define subdomain markers and integration measure
+        dx = fn.Measure('dx', domain=mesh, subdomain_data=domains)
+        
+        J = setup_coil(mesh, domains)
+        
+        class Nu(fn.UserExpression): # UserExpression instead of Expression
+            def __init__(self, markers, **kwargs):
+                super().__init__(**kwargs) # This part is new!
+                self.markers = markers
+            def eval_cell(self, values, x, cell):
+                if self.markers[cell.index] == 1:
+                    values[0] = 0.0   # iron
+                elif self.markers[cell.index] == 2:
+                    values[0] = 1/mu0      # air
+                elif self.markers[cell.index] == 3:
+                    values[0] = 1/mu0      # air
+                else:
+                    print('no such domain',self.markers[cell.index] )
+                    
+        nus = Nu(domains, degree=1)
+        
+        
+        """ weak formulation """
+        
+        az  = fn.Function(CG)
+        u  = fn.Function(CG)
+        v  = fn.TestFunction(CG)
+        #az = Function(CG)
+        #a  = (1/mu)*dot(grad(az), grad(v))*dx
+        a = fn.inner(nus*curl2D(u), curl2D(v))*dx + fn.inner(nu_lin(curl2D(u))*curl2D(u),curl2D(v))*dx(1)
+        L  = J*v*dx(3)
+        
+        F = a - L
+        # solve variational problem
+        fn.solve(F == 0, u, bc)
+        az = u
+        self.az = az
+        # function space for H- and B- field allocated on faces of elements
+        W = fn.VectorFunctionSpace(mesh, fn.FiniteElement("DP", fn.triangle, 0),1)
+        B = fn.project(curl2D(az), W)
+        H = None# project((1/mu)*curl(az), W)
+        self.B = B
+        self.H = H
+
+        print('Copper surface ', fn.assemble(fn.Constant(1.0)*dx(3)))
+    
+    def call_A(self,x_eval,y_eval):
+        
+        
+        Afem = 0 * x_eval
+        for i in range(x_eval.size):
+            try:
+                Afem[i] = self.az(x_eval[i],y_eval[i])
+            except:
+                Afem[i] = np.nan
+        return Afem
+    
+    def call_B(self,x_eval,y_eval):
+        
+        
+        Bfem = []
+        for i in range(x_eval.size):
+            try:
+                Bfem.append(self.B(x_eval[i],y_eval[i]))
+            except:
+                Bfem.append([ np.nan , np.nan])
+        return np.array(Bfem)
+    
+    def call_H(self,x_eval,y_eval):
+        Hfem = []
+        for i in range(x_eval.size):
+            try:
+                Hfem.append(self.H(x_eval[i],y_eval[i]))
+            except:
+                Hfem.append([ np.nan , np.nan])
+        return np.array(Hfem)
+    
+fem = FEM(mu0=model.mu0,mur=model.mur,J0 = model.J0,meshsize = 0.00025)
+
+u1_ref = fem.call_A(xy1[:,0],xy1[:,1]).reshape(x.shape)
+u2_ref = fem.call_A(xy2[:,0],xy2[:,1]).reshape(x.shape)
+u3_ref = fem.call_A(xy3[:,0],xy3[:,1]).reshape(x.shape)
+u4_ref = fem.call_A(xy4[:,0],xy4[:,1]).reshape(x.shape)
+
+plt.figure()
+ax = plt.gca()
+plt.contourf(xy1[:,0].reshape(x.shape), xy1[:,1].reshape(x.shape), u1_ref, levels = 100, vmin = min([u1_ref.min(),u2_ref.min(),u3_ref.min(),u4_ref.min()]), vmax = max([u1_ref.max(),u2_ref.max(),u3_ref.max(),u4_ref.max()]))
+plt.contourf(xy2[:,0].reshape(x.shape), xy2[:,1].reshape(x.shape), u2_ref, levels = 100, vmin = min([u1_ref.min(),u2_ref.min(),u3_ref.min(),u4_ref.min()]), vmax = max([u1_ref.max(),u2_ref.max(),u3_ref.max(),u4_ref.max()]))
+plt.contourf(xy3[:,0].reshape(x.shape), xy3[:,1].reshape(x.shape), u3_ref, levels = 100, vmin = min([u1_ref.min(),u2_ref.min(),u3_ref.min(),u4_ref.min()]), vmax = max([u1_ref.max(),u2_ref.max(),u3_ref.max(),u4_ref.max()]))
+plt.contourf(xy4[:,0].reshape(x.shape), xy4[:,1].reshape(x.shape), u4_ref, levels = 100, vmin = min([u1_ref.min(),u2_ref.min(),u3_ref.min(),u4_ref.min()]), vmax = max([u1_ref.max(),u2_ref.max(),u3_ref.max(),u4_ref.max()]))
+plt.colorbar()
+
+delta1 = np.abs(u1-u1_ref)
+delta2 = np.abs(u2-u2_ref)
+delta3 = np.abs(u3-u3_ref)
+delta4 = np.abs(u4-u4_ref)
+
+plt.figure()
+ax = plt.gca()
+plt.contourf(xy2[:,0].reshape(x.shape), xy2[:,1].reshape(x.shape), delta2, levels = 100, vmin = min([delta1.min(),delta2.min(),delta3.min(),delta4.min()]), vmax = max([delta1.max(),delta2.max(),delta3.max(),delta4.max()]))
+plt.contourf(xy3[:,0].reshape(x.shape), xy3[:,1].reshape(x.shape), delta3, levels = 100, vmin = min([delta1.min(),delta2.min(),delta3.min(),delta4.min()]), vmax = max([delta1.max(),delta2.max(),delta3.max(),delta4.max()]))
+plt.contourf(xy4[:,0].reshape(x.shape), xy4[:,1].reshape(x.shape), delta4, levels = 100, vmin = min([delta1.min(),delta2.min(),delta3.min(),delta4.min()]), vmax = max([delta1.max(),delta2.max(),delta3.max(),delta4.max()]))
+plt.contourf(xy1[:,0].reshape(x.shape), xy1[:,1].reshape(x.shape), delta1, levels = 100, vmin = min([delta1.min(),delta2.min(),delta3.min(),delta4.min()]), vmax = max([delta1.max(),delta2.max(),delta3.max(),delta4.max()]))
+plt.colorbar()
+plt.xlabel(r'$x_1$')
+plt.ylabel(r'$x_2$')
+plt.savefig('error_pinn.eps')
+print(max([np.max(delta1),np.max(delta2),np.max(delta3),np.max(delta4)]))
+# %%
