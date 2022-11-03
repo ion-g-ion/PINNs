@@ -228,6 +228,7 @@ class BSplineBasis:
 
 
 import jax.numpy as jnp
+import jax 
 
 class JaxPiecewiseLinear():
     
@@ -241,3 +242,92 @@ class JaxPiecewiseLinear():
         for i in range(self.N-1):
             idx = jnp.logical_and(x>=self.konts[i],x<self.knots[i+1])
             ret = ret.at[idx].set( 1 )
+
+
+class BSplineBasisJAX():
+    
+    def __init__(self, knots, deg):
+        self.deg = deg
+        self.n = knots.size+deg-1
+        self.knots = jnp.array(np.concatenate(( np.ones(deg)*knots[0], knots , np.ones(deg)*knots[-1] )))
+        
+    def _eval_basis(self, x):
+
+        result = jnp.zeros((x.shape[0],self.knots.size-1))
+        
+        for i in range(result.shape[1]):
+            if self.knots[-1]<=self.knots[i+1] and self.knots[i]<self.knots[-1]:
+                idx = jnp.logical_and(x>=self.knots[i], x<=self.knots[i+1]) 
+            else:
+                idx = jnp.logical_and(x>=self.knots[i], x<self.knots[i+1])
+            result = result.at[idx,i].set(1.0)
+            # result[idx,i] = 1.0
+        
+        for d in range(self.deg):
+            for i in range(result.shape[1]-d-1):
+                a = result[:,i]*(x-self.knots[i])/(self.knots[i+d+1]-self.knots[i])
+                b = result[:,i+1]*(self.knots[i+d+2]-x)/(self.knots[i+d+2]-self.knots[i+1])
+                result_new = result.copy()
+                result_new = result_new.at[:,i].set(0.0)
+                # result_new[:,i] = 0.0
+                if (self.knots[i+d+1]-self.knots[i]) != 0:
+                    result_new = result_new.at[:,i].set( result_new[:,i] + a )
+                    # result_new[:,i] = result_new[:,i] + a
+                if (self.knots[i+d+2]-self.knots[i+1])!=0:
+                    result_new = result_new.at[:,i].set( result_new[:,i] + b )
+                    # result_new[:,i] = result_new[:,i] + b
+                result = result_new.copy() 
+        # result[x==self.knots[-1],self.n-1] = 1.0
+        return result[:,:self.n]
+           
+    def _eval_basis_derivative(self,x):
+
+        result = np.zeros((x.shape[0],self.knots.size-1))
+        
+        for i in range(result.shape[1]):
+            idx = np.logical_and(x>=self.knots[i], x<=self.knots[i+1]) if self.knots[-1]<=self.knots[i+1] and self.knots[i]<self.knots[-1] else jnp.logical_and(x>=self.knots[i], x<self.knots[i+1])
+            # result = result.at[idx,i].set(1.0)
+            result[idx,i] = 1.0
+        #result[x==self.knots[-1],-1] = 1.0
+        
+        for d in range(self.deg):
+            for i in range(result.shape[1]-d-1):
+                if d == self.deg-1:
+                    a = self.deg*result[:,i]*(1)/(self.knots[i+d+1]-self.knots[i])
+                    b = self.deg*result[:,i+1]*(-1)/(self.knots[i+d+2]-self.knots[i+1])
+                else:
+                    a = result[:,i]*(x-self.knots[i])/(self.knots[i+d+1]-self.knots[i])
+                    b = result[:,i+1]*(self.knots[i+d+2]-x)/(self.knots[i+d+2]-self.knots[i+1])
+                result_new = result.copy()
+                # result_new = result_new.at[:,i].set(0.0)
+                result_new[:,i] = 0.0
+                if (self.knots[i+d+1]-self.knots[i]) != 0:
+                    # result_new  = result_new.at[:,i].set(result_new[:,i] + a)
+                    result_new[:,i] = result_new[:,i] + a
+                if (self.knots[i+d+2]-self.knots[i+1])!=0:
+                    # result_new = result_new.at[:,i].set(result_new[:,i] + b)
+                    result_new[:,i] = result_new[:,i] + b
+                result = result_new.copy() 
+                
+        # result[x==self.knots[-1],self.n-1] = 1.0
+        return result[:,:self.n]
+            
+    def __call__(self, x, derivative = False):
+        """
+        Evaluates the basis at the given points x.
+        Args:
+            x (torch.tensor): vector of size M
+            derivative (bool, optional): evaluate the derivative of the basis or not. Defaults to False.
+        Returns:
+            torch.tensor: a matrix of size MxN
+        """
+        if derivative:
+            return self._eval_basis_derivative(x)
+        else:
+            return self._eval_basis(x)
+   
+    def interpolation_points(self):
+
+        pts = np.array([np.sum(self.knots[i+1:i+self.deg+1]) for i in range(self.n)])/(self.deg)
+        Mat = self.__call__(pts)
+        return pts, Mat
