@@ -183,26 +183,31 @@ class PatchNURBS(Patch):
         return PatchNURBS(basis_new,knots_new, weights_new, self.rand_key, bounds=bounds_new)
         
     def _eval_derivative(self, y, dim):
-        Bs = [b(y[:,i], derivative = False) for i,b in enumerate(self.basis)]
-        dBs = [b(y[:,i], derivative = (dim ==i)) for i,b in enumerate(self.basis)]
-
-        den = np.einsum('im,i...->m...',Bs[0],self.weights)
-        for i in range(1,self.d):
-            den = np.einsum('im,mi...->m...',Bs[i],den)
-        den = np.tile(den[...,None],self.dembedding)
-
-        Dden = np.einsum('im,i...->m...',dBs[0],self.weights)
-        for i in range(1,self.d):
-            Dden = np.einsum('im,mi...->m...',dBs[i],Dden)
-        Dden = np.tile(Dden[...,None],self.dembedding)
-
-        xs = np.einsum('im,i...->m...',Bs[0],np.einsum('...i,...->...i',self.knots,self.weights))
-        for i in range(1,self.d):
-            xs = np.einsum('im,mi...->m...',Bs[i],xs)
         
-        Dxs = np.einsum('im,i...->m...',dBs[0],np.einsum('...i,...->...i',self.knots,self.weights))
+        Bs = []
+        dBs =[]
+        
+        for i in range(len(self.basis)):
+            Bs.append(self.basis[i](y[...,i]))
+            dBs.append(self.basis[i](y[:,i], derivative = (dim ==i)))
+
+        den = jnp.einsum('im,i...->m...',Bs[0],self.weights)
         for i in range(1,self.d):
-            Dxs = np.einsum('im,mi...->m...',dBs[i],Dxs)
+            den = jnp.einsum('im,mi...->m...',Bs[i],den)
+        den = jnp.tile(den[...,None],self.dembedding)
+
+        Dden = jnp.einsum('im,i...->m...',dBs[0],self.weights)
+        for i in range(1,self.d):
+            Dden = jnp.einsum('im,mi...->m...',dBs[i],Dden)
+        Dden = jnp.tile(Dden[...,None],self.dembedding)
+
+        xs = jnp.einsum('im,i...->m...',Bs[0],jnp.einsum('...i,...->...i',self.knots,self.weights))
+        for i in range(1,self.d):
+            xs = jnp.einsum('im,mi...->m...',Bs[i],xs)
+        
+        Dxs = jnp.einsum('im,i...->m...',dBs[0],jnp.einsum('...i,...->...i',self.knots,self.weights))
+        for i in range(1,self.d):
+            Dxs = jnp.einsum('im,mi...->m...',dBs[i],Dxs)
 
         return (Dxs*den-xs*Dden)/(den**2)
     
@@ -221,7 +226,7 @@ class PatchNURBS(Patch):
         for d in range(self.d):
             lst.append(self._eval_derivative(y,d)[:,:,None])
 
-        return np.concatenate(tuple(lst),-1)
+        return jnp.concatenate(tuple(lst),-1)
 
     def importance_sampling(self, N, pdf = None):
         
@@ -354,3 +359,308 @@ class PatchNURBS(Patch):
              
 
 
+
+class PatchNURBSParam(Patch):
+
+    def __init__(self, basis, knots, weights, rand_key, bounds = None):
+        super(PatchNURBSParam, self).__init__(rand_key)
+        self.d = len(basis)
+        self.basis = basis
+        self.knots = knots 
+        self.weights = weights
+        self.dembedding = self.knots.shape[-1]
+        if bounds == None:
+            self.bounds = [(b.knots[0],b.knots[-1]) for b in self.basis]
+        else:
+            self.bounds = bounds
+            
+    def __call__(self, y, differential=False):
+          
+        Bs = [b(y[:,i]) for i,b in enumerate(self.basis)]
+
+        den = np.einsum('im,i...->m...',Bs[0],self.weights)
+        for i in range(1,self.d):
+            den = np.einsum('im,mi...->m...',Bs[i],den)
+
+        xs = np.einsum('im,i...->m...',Bs[0],np.einsum('...i,...->...i',self.knots,self.weights))
+        for i in range(1,self.d):
+            xs = np.einsum('im,mi...->m...',Bs[i],xs)
+
+        Gys = np.einsum('...i,...->...i',xs,1/den)
+        
+        if differential:
+            DGys = self._eval_omega(y)
+            Weights = 1
+            if self.d == 3 and self.dembedding == 3:
+                diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )*Weights
+            elif self.d==2 and self.dembedding == 2:
+                diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])*Weights
+            elif self.d==2 and self.dembedding==3:
+                diff = np.einsum('ij,i->ij',tangent2normal_3d(DGys),Weights)
+            elif self.d==1:
+                diff = DGys[...,:,0]*Weights
+            else:
+                diff = np.einsum('ij,i->ij',DGys,Weights)
+            
+        if differential:
+            return Gys, diff   
+        else: return Gys
+    
+         
+
+    def __repr__(self):
+        if self.d == 1:
+            s = 'NURBS curve'
+        elif self.d == 2:
+            s = 'NURBS surface'
+        elif self.d == 3:
+            s = 'NURBS volume'
+        else: 
+            s = 'NURBS instance'
+        
+        s += ' embedded in a '+str(self.dembedding)+'D space.\n'
+        s += 'Basis:\n' 
+        for b in self.basis:
+            s+=str(b)+'\n'
+        
+        return s
+        
+    def __getitem__(self, key):
+        
+        if len(key) != self.d:
+            raise Exception('Invalid number of dimensions.')
+        
+        basis_new = []
+        bounds_new = []
+        knots = self.knots.copy()
+        weights = self.weights.copy()
+        
+        axes = [] 
+        for k, id in enumerate(key):
+            if isinstance(id,int) or isinstance(id,float):
+                if self.bounds[k][0]<=id and id<=self.bounds[k][1]:
+                    axes.append(k)
+                    
+                    B = self.basis[k](id).flatten()
+                    s = tuple([None]*k+[slice(None,None,None)]+[None]*(self.d-k-1))
+                    B = B[s]
+                    weights = weights*B
+                    
+                else:
+                    raise Exception("Value must be inside the domain of the BSpline basis.")
+            elif isinstance(id,slice):
+                basis_new.append(self.basis[k])
+                start = id.start if id.start!=None else self.bounds[k][0]
+                stop = id.stop if id.stop!=None else self.bounds[k][1]
+                bounds_new.append((start,stop))
+            else:
+                raise Exception("Only slices and scalars are permitted")
+
+        weights_new = np.sum(weights,axis=tuple(axes))
+        knots_new = np.sum(self.knots*weights[...,None], axis=tuple(axes))
+        knots_new = knots_new/weights_new[...,None]
+        
+               
+        return PatchNURBS(basis_new,knots_new, weights_new, self.rand_key, bounds=bounds_new)
+        
+    def _eval_derivative(self, y, dim):
+        
+        Bs = []
+        dBs =[]
+        
+        for i in range(len(self.basis)):
+            Bs.append(self.basis[i](y[...,i]))
+            dBs.append(self.basis[i](y[:,i], derivative = (dim ==i)))
+
+        den = jnp.einsum('im,i...->m...',Bs[0],self.weights)
+        for i in range(1,self.d):
+            den = jnp.einsum('im,mi...->m...',Bs[i],den)
+        den = jnp.tile(den[...,None],self.dembedding)
+
+        Dden = jnp.einsum('im,i...->m...',dBs[0],self.weights)
+        for i in range(1,self.d):
+            Dden = jnp.einsum('im,mi...->m...',dBs[i],Dden)
+        Dden = jnp.tile(Dden[...,None],self.dembedding)
+
+        xs = jnp.einsum('im,i...->m...',Bs[0],jnp.einsum('...i,...->...i',self.knots,self.weights))
+        for i in range(1,self.d):
+            xs = jnp.einsum('im,mi...->m...',Bs[i],xs)
+        
+        Dxs = jnp.einsum('im,i...->m...',dBs[0],jnp.einsum('...i,...->...i',self.knots,self.weights))
+        for i in range(1,self.d):
+            Dxs = jnp.einsum('im,mi...->m...',dBs[i],Dxs)
+
+        return (Dxs*den-xs*Dden)/(den**2)
+    
+    def GetJacobian(self, y: jnp.array) -> jnp.array:
+        """
+        Evaluate the Jacobian of the geometry transformation
+
+        Args:
+            y (jax.numpy.array): the positions in the reference domain. Has the shape N x d.
+
+        Returns:
+            jax.numpy.array: _description_
+        """
+        
+        lst = []
+        for d in range(self.d):
+            lst.append(self._eval_derivative(y,d)[:,:,None])
+
+        return jnp.concatenate(tuple(lst),-1)
+        
+    def GetMetricTensors(self, y: jnp.array) -> tuple[jnp.array,jnp.array]:
+        
+        
+        DGys = self.GetJacobian(y)
+        Inv = jnp.linalg.inv(DGys)
+        omega = jnp.abs(jnp.linalg.det(DGys))
+        K = jnp.einsum('mij,mjk,m->mik',Inv,jnp.transpose(Inv,[0,2,1]),omega)
+  
+        return (omega,K)
+    
+    def _eval_omega(self,y):
+        """
+        Evaluate the derivative of the parametrization (jacobian).
+        y[...,i,j] = \partial_y
+        
+        Args:
+            y (numpy.array): the points
+
+        Returns:
+            numpy.array: _description_
+        """
+        lst = []
+        for d in range(self.d):
+            lst.append(self._eval_derivative(y,d)[:,:,None])
+
+        return jnp.concatenate(tuple(lst),-1)
+
+    
+    def importance_sampling(self, N, pdf = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+            
+        vol_ref = 1.0
+        for i  in self.bounds:
+            vol_ref *= i[1]-i[0]
+            
+        ys = np.random.rand(N,self.d)*np.array([i[1]-i[0] for i in self.bounds]) + np.array([i[0] for i in self.bounds])       
+        Gys = self.__call__(ys)
+        
+        DGys = self._eval_omega(ys)
+        
+        if self.d == 3 and self.dembedding == 3:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
+        elif self.d==2 and self.dembedding == 2:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
+        elif self.d==2 and self.dembedding==3:
+            diff = tangent2normal_3d(DGys)
+        elif self.d==1:
+            diff = DGys[...,:,0] 
+        else:
+            diff = DGys
+        return Gys, diff*vol_ref/N
+     
+    def quadrature(self, N = 32, knots = 'leg'):
+        
+       
+       
+        
+        Knots = [(np.polynomial.legendre.leggauss(N)[0]+1)*0.5*(self.bounds[i][1]-self.bounds[i][0])+self.bounds[i][0] for i in range(self.d)]
+        Ws = [np.polynomial.legendre.leggauss(N)[1]*0.5*(self.bounds[i][1]-self.bounds[i][0]) for i in range(self.d)]
+        Knots = np.meshgrid(*Knots)
+        ys = np.concatenate(tuple([k.flatten()[:,None] for k in Knots]),-1)
+        
+        Weights = Ws[0]
+        for i in range(1,self.d):
+            Weights = np.kron(Weights, Ws[i])
+                   
+        Gys = self.__call__(ys)
+        
+        DGys = self._eval_omega(ys)
+        
+        if self.d == 3 and self.dembedding == 3:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )*Weights
+        elif self.d==2 and self.dembedding == 2:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])*Weights
+        elif self.d==2 and self.dembedding==3:
+            diff = np.einsum('ij,i->ij',tangent2normal_3d(DGys),Weights)
+        elif self.d==1:
+            diff = DGys[...,:,0]*Weights
+        else:
+            diff = np.einsum('ij,i->ij',DGys,Weights)
+        return Gys, diff   
+    
+    def importance_sampling_2d(self, N, pdf = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+
+        ys = np.random.rand(N,self.d)
+
+        Gys = self.__call__(ys)
+
+        DGys = self._eval_omega(ys)
+         
+        det = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
+        
+        return Gys, det
+    
+    
+
+    def importance_sampling_3d(self, N, pdf = None, bounds = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+        if bounds ==None:
+            bounds = ((0,1),(0,1),(0,1))
+            
+        ys = np.random.rand(N,self.d)*np.array([bounds[0][1]-bounds[0][0],bounds[1][1]-bounds[1][0],bounds[2][1]-bounds[2][0]]) + np.array([bounds[0][0],bounds[1][0],bounds[2][0]])       
+        Gys = self.__call__(ys)
+
+        DGys = self._eval_omega(ys)
+         
+        det = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
+        det = det/det.size*(bounds[0][1]-bounds[0][0])*(bounds[1][1]-bounds[1][0])*(bounds[2][1]-bounds[2][0])
+        
+
+            
+        return Gys, det
+    
+    def sample_inside(self, N, pdf=None):
+        
+        if pdf is None:
+            ys = np.random.rand(N, self.d)
+            # ys = jax.random.uniform(self.rand_key, (N, self.d))
+            xs = self.__call__(ys)
+        else:
+            pass
+            # Gy = self.__call__(ys)
+        return xs
+    
+    
+    
+    def sample_boundary(self, d, end, N, normalize=True, pdf=None):
+        
+        if pdf == None:
+            y = np.random.rand(N,self.d)
+            y[:,d] = end
+            Bs = [b(y[:,i]) for i,b in enumerate(self.basis)]
+            dBs = [b(y[:,i], derivative  = True) for i,b in enumerate(self.basis)]
+
+            pts = self.__call__(y)
+            pts_tangent = []
+            for i in range(self.d):
+                if i!=d:
+                    ds = [False]*self.d
+                    ds[i] = True
+                    
+                    v = self._eval_derivative(y, i)
+                    if normalize:
+                        v = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+                    pts_tangent += [v[:,None,:]]
+            #v = self._eval_derivative(y, d)
+            #norm = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+            return pts, np.concatenate(tuple(pts_tangent),1)#, norm

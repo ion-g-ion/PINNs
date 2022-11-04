@@ -229,6 +229,7 @@ class BSplineBasis:
 
 import jax.numpy as jnp
 import jax 
+import jax.lax
 
 class JaxPiecewiseLinear():
     
@@ -246,71 +247,107 @@ class JaxPiecewiseLinear():
 
 class BSplineBasisJAX():
     
-    def __init__(self, knots, deg):
-        self.deg = deg
-        self.n = knots.size+deg-1
-        self.knots = jnp.array(np.concatenate(( np.ones(deg)*knots[0], knots , np.ones(deg)*knots[-1] )))
+    def __init__(self, knots: np.array, deg: int):
+        self.__deg = deg
+        self.__n = knots.size+deg-1
+        self.__knots = jnp.array(np.concatenate(( np.ones(deg)*knots[0], knots , np.ones(deg)*knots[-1] )))
         
+
+    @property
+    def knots(self):
+        return self.__knots
+    
+    @property
+    def deg(self):
+        return self.__deg
+    
+    @property
+    def n(self):
+        return self.__n
+    
     def _eval_basis(self, x):
 
-        result = jnp.zeros((x.shape[0],self.knots.size-1))
+        result = jnp.zeros((x.shape[0],self.__knots.size-1))
         
-        for i in range(result.shape[1]):
-            if self.knots[-1]<=self.knots[i+1] and self.knots[i]<self.knots[-1]:
-                idx = jnp.logical_and(x>=self.knots[i], x<=self.knots[i+1]) 
-            else:
-                idx = jnp.logical_and(x>=self.knots[i], x<self.knots[i+1])
-            result = result.at[idx,i].set(1.0)
+        for i in range(self.__knots.size-1):
+
+            
+            tmp1 = jnp.where(jnp.logical_and(x>=self.__knots[i], x<=self.__knots[i+1]),1.0,0.0)
+            tmp2 = jnp.where(jnp.logical_and(x>=self.__knots[i], x< self.__knots[i+1]),1.0,0.0)
+            result_new = jnp.where(i==self.__n-1, tmp1, tmp2)
+            # if self.__knots[-1]<=self.__knots[i+1] and self.__knots[i]<self.__knots[-1]:
+            #     idx = jnp.logical_and(x>=self.__knots[i], x<=self.__knots[i+1]) 
+            # else:
+            #     idx = jnp.logical_and(x>=self.__knots[i], x<self.__knots[i+1])
+            result = result.at[:,i].set(result_new)
             # result[idx,i] = 1.0
         
-        for d in range(self.deg):
+        for d in range(self.__deg):
             for i in range(result.shape[1]-d-1):
-                a = result[:,i]*(x-self.knots[i])/(self.knots[i+d+1]-self.knots[i])
-                b = result[:,i+1]*(self.knots[i+d+2]-x)/(self.knots[i+d+2]-self.knots[i+1])
+                a = result[:,i]*(x-self.__knots[i])/(self.__knots[i+d+1]-self.__knots[i])
+                b = result[:,i+1]*(self.__knots[i+d+2]-x)/(self.__knots[i+d+2]-self.__knots[i+1])
                 result_new = result.copy()
                 result_new = result_new.at[:,i].set(0.0)
                 # result_new[:,i] = 0.0
-                if (self.knots[i+d+1]-self.knots[i]) != 0:
-                    result_new = result_new.at[:,i].set( result_new[:,i] + a )
-                    # result_new[:,i] = result_new[:,i] + a
-                if (self.knots[i+d+2]-self.knots[i+1])!=0:
-                    result_new = result_new.at[:,i].set( result_new[:,i] + b )
-                    # result_new[:,i] = result_new[:,i] + b
+                
+                result_new = jax.lax.cond((self.__knots[i+d+1]-self.__knots[i]) != 0, lambda : result_new.at[:,i].set( result_new[:,i] + a ), lambda : result_new)
+                result_new = jax.lax.cond((self.__knots[i+d+2]-self.__knots[i+1])!=0, lambda : result_new.at[:,i].set( result_new[:,i] + b ), lambda : result_new)
+                
+                # if (self.__knots[i+d+1]-self.__knots[i]) != 0:
+                #     result_new = result_new.at[:,i].set( result_new[:,i] + a )
+                #     # result_new[:,i] = result_new[:,i] + a
+                # if (self.__knots[i+d+2]-self.__knots[i+1])!=0:
+                #     result_new = result_new.at[:,i].set( result_new[:,i] + b )
+                #     # result_new[:,i] = result_new[:,i] + b
                 result = result_new.copy() 
         # result[x==self.knots[-1],self.n-1] = 1.0
-        return result[:,:self.n]
+        return result[:,:self.__n].T
            
     def _eval_basis_derivative(self,x):
 
-        result = np.zeros((x.shape[0],self.knots.size-1))
+        result = jnp.zeros((x.shape[0],self.__knots.size-1))
         
         for i in range(result.shape[1]):
-            idx = np.logical_and(x>=self.knots[i], x<=self.knots[i+1]) if self.knots[-1]<=self.knots[i+1] and self.knots[i]<self.knots[-1] else jnp.logical_and(x>=self.knots[i], x<self.knots[i+1])
-            # result = result.at[idx,i].set(1.0)
-            result[idx,i] = 1.0
+            tmp1 = jnp.where(jnp.logical_and(x>=self.__knots[i], x<=self.__knots[i+1]),1.0,0.0)
+            tmp2 = jnp.where(jnp.logical_and(x>=self.__knots[i], x< self.__knots[i+1]),1.0,0.0)
+            result_new = jnp.where(i==self.__n-1, tmp1, tmp2)
+            # if self.__knots[-1]<=self.__knots[i+1] and self.__knots[i]<self.__knots[-1]:
+            #     idx = jnp.logical_and(x>=self.__knots[i], x<=self.__knots[i+1]) 
+            # else:
+            #     idx = jnp.logical_and(x>=self.__knots[i], x<self.__knots[i+1])
+            result = result.at[:,i].set(result_new)
+            
+            #    idx = np.logical_and(x>=self.__knots[i], x<=self.__knots[i+1]) if self.__knots[-1]<=self.__knots[i+1] and self.__knots[i]<self.__knots[-1] else jnp.logical_and(x>=self.__knots[i], x<self.__knots[i+1])
+            #    # result = result.at[idx,i].set(1.0)
+            #    result[idx,i] = 1.0
         #result[x==self.knots[-1],-1] = 1.0
         
-        for d in range(self.deg):
+        for d in range(self.__deg):
             for i in range(result.shape[1]-d-1):
-                if d == self.deg-1:
-                    a = self.deg*result[:,i]*(1)/(self.knots[i+d+1]-self.knots[i])
-                    b = self.deg*result[:,i+1]*(-1)/(self.knots[i+d+2]-self.knots[i+1])
+                if d == self.__deg-1:
+                    a = self.__deg*result[:,i]*(1)/(self.__knots[i+d+1]-self.__knots[i])
+                    b = self.__deg*result[:,i+1]*(-1)/(self.__knots[i+d+2]-self.__knots[i+1])
                 else:
-                    a = result[:,i]*(x-self.knots[i])/(self.knots[i+d+1]-self.knots[i])
-                    b = result[:,i+1]*(self.knots[i+d+2]-x)/(self.knots[i+d+2]-self.knots[i+1])
+                    a = result[:,i]*(x-self.__knots[i])/(self.__knots[i+d+1]-self.__knots[i])
+                    b = result[:,i+1]*(self.__knots[i+d+2]-x)/(self.__knots[i+d+2]-self.__knots[i+1])
                 result_new = result.copy()
-                # result_new = result_new.at[:,i].set(0.0)
-                result_new[:,i] = 0.0
-                if (self.knots[i+d+1]-self.knots[i]) != 0:
-                    # result_new  = result_new.at[:,i].set(result_new[:,i] + a)
-                    result_new[:,i] = result_new[:,i] + a
-                if (self.knots[i+d+2]-self.knots[i+1])!=0:
-                    # result_new = result_new.at[:,i].set(result_new[:,i] + b)
-                    result_new[:,i] = result_new[:,i] + b
+                result_new = result_new.at[:,i].set(0.0)
+                # result_new[:,i] = 0.0
+
+                #   if (self.__knots[i+d+1]-self.__knots[i]) != 0:
+                #       result_new  = result_new.at[:,i].set(result_new[:,i] + a)
+                #       # result_new[:,i] = result_new[:,i] + a
+                #   if (self.__knots[i+d+2]-self.__knots[i+1])!=0:
+                #       result_new = result_new.at[:,i].set(result_new[:,i] + b)
+                #       # result_new[:,i] = result_new[:,i] + b
+
+                result_new = jax.lax.cond((self.__knots[i+d+1]-self.__knots[i]) != 0, lambda : result_new.at[:,i].set( result_new[:,i] + a ), lambda : result_new)
+                result_new = jax.lax.cond((self.__knots[i+d+2]-self.__knots[i+1])!=0, lambda : result_new.at[:,i].set( result_new[:,i] + b ), lambda : result_new)
+
                 result = result_new.copy() 
                 
         # result[x==self.knots[-1],self.n-1] = 1.0
-        return result[:,:self.n]
+        return result[:,:self.__n].T
             
     def __call__(self, x, derivative = False):
         """
@@ -328,6 +365,6 @@ class BSplineBasisJAX():
    
     def interpolation_points(self):
 
-        pts = np.array([np.sum(self.knots[i+1:i+self.deg+1]) for i in range(self.n)])/(self.deg)
+        pts = np.array([np.sum(self.__knots[i+1:i+self.__deg+1]) for i in range(self.n)])/(self.__deg)
         Mat = self.__call__(pts)
         return pts, Mat

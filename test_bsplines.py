@@ -42,19 +42,22 @@ if __name__ == '__main__':
     plt.figure()
     plt.plot(x,y.T)
     
-    plt.show()
+   
     
     
     # JAX Bspl
 
-    basis = pinns.bspline.BSplineBasisJAX(knots, deg)(np.linspace(0,1,7),2)
+    basis = pinns.bspline.BSplineBasisJAX(np.linspace(0,1,7),2)
+    
+    basisj = jax.jit(basis)
     
     x = np.linspace(0,1,1001)
 
-    y = basis(x)
+    y = np.array(basisj(x))
     plt.figure()
     plt.plot(x,y.T)
 
+     
     y = basis(x, derivative = True)
     plt.figure()
     plt.plot(x,y.T)
