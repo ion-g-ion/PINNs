@@ -66,6 +66,8 @@ if __name__ == '__main__':
     basis = pinns.bspline.BSplineBasisJAX(np.array([0,0.1,0.5,0.5,0.9,1]),2)
     
     y = basis(x)
+    print(y.shape)
+    
     plt.figure()
     plt.plot(x,y.T)
 

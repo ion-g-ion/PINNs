@@ -21,6 +21,12 @@ class PINN():
         self.neural_networks_initializers[name] = ann[0]
         self.weights[name] = ann[0](self.key, input_shape)[1]
 
+    def add_neural_network_param(self, name, ann, input_shape):
+        
+        self.neural_networks[name] = lambda w,x,p : ann[1](w,(x,p))
+        self.neural_networks_initializers[name] = ann[0]
+        self.weights[name] = ann[0](self.key, input_shape)[1]
+
     def add_trainable_parameter(self, name, shape):
 
         self.weights[name] = jax.random.normal(self.key, shape)

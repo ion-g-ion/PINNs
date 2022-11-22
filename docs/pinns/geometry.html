@@ -1,0 +1,2254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>pinns.geometry API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>pinns.geometry</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import jax
+import jax.numpy as jnp
+import numpy as np
+from .bspline import BSplineBasisJAX
+from typing import Union, Callable, TypeVar, Generic, Any
+
+def tangent2normal_2d(tangents):
+    rotation = np.array([[0,-1],[1,0]])
+    return np.einsum(&#39;ij,mnj-&gt;mni&#39;,rotation,tangents)
+
+def tangent2normal_3d(tangents):
+
+    result1 = tangents[...,1,0]*tangents[...,2,1]-tangents[...,2,0]*tangents[...,1,1]
+    result2 = tangents[...,2,0]*tangents[...,0,1]-tangents[...,0,0]*tangents[...,2,1]
+    result3 = tangents[...,0,0]*tangents[...,1,1]-tangents[...,1,0]*tangents[...,0,1]
+    return np.concatenate((result1[...,None], result2[...,None], result3[...,None]),-1)
+
+def normalize(vectors):
+    norms = np.linalg.norm(vectors,axis=-1)
+    return vectors / np.tile(norms[...,None],vectors.shape[-1])
+    
+def tensor_product_integration(bases, N):
+    Ks = [b.quadrature_points(n)[0] for b,n in zip(bases,N)]
+    Ws = [b.quadrature_points(n)[1] for b,n in zip(bases,N)]
+    Knots = np.meshgrid(*Ks)
+    points = np.concatenate(tuple([k.flatten()[:,None] for k in Knots]),-1)
+    weights = np.ones((1,))
+    for w in Ws:
+        weights = np.kron(w,weights)
+    return points, weights
+    
+class AffineTransformation():
+    def __init__(self, Mat, offset):
+        self.Mat = Mat
+        self.offset = offset
+    
+    def __call__(self,points):
+        return np.einsum(&#39;...j,ij-&gt;...i&#39;,points, self.Mat)+self.offset
+    
+    def metric_coefficients(self):
+        pass    
+    
+class Patch():
+
+    def __init__(self, rand_key) -&gt; None:
+        self.rand_key = rand_key
+
+    def sample_inside(self, N, pdf = None):
+        pass
+
+    def sample_boundary(self, d, end, N, tangent = False, normal = False, pdf = None):
+        pass
+    def __call__(self,y):
+        pass
+
+class PatchParametrized(Patch):
+
+    def __init__(self, parametrization, dims, rand_key):
+        super(PatchParametrized, self).__init__(rand_key)
+        self.dims = dims
+        self._parametrization = parametrization
+        self._parametrization_in = jax.jit(parametrization)
+        self._parametrization_bd = jax.jit(parametrization)
+        self._parametrization_bd_jacobian = jax.jit(jax.jacfwd(parametrization))
+
+    def sample_inside(self, N, pdf=None):
+
+        if pdf is None:
+            ys = jax.random.uniform(self.rand_key, (N, self.dims))
+            xs = self._parametrization_in(ys)
+
+        return xs
+
+    def sample_boundary(self, d, end, N, tangent = False, normal = False, pdf=None):
+        
+        if pdf is None:
+            ys = jax.random.uniform(self.rand_key, (N, self.dims))
+            ys = ys.at[:,d].set(end)
+            xs = self._parametrization_bd(ys)
+
+        return xs
+
+
+class PatchNURBS(Patch):
+
+    def __init__(self, basis, knots, weights, rand_key, bounds = None):
+        super(PatchNURBS, self).__init__(rand_key)
+        self.d = len(basis)
+        self.basis = basis
+        self.knots = knots 
+        self.weights = weights
+        self.dembedding = self.knots.shape[-1]
+        if bounds == None:
+            self.bounds = [(b.knots[0],b.knots[-1]) for b in self.basis]
+        else:
+            self.bounds = bounds
+            
+    def __call__(self, y, differential=False):
+          
+        Bs = [b(y[:,i]) for i,b in enumerate(self.basis)]
+
+        den = np.einsum(&#39;im,i...-&gt;m...&#39;,Bs[0],self.weights)
+        for i in range(1,self.d):
+            den = np.einsum(&#39;im,mi...-&gt;m...&#39;,Bs[i],den)
+
+        xs = np.einsum(&#39;im,i...-&gt;m...&#39;,Bs[0],np.einsum(&#39;...i,...-&gt;...i&#39;,self.knots,self.weights))
+        for i in range(1,self.d):
+            xs = np.einsum(&#39;im,mi...-&gt;m...&#39;,Bs[i],xs)
+
+        Gys = np.einsum(&#39;...i,...-&gt;...i&#39;,xs,1/den)
+        
+        if differential:
+            DGys = self._eval_omega(y)
+            Weights = 1
+            if self.d == 3 and self.dembedding == 3:
+                diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )*Weights  # type: ignore
+            elif self.d==2 and self.dembedding == 2:
+                diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])*Weights
+            elif self.d==2 and self.dembedding==3:
+                diff = np.einsum(&#39;ij,i-&gt;ij&#39;,tangent2normal_3d(DGys),Weights)
+            elif self.d==1:
+                diff = DGys[...,:,0]*Weights
+            else:
+                diff = np.einsum(&#39;ij,i-&gt;ij&#39;,DGys,Weights)
+            
+        if differential:
+            return Gys, diff   
+        else: return Gys
+    
+         
+
+    def __repr__(self):
+        if self.d == 1:
+            s = &#39;NURBS curve&#39;
+        elif self.d == 2:
+            s = &#39;NURBS surface&#39;
+        elif self.d == 3:
+            s = &#39;NURBS volume&#39;
+        else: 
+            s = &#39;NURBS instance&#39;
+        
+        s += &#39; embedded in a &#39;+str(self.dembedding)+&#39;D space.\n&#39;
+        s += &#39;Basis:\n&#39; 
+        for b in self.basis:
+            s+=str(b)+&#39;\n&#39;
+        
+        return s
+        
+    def __getitem__(self, key):
+        
+        if len(key) != self.d:
+            raise Exception(&#39;Invalid number of dimensions.&#39;)
+        
+        basis_new = []
+        bounds_new = []
+        knots = self.knots.copy()
+        weights = self.weights.copy()
+        
+        axes = [] 
+        for k, id in enumerate(key):
+            if isinstance(id,int) or isinstance(id,float):
+                if self.bounds[k][0]&lt;=id and id&lt;=self.bounds[k][1]:
+                    axes.append(k)
+                    
+                    B = self.basis[k](id).flatten()
+                    s = tuple([None]*k+[slice(None,None,None)]+[None]*(self.d-k-1))
+                    B = B[s]
+                    weights = weights*B
+                    
+                else:
+                    raise Exception(&#34;Value must be inside the domain of the BSpline basis.&#34;)
+            elif isinstance(id,slice):
+                basis_new.append(self.basis[k])
+                start = id.start if id.start!=None else self.bounds[k][0]
+                stop = id.stop if id.stop!=None else self.bounds[k][1]
+                bounds_new.append((start,stop))
+            else:
+                raise Exception(&#34;Only slices and scalars are permitted&#34;)
+
+        weights_new = np.sum(weights,axis=tuple(axes))
+        knots_new = np.sum(self.knots*weights[...,None], axis=tuple(axes))
+        knots_new = knots_new/weights_new[...,None]
+        
+               
+        return PatchNURBS(basis_new,knots_new, weights_new, self.rand_key, bounds=bounds_new)
+        
+    def _eval_derivative(self, y, dim):
+        
+        Bs = []
+        dBs =[]
+        
+        for i in range(len(self.basis)):
+            Bs.append(self.basis[i](y[...,i]))
+            dBs.append(self.basis[i](y[:,i], derivative = (dim ==i)))
+
+        den = jnp.einsum(&#39;im,i...-&gt;m...&#39;,Bs[0],self.weights)
+        for i in range(1,self.d):
+            den = jnp.einsum(&#39;im,mi...-&gt;m...&#39;,Bs[i],den)
+        den = jnp.tile(den[...,None],self.dembedding)
+
+        Dden = jnp.einsum(&#39;im,i...-&gt;m...&#39;,dBs[0],self.weights)
+        for i in range(1,self.d):
+            Dden = jnp.einsum(&#39;im,mi...-&gt;m...&#39;,dBs[i],Dden)
+        Dden = jnp.tile(Dden[...,None],self.dembedding)
+
+        xs = jnp.einsum(&#39;im,i...-&gt;m...&#39;,Bs[0],jnp.einsum(&#39;...i,...-&gt;...i&#39;,self.knots,self.weights))
+        for i in range(1,self.d):
+            xs = jnp.einsum(&#39;im,mi...-&gt;m...&#39;,Bs[i],xs)
+        
+        Dxs = jnp.einsum(&#39;im,i...-&gt;m...&#39;,dBs[0],jnp.einsum(&#39;...i,...-&gt;...i&#39;,self.knots,self.weights))
+        for i in range(1,self.d):
+            Dxs = jnp.einsum(&#39;im,mi...-&gt;m...&#39;,dBs[i],Dxs)
+
+        return (Dxs*den-xs*Dden)/(den**2)
+    
+    def _eval_omega(self,y):
+        &#34;&#34;&#34;
+        Evaluate the derivative of the parametrization (jacobian).
+        y[...,i,j] = \partial_y
+        
+        Args:
+            y (numpy.array): the points
+
+        Returns:
+            numpy.array: _description_
+        &#34;&#34;&#34;
+        lst = []
+        for d in range(self.d):
+            lst.append(self._eval_derivative(y,d)[:,:,None])
+
+        return jnp.concatenate(tuple(lst),-1)
+
+    def importance_sampling(self, N, pdf = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+            
+        vol_ref = 1.0
+        for i  in self.bounds:
+            vol_ref *= i[1]-i[0]
+            
+        ys = np.random.rand(N,self.d)*np.array([i[1]-i[0] for i in self.bounds]) + np.array([i[0] for i in self.bounds])       
+        Gys = self.__call__(ys)
+        
+        DGys = self._eval_omega(ys)
+        
+        if self.d == 3 and self.dembedding == 3:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
+        elif self.d==2 and self.dembedding == 2:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
+        elif self.d==2 and self.dembedding==3:
+            diff = tangent2normal_3d(DGys)
+        elif self.d==1:
+            diff = DGys[...,:,0] 
+        else:
+            diff = DGys
+        return Gys, diff*vol_ref/N
+     
+    def quadrature(self, N = 32, knots = &#39;leg&#39;):
+        
+       
+       
+        
+        Knots = [(np.polynomial.legendre.leggauss(N)[0]+1)*0.5*(self.bounds[i][1]-self.bounds[i][0])+self.bounds[i][0] for i in range(self.d)]
+        Ws = [np.polynomial.legendre.leggauss(N)[1]*0.5*(self.bounds[i][1]-self.bounds[i][0]) for i in range(self.d)]
+        Knots = np.meshgrid(*Knots)
+        ys = np.concatenate(tuple([k.flatten()[:,None] for k in Knots]),-1)
+        
+        Weights = Ws[0]
+        for i in range(1,self.d):
+            Weights = np.kron(Weights, Ws[i])
+                   
+        Gys = self.__call__(ys)
+        
+        DGys = self._eval_omega(ys)
+        
+        if self.d == 3 and self.dembedding == 3:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )*Weights
+        elif self.d==2 and self.dembedding == 2:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])*Weights
+        elif self.d==2 and self.dembedding==3:
+            diff = np.einsum(&#39;ij,i-&gt;ij&#39;,tangent2normal_3d(DGys),Weights)
+        elif self.d==1:
+            diff = DGys[...,:,0]*Weights
+        else:
+            diff = np.einsum(&#39;ij,i-&gt;ij&#39;,DGys,Weights)
+        return Gys, diff   
+    
+    def importance_sampling_2d(self, N, pdf = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+
+        ys = np.random.rand(N,self.d)
+
+        Gys = self.__call__(ys)
+
+        DGys = self._eval_omega(ys)
+         
+        det = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
+        
+        return Gys, det
+    
+    
+
+    def importance_sampling_3d(self, N, pdf = None, bounds = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+        if bounds ==None:
+            bounds = ((0,1),(0,1),(0,1))
+            
+        ys = np.random.rand(N,self.d)*np.array([bounds[0][1]-bounds[0][0],bounds[1][1]-bounds[1][0],bounds[2][1]-bounds[2][0]]) + np.array([bounds[0][0],bounds[1][0],bounds[2][0]])       
+        Gys = self.__call__(ys)
+
+        DGys = self._eval_omega(ys)
+         
+        det = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
+        det = det/det.size*(bounds[0][1]-bounds[0][0])*(bounds[1][1]-bounds[1][0])*(bounds[2][1]-bounds[2][0])
+        
+
+            
+        return Gys, det
+    
+    def sample_inside(self, N, pdf=None):
+        
+        if pdf is None:
+            ys = np.random.rand(N, self.d)
+            # ys = jax.random.uniform(self.rand_key, (N, self.d))
+            xs = self.__call__(ys)
+        else:
+            pass
+            # Gy = self.__call__(ys)
+        return xs
+    
+    
+    
+    def sample_boundary(self, d, end, N, normalize=True, pdf=None):
+        
+        if pdf == None:
+            y = np.random.rand(N,self.d)
+            y[:,d] = end
+            Bs = [b(y[:,i]) for i,b in enumerate(self.basis)]
+            dBs = [b(y[:,i], derivative  = True) for i,b in enumerate(self.basis)]
+
+            pts = self.__call__(y)
+            pts_tangent = []
+            for i in range(self.d):
+                if i!=d:
+                    ds = [False]*self.d
+                    ds[i] = True
+                    
+                    v = self._eval_derivative(y, i)
+                    if normalize:
+                        v = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+                    pts_tangent += [v[:,None,:]]
+            #v = self._eval_derivative(y, d)
+            #norm = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+            return pts, np.concatenate(tuple(pts_tangent),1)#, norm
+
+             
+
+Array = np.ndarray | jnp.DeviceArray
+
+class PatchNURBSParam(Patch):
+    __d : int
+    __dembedding : int
+    __dparam: int
+    __basis : list[BSplineBasisJAX]
+    __weights: Callable | Array
+    __knots: Callable | Array
+    __bounds: list[tuple[float,float]]
+    __N: list[int]
+    
+    def __init__(self, basis : list[BSplineBasisJAX], knots : Array | Callable, weights: Array | Callable, dparam : int, dembedding :int, rand_key: jax.random.PRNGKey, bounds = None):
+        super(PatchNURBSParam, self).__init__(rand_key)
+        
+        if not ((dparam&gt;0 and callable(weights) and callable(knots)) or (dparam==0 and not callable(knots) and not callable(weights))):
+            raise Exception(&#34;The weights and knots are callable iff the number of parameters is greater than 0.&#34;)
+        
+        self.__d = len(basis)
+        self.__basis = basis
+        self.__knots = knots 
+        self.__weights = weights
+        self.__dembedding = dembedding
+        self.__dparam = dparam
+        self.__N = [b.n for b in basis]
+        
+        if bounds == None:
+            self.__bounds = [(b.knots[0],b.knots[-1]) for b in basis]
+        else:
+            self.__bounds = bounds
+            
+    def __call__(self, y: Array, params: Array|None = None, differential: bool =False) -&gt; Array | tuple[Array, Array]:
+          
+        Bs = [b(y[:,i]).T for i,b in enumerate(self.__basis)]
+
+        if self.__dparam == 0:
+            den = jnp.einsum(&#39;mi,i...-&gt;m...&#39;,Bs[0],self.__weights)
+            for i in range(1,self.__d):
+                den = jnp.einsum(&#39;mi,mi...-&gt;m...&#39;,Bs[i],den)
+        else:
+            def tmp(w, *bs):  # type: ignore
+                den = jnp.einsum(&#39;i,i...-&gt;...&#39;,bs[0],w)
+                for i in range(1,self.__d):
+                    den = jnp.einsum(&#39;i,i...-&gt;...&#39;,bs[i],den)
+                
+                return den
+            den = jax.vmap(lambda x , *args: tmp(self.__weights(x), *args),(0))(params, *Bs)
+            
+                
+        if self.__dparam == 0:
+            xs = jnp.einsum(&#39;mi,i...-&gt;m...&#39;,Bs[0],jnp.einsum(&#39;...i,...-&gt;...i&#39;,self.__knots,self.__weights))
+            for i in range(1,self.__d):
+                xs = jnp.einsum(&#39;mi,mi...-&gt;m...&#39;,Bs[i],xs)
+        else:
+            def tmp(w,k, *bs):
+                xs = jnp.einsum(&#39;i,i...-&gt;...&#39;,bs[0],jnp.einsum(&#39;...i,...-&gt;...i&#39;,k,w))
+                for i in range(1,self.__d):
+                    xs = jnp.einsum(&#39;i,i...-&gt;...&#39;,bs[i],xs)
+                return xs
+                    
+            xs = jax.vmap(lambda x, *args: tmp(self.__weights(x), self.__knots(x), *args))(params,*Bs)
+        Gys = jnp.einsum(&#39;...i,...-&gt;...i&#39;,xs,1/den)
+        
+        if differential:
+            DGys = self._eval_omega(y, params)
+            Weights = 1
+            if self.__d == 3 and self.__dembedding == 3:
+                diff = jnp.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )*Weights
+            elif self.__d==2 and self.__dembedding == 2:
+                diff = jnp.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])*Weights
+            elif self.__d==2 and self.__dembedding==3:
+                def tmp(tangents):
+                    result1 = tangents[...,1,0]*tangents[...,2,1]-tangents[...,2,0]*tangents[...,1,1]
+                    result2 = tangents[...,2,0]*tangents[...,0,1]-tangents[...,0,0]*tangents[...,2,1]
+                    result3 = tangents[...,0,0]*tangents[...,1,1]-tangents[...,1,0]*tangents[...,0,1]
+                    return jnp.concatenate((result1[...,None], result2[...,None], result3[...,None]),-1)
+                diff = tmp(DGys) # jnp.einsum(&#39;ij,i-&gt;ij&#39;,tmp(DGys),Weights)
+            elif self.__d==1:
+                diff = DGys[...,:,0]*Weights
+            else:
+                diff = DGys # jnp.einsum(&#39;ij,i-&gt;ij&#39;,DGys,Weights)
+            
+        if differential:
+            return Gys, diff   
+        else: return Gys
+    
+         
+
+    def __repr__(self):
+        if self.__d == 1:
+            s = &#39;NURBS curve&#39;
+        elif self.__d == 2:
+            s = &#39;NURBS surface&#39;
+        elif self.__d == 3:
+            s = &#39;NURBS volume&#39;
+        else: 
+            s = &#39;NURBS instance&#39;
+        
+        s += &#39; embedded in a &#39;+str(self.__dembedding)+&#39;D space depending on &#39; + str(self.__dparam) + &#39; parameters.\n&#39;
+        s += &#39;Basis:\n&#39; 
+        for b in self.__basis:
+            s+=str(b)+&#39;\n&#39;
+        
+        return s
+        
+    def __getitem__(self, key):
+        
+        if len(key) != self.__d+self.__dparam:
+            raise Exception(&#39;Invalid number of dimensions. It must equal the number of spacial dimensions + number of parameters.&#39;)
+        
+        axes = []
+        basis_new = []
+        bounds_new = []
+        
+        
+        weights_mult = jnp.ones(self.__N)
+        transform = False
+        for k in range(self.__d):
+            id = key[k]
+            if isinstance(id,int) or isinstance(id,float):
+                if self.__bounds[k][0]&lt;=id and id&lt;=self.__bounds[k][1]:
+                    axes.append(k)
+                    B = self.__basis[k](np.array([id])).flatten()
+                    s = tuple([None]*k+[slice(None,None,None)]+[None]*(self.__d-k-1))
+                    B = B[s]
+                    weights_mult = weights_mult*B
+                    transform = True                    
+                else:
+                    raise Exception(&#34;Value must be inside the domain of the BSpline basis.&#34;)
+            elif isinstance(id,slice):
+                basis_new.append(self.__basis[k])
+                start = id.start if id.start!=None else self.__bounds[k][0]
+                stop = id.stop if id.stop!=None else self.__bounds[k][1]
+                bounds_new.append((start,stop))
+            else:
+                raise Exception(&#34;Only slices and scalars are permitted&#34;)
+            
+        if self.__dparam == 0:
+            weights_new = jnp.sum(self.__weights*weights_mult,axis=tuple(axes))
+            knots_new = jnp.sum(self.__knots*(self.__weights*weights_mult)[...,None], axis=tuple(axes))
+            knots_new = knots_new/weights_new[...,None]
+        else:
+            weights_new = lambda *args: jnp.sum(self.__weights(*args)*weights_mult, axis=tuple(axes))
+            knots_new = lambda *args: jnp.sum(self.__knots(*args)*(self.__weights(*args)*weights_mult)[...,None], axis=tuple(axes))/weights_new(*args)[...,None]
+               
+            params_take = []
+            vect = []
+            
+            for k in range(self.__dparam):
+                id = key[k+self.__d]
+                if isinstance(id,int) or isinstance(id,float):
+                    vect.append(float(id))
+                elif isinstance(id,slice) and (id.start == None and id.stop==None and id.step==None):
+                    params_take.append(k)
+                    vect.append(0.0)
+                else:
+                    raise Exception(&#34;Only slices and scalars are permitted&#34;)
+                
+            E = np.eye(self.__dparam)[tuple(params_take),:]
+            vect = np.array(vect)
+            
+            if len(params_take)!=0:
+                weights_new = lambda ps: jnp.sum(self.__weights(jnp.einsum(&#39;...i,ij-&gt;...j&#39;,ps,E)+vect)*weights_mult, axis=tuple(axes))
+                knots_new = lambda ps: jnp.sum(self.__knots(jnp.einsum(&#39;...i,ij-&gt;...j&#39;,ps,E)+vect)*(self.__weights(jnp.einsum(&#39;...i,ij-&gt;...j&#39;,ps,E)+vect)*weights_mult)[...,None], axis=tuple(axes))/weights_new(jnp.einsum(&#39;...i,ij-&gt;...j&#39;,ps,E)+vect)[...,None]
+            else:
+                weights_new = jnp.sum(self.__weights(vect)*weights_mult, axis=tuple(axes))
+                knots_new =  jnp.sum(self.__knots(vect)*(self.__weights(vect)*weights_mult)[...,None], axis=tuple(axes))/weights_new[...,None]
+            param_new = len(params_take)
+        
+        return PatchNURBSParam(basis_new, knots_new, weights_new, param_new, self.__dembedding, self.rand_key, bounds=bounds_new)
+        
+    def _eval_derivative(self, y: Array, params: Array|None, dim: int)-&gt;Array:
+        
+        Bs = []
+        dBs =[]
+        
+        for i in range(len(self.__basis)):
+                Bs.append(self.__basis[i](y[...,i]).T)
+                dBs.append(self.__basis[i](y[:,i], derivative = (dim ==i)).T)
+
+        if self.__dparam == 0:
+        
+            den = jnp.einsum(&#39;im,i...-&gt;m...&#39;,Bs[0],self.__weights)
+            for i in range(1,self.__d):
+                den = jnp.einsum(&#39;im,mi...-&gt;m...&#39;,Bs[i],den)
+            den = jnp.tile(den[...,None],self.__dembedding)
+
+            Dden = jnp.einsum(&#39;im,i...-&gt;m...&#39;,dBs[0],self.__weights)
+            for i in range(1,self.__d):
+                Dden = jnp.einsum(&#39;im,mi...-&gt;m...&#39;,dBs[i],Dden)
+            Dden = jnp.tile(Dden[...,None],self.__dembedding)
+
+            xs = jnp.einsum(&#39;im,i...-&gt;m...&#39;,Bs[0],jnp.einsum(&#39;...i,...-&gt;...i&#39;,self.__knots,self.__weights))
+            for i in range(1,self.__d):
+                xs = jnp.einsum(&#39;im,mi...-&gt;m...&#39;,Bs[i],xs)
+            
+            Dxs = jnp.einsum(&#39;im,i...-&gt;m...&#39;,dBs[0],jnp.einsum(&#39;...i,...-&gt;...i&#39;,self.__knots,self.__weights))
+            for i in range(1,self.__d):
+                Dxs = jnp.einsum(&#39;im,mi...-&gt;m...&#39;,dBs[i],Dxs)
+        else:
+            def tmp(w, *bs):
+                den = jnp.einsum(&#39;i,i...-&gt;...&#39;,bs[0],w)
+                for i in range(1,self.__d):
+                    den = jnp.einsum(&#39;i,i...-&gt;...&#39;,bs[i],den)
+                den = jnp.tile(den[...,None],self.__dembedding)
+                return den
+            
+            tmp_jit = jax.vmap(lambda x , *args: tmp(self.__weights(x), *args))
+            den = tmp_jit(params, *Bs)
+            Dden = tmp_jit(params, *dBs)
+            
+            def tmp(w,k, *bs):
+                xs = jnp.einsum(&#39;i,i...-&gt;...&#39;,bs[0],jnp.einsum(&#39;...i,...-&gt;...i&#39;,k,w))
+                for i in range(1,self.__d):
+                    xs = jnp.einsum(&#39;i,i...-&gt;...&#39;,bs[i],xs)
+                return xs
+            
+            tmp_jit = jax.vmap(lambda x, *args: tmp(self.__weights(x), self.__knots(x), *args)) 
+            xs = tmp_jit(params,*Bs)
+            Dxs = tmp_jit(params,*dBs)
+            
+        return (Dxs*den-xs*Dden)/(den**2)
+    
+    def GetJacobian(self, y: Array, params: Array | None) -&gt; jax.numpy.DeviceArray:
+        &#34;&#34;&#34;
+        Evaluate the Jacobian of the geometry transformation
+
+        Args:
+            y (jax.numpy.array): the positions in the reference domain. Has the shape N x d.
+
+        Returns:
+            jax.numpy.array: _description_
+        &#34;&#34;&#34;
+        
+        lst = []
+        for d in range(self.d):
+            lst.append(self._eval_derivative(y,params, d)[:,:,None])
+
+        return jnp.concatenate(tuple(lst),-1)
+        
+    def GetMetricTensors(self, y: Array, params: Array) -&gt; tuple[jnp.DeviceArray,jnp.DeviceArray]:
+        
+        
+        DGys = self.GetJacobian(y, params)
+        Inv = jnp.linalg.inv(DGys)
+        omega = jnp.abs(jnp.linalg.det(DGys))
+        K = jnp.einsum(&#39;mij,mjk,m-&gt;mik&#39;,Inv,jnp.transpose(Inv,[0,2,1]),omega)
+  
+        return (omega,K)
+    
+    def _eval_omega(self,y, params):
+        &#34;&#34;&#34;
+        Evaluate the derivative of the parametrization (jacobian).
+        y[...,i,j] = \partial_y
+        
+        Args:
+            y (numpy.array): the points
+
+        Returns:
+            numpy.array: _description_
+        &#34;&#34;&#34;
+        lst = []
+        for d in range(self.__d):
+            lst.append(self._eval_derivative(y, params, d)[:,:,None])
+
+        return jnp.concatenate(tuple(lst),-1)
+
+    
+    def importance_sampling(self, N, pdf = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+            
+        vol_ref = 1.0
+        for i  in self.bounds:
+            vol_ref *= i[1]-i[0]
+            
+        ys = np.random.rand(N,self.d)*np.array([i[1]-i[0] for i in self.bounds]) + np.array([i[0] for i in self.bounds])       
+        Gys = self.__call__(ys)
+        
+        DGys = self._eval_omega(ys)
+        
+        if self.d == 3 and self.dembedding == 3:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
+        elif self.d==2 and self.dembedding == 2:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
+        elif self.d==2 and self.dembedding==3:
+            diff = tangent2normal_3d(DGys)
+        elif self.d==1:
+            diff = DGys[...,:,0] 
+        else:
+            diff = DGys
+        return Gys, diff*vol_ref/N
+     
+    def quadrature(self, N = 32, knots = &#39;leg&#39;):
+        
+       
+       
+        
+        Knots = [(np.polynomial.legendre.leggauss(N)[0]+1)*0.5*(self.bounds[i][1]-self.bounds[i][0])+self.bounds[i][0] for i in range(self.d)]
+        Ws = [np.polynomial.legendre.leggauss(N)[1]*0.5*(self.bounds[i][1]-self.bounds[i][0]) for i in range(self.d)]
+        Knots = np.meshgrid(*Knots)
+        ys = np.concatenate(tuple([k.flatten()[:,None] for k in Knots]),-1)
+        
+        Weights = Ws[0]
+        for i in range(1,self.d):
+            Weights = np.kron(Weights, Ws[i])
+                   
+        Gys = self.__call__(ys)
+        
+        DGys = self._eval_omega(ys)
+        
+        if self.d == 3 and self.dembedding == 3:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )*Weights
+        elif self.d==2 and self.dembedding == 2:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])*Weights
+        elif self.d==2 and self.dembedding==3:
+            diff = np.einsum(&#39;ij,i-&gt;ij&#39;,tangent2normal_3d(DGys),Weights)
+        elif self.d==1:
+            diff = DGys[...,:,0]*Weights
+        else:
+            diff = np.einsum(&#39;ij,i-&gt;ij&#39;,DGys,Weights)
+        return Gys, diff   
+    
+    def importance_sampling_2d(self, N, pdf = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+
+        ys = np.random.rand(N,self.d)
+
+        Gys = self.__call__(ys)
+
+        DGys = self._eval_omega(ys)
+         
+        det = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
+        
+        return Gys, det
+    
+    
+
+    def importance_sampling_3d(self, N, pdf = None, bounds = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+        if bounds ==None:
+            bounds = ((0,1),(0,1),(0,1))
+            
+        ys = np.random.rand(N,self.d)*np.array([bounds[0][1]-bounds[0][0],bounds[1][1]-bounds[1][0],bounds[2][1]-bounds[2][0]]) + np.array([bounds[0][0],bounds[1][0],bounds[2][0]])       
+        Gys = self.__call__(ys)
+
+        DGys = self._eval_omega(ys)
+         
+        det = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
+        det = det/det.size*(bounds[0][1]-bounds[0][0])*(bounds[1][1]-bounds[1][0])*(bounds[2][1]-bounds[2][0])
+        
+
+            
+        return Gys, det
+    
+    def sample_inside(self, N, pdf=None):
+        
+        if pdf is None:
+            ys = np.random.rand(N, self.d)
+            # ys = jax.random.uniform(self.rand_key, (N, self.d))
+            xs = self.__call__(ys)
+        else:
+            pass
+            # Gy = self.__call__(ys)
+        return xs
+    
+    
+    
+    def sample_boundary(self, d, end, N, normalize=True, pdf=None):
+        
+        if pdf == None:
+            y = np.random.rand(N,self.d)
+            y[:,d] = end
+            Bs = [b(y[:,i]) for i,b in enumerate(self.basis)]
+            dBs = [b(y[:,i], derivative  = True) for i,b in enumerate(self.basis)]
+
+            pts = self.__call__(y)
+            pts_tangent = []
+            for i in range(self.d):
+                if i!=d:
+                    ds = [False]*self.d
+                    ds[i] = True
+                    
+                    v = self._eval_derivative(y, i)
+                    if normalize:
+                        v = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+                    pts_tangent += [v[:,None,:]]
+            #v = self._eval_derivative(y, d)
+            #norm = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+            return pts, np.concatenate(tuple(pts_tangent),1)#, norm</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="pinns.geometry.normalize"><code class="name flex">
+<span>def <span class="ident">normalize</span></span>(<span>vectors)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def normalize(vectors):
+    norms = np.linalg.norm(vectors,axis=-1)
+    return vectors / np.tile(norms[...,None],vectors.shape[-1])</code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.tangent2normal_2d"><code class="name flex">
+<span>def <span class="ident">tangent2normal_2d</span></span>(<span>tangents)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def tangent2normal_2d(tangents):
+    rotation = np.array([[0,-1],[1,0]])
+    return np.einsum(&#39;ij,mnj-&gt;mni&#39;,rotation,tangents)</code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.tangent2normal_3d"><code class="name flex">
+<span>def <span class="ident">tangent2normal_3d</span></span>(<span>tangents)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def tangent2normal_3d(tangents):
+
+    result1 = tangents[...,1,0]*tangents[...,2,1]-tangents[...,2,0]*tangents[...,1,1]
+    result2 = tangents[...,2,0]*tangents[...,0,1]-tangents[...,0,0]*tangents[...,2,1]
+    result3 = tangents[...,0,0]*tangents[...,1,1]-tangents[...,1,0]*tangents[...,0,1]
+    return np.concatenate((result1[...,None], result2[...,None], result3[...,None]),-1)</code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.tensor_product_integration"><code class="name flex">
+<span>def <span class="ident">tensor_product_integration</span></span>(<span>bases, N)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def tensor_product_integration(bases, N):
+    Ks = [b.quadrature_points(n)[0] for b,n in zip(bases,N)]
+    Ws = [b.quadrature_points(n)[1] for b,n in zip(bases,N)]
+    Knots = np.meshgrid(*Ks)
+    points = np.concatenate(tuple([k.flatten()[:,None] for k in Knots]),-1)
+    weights = np.ones((1,))
+    for w in Ws:
+        weights = np.kron(w,weights)
+    return points, weights</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="pinns.geometry.AffineTransformation"><code class="flex name class">
+<span>class <span class="ident">AffineTransformation</span></span>
+<span>(</span><span>Mat, offset)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AffineTransformation():
+    def __init__(self, Mat, offset):
+        self.Mat = Mat
+        self.offset = offset
+    
+    def __call__(self,points):
+        return np.einsum(&#39;...j,ij-&gt;...i&#39;,points, self.Mat)+self.offset
+    
+    def metric_coefficients(self):
+        pass    </code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="pinns.geometry.AffineTransformation.metric_coefficients"><code class="name flex">
+<span>def <span class="ident">metric_coefficients</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def metric_coefficients(self):
+    pass    </code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pinns.geometry.Patch"><code class="flex name class">
+<span>class <span class="ident">Patch</span></span>
+<span>(</span><span>rand_key)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Patch():
+
+    def __init__(self, rand_key) -&gt; None:
+        self.rand_key = rand_key
+
+    def sample_inside(self, N, pdf = None):
+        pass
+
+    def sample_boundary(self, d, end, N, tangent = False, normal = False, pdf = None):
+        pass
+    def __call__(self,y):
+        pass</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="pinns.geometry.PatchNURBS" href="#pinns.geometry.PatchNURBS">PatchNURBS</a></li>
+<li><a title="pinns.geometry.PatchNURBSParam" href="#pinns.geometry.PatchNURBSParam">PatchNURBSParam</a></li>
+<li><a title="pinns.geometry.PatchParametrized" href="#pinns.geometry.PatchParametrized">PatchParametrized</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="pinns.geometry.Patch.sample_boundary"><code class="name flex">
+<span>def <span class="ident">sample_boundary</span></span>(<span>self, d, end, N, tangent=False, normal=False, pdf=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sample_boundary(self, d, end, N, tangent = False, normal = False, pdf = None):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.Patch.sample_inside"><code class="name flex">
+<span>def <span class="ident">sample_inside</span></span>(<span>self, N, pdf=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sample_inside(self, N, pdf = None):
+    pass</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pinns.geometry.PatchNURBS"><code class="flex name class">
+<span>class <span class="ident">PatchNURBS</span></span>
+<span>(</span><span>basis, knots, weights, rand_key, bounds=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PatchNURBS(Patch):
+
+    def __init__(self, basis, knots, weights, rand_key, bounds = None):
+        super(PatchNURBS, self).__init__(rand_key)
+        self.d = len(basis)
+        self.basis = basis
+        self.knots = knots 
+        self.weights = weights
+        self.dembedding = self.knots.shape[-1]
+        if bounds == None:
+            self.bounds = [(b.knots[0],b.knots[-1]) for b in self.basis]
+        else:
+            self.bounds = bounds
+            
+    def __call__(self, y, differential=False):
+          
+        Bs = [b(y[:,i]) for i,b in enumerate(self.basis)]
+
+        den = np.einsum(&#39;im,i...-&gt;m...&#39;,Bs[0],self.weights)
+        for i in range(1,self.d):
+            den = np.einsum(&#39;im,mi...-&gt;m...&#39;,Bs[i],den)
+
+        xs = np.einsum(&#39;im,i...-&gt;m...&#39;,Bs[0],np.einsum(&#39;...i,...-&gt;...i&#39;,self.knots,self.weights))
+        for i in range(1,self.d):
+            xs = np.einsum(&#39;im,mi...-&gt;m...&#39;,Bs[i],xs)
+
+        Gys = np.einsum(&#39;...i,...-&gt;...i&#39;,xs,1/den)
+        
+        if differential:
+            DGys = self._eval_omega(y)
+            Weights = 1
+            if self.d == 3 and self.dembedding == 3:
+                diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )*Weights  # type: ignore
+            elif self.d==2 and self.dembedding == 2:
+                diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])*Weights
+            elif self.d==2 and self.dembedding==3:
+                diff = np.einsum(&#39;ij,i-&gt;ij&#39;,tangent2normal_3d(DGys),Weights)
+            elif self.d==1:
+                diff = DGys[...,:,0]*Weights
+            else:
+                diff = np.einsum(&#39;ij,i-&gt;ij&#39;,DGys,Weights)
+            
+        if differential:
+            return Gys, diff   
+        else: return Gys
+    
+         
+
+    def __repr__(self):
+        if self.d == 1:
+            s = &#39;NURBS curve&#39;
+        elif self.d == 2:
+            s = &#39;NURBS surface&#39;
+        elif self.d == 3:
+            s = &#39;NURBS volume&#39;
+        else: 
+            s = &#39;NURBS instance&#39;
+        
+        s += &#39; embedded in a &#39;+str(self.dembedding)+&#39;D space.\n&#39;
+        s += &#39;Basis:\n&#39; 
+        for b in self.basis:
+            s+=str(b)+&#39;\n&#39;
+        
+        return s
+        
+    def __getitem__(self, key):
+        
+        if len(key) != self.d:
+            raise Exception(&#39;Invalid number of dimensions.&#39;)
+        
+        basis_new = []
+        bounds_new = []
+        knots = self.knots.copy()
+        weights = self.weights.copy()
+        
+        axes = [] 
+        for k, id in enumerate(key):
+            if isinstance(id,int) or isinstance(id,float):
+                if self.bounds[k][0]&lt;=id and id&lt;=self.bounds[k][1]:
+                    axes.append(k)
+                    
+                    B = self.basis[k](id).flatten()
+                    s = tuple([None]*k+[slice(None,None,None)]+[None]*(self.d-k-1))
+                    B = B[s]
+                    weights = weights*B
+                    
+                else:
+                    raise Exception(&#34;Value must be inside the domain of the BSpline basis.&#34;)
+            elif isinstance(id,slice):
+                basis_new.append(self.basis[k])
+                start = id.start if id.start!=None else self.bounds[k][0]
+                stop = id.stop if id.stop!=None else self.bounds[k][1]
+                bounds_new.append((start,stop))
+            else:
+                raise Exception(&#34;Only slices and scalars are permitted&#34;)
+
+        weights_new = np.sum(weights,axis=tuple(axes))
+        knots_new = np.sum(self.knots*weights[...,None], axis=tuple(axes))
+        knots_new = knots_new/weights_new[...,None]
+        
+               
+        return PatchNURBS(basis_new,knots_new, weights_new, self.rand_key, bounds=bounds_new)
+        
+    def _eval_derivative(self, y, dim):
+        
+        Bs = []
+        dBs =[]
+        
+        for i in range(len(self.basis)):
+            Bs.append(self.basis[i](y[...,i]))
+            dBs.append(self.basis[i](y[:,i], derivative = (dim ==i)))
+
+        den = jnp.einsum(&#39;im,i...-&gt;m...&#39;,Bs[0],self.weights)
+        for i in range(1,self.d):
+            den = jnp.einsum(&#39;im,mi...-&gt;m...&#39;,Bs[i],den)
+        den = jnp.tile(den[...,None],self.dembedding)
+
+        Dden = jnp.einsum(&#39;im,i...-&gt;m...&#39;,dBs[0],self.weights)
+        for i in range(1,self.d):
+            Dden = jnp.einsum(&#39;im,mi...-&gt;m...&#39;,dBs[i],Dden)
+        Dden = jnp.tile(Dden[...,None],self.dembedding)
+
+        xs = jnp.einsum(&#39;im,i...-&gt;m...&#39;,Bs[0],jnp.einsum(&#39;...i,...-&gt;...i&#39;,self.knots,self.weights))
+        for i in range(1,self.d):
+            xs = jnp.einsum(&#39;im,mi...-&gt;m...&#39;,Bs[i],xs)
+        
+        Dxs = jnp.einsum(&#39;im,i...-&gt;m...&#39;,dBs[0],jnp.einsum(&#39;...i,...-&gt;...i&#39;,self.knots,self.weights))
+        for i in range(1,self.d):
+            Dxs = jnp.einsum(&#39;im,mi...-&gt;m...&#39;,dBs[i],Dxs)
+
+        return (Dxs*den-xs*Dden)/(den**2)
+    
+    def _eval_omega(self,y):
+        &#34;&#34;&#34;
+        Evaluate the derivative of the parametrization (jacobian).
+        y[...,i,j] = \partial_y
+        
+        Args:
+            y (numpy.array): the points
+
+        Returns:
+            numpy.array: _description_
+        &#34;&#34;&#34;
+        lst = []
+        for d in range(self.d):
+            lst.append(self._eval_derivative(y,d)[:,:,None])
+
+        return jnp.concatenate(tuple(lst),-1)
+
+    def importance_sampling(self, N, pdf = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+            
+        vol_ref = 1.0
+        for i  in self.bounds:
+            vol_ref *= i[1]-i[0]
+            
+        ys = np.random.rand(N,self.d)*np.array([i[1]-i[0] for i in self.bounds]) + np.array([i[0] for i in self.bounds])       
+        Gys = self.__call__(ys)
+        
+        DGys = self._eval_omega(ys)
+        
+        if self.d == 3 and self.dembedding == 3:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
+        elif self.d==2 and self.dembedding == 2:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
+        elif self.d==2 and self.dembedding==3:
+            diff = tangent2normal_3d(DGys)
+        elif self.d==1:
+            diff = DGys[...,:,0] 
+        else:
+            diff = DGys
+        return Gys, diff*vol_ref/N
+     
+    def quadrature(self, N = 32, knots = &#39;leg&#39;):
+        
+       
+       
+        
+        Knots = [(np.polynomial.legendre.leggauss(N)[0]+1)*0.5*(self.bounds[i][1]-self.bounds[i][0])+self.bounds[i][0] for i in range(self.d)]
+        Ws = [np.polynomial.legendre.leggauss(N)[1]*0.5*(self.bounds[i][1]-self.bounds[i][0]) for i in range(self.d)]
+        Knots = np.meshgrid(*Knots)
+        ys = np.concatenate(tuple([k.flatten()[:,None] for k in Knots]),-1)
+        
+        Weights = Ws[0]
+        for i in range(1,self.d):
+            Weights = np.kron(Weights, Ws[i])
+                   
+        Gys = self.__call__(ys)
+        
+        DGys = self._eval_omega(ys)
+        
+        if self.d == 3 and self.dembedding == 3:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )*Weights
+        elif self.d==2 and self.dembedding == 2:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])*Weights
+        elif self.d==2 and self.dembedding==3:
+            diff = np.einsum(&#39;ij,i-&gt;ij&#39;,tangent2normal_3d(DGys),Weights)
+        elif self.d==1:
+            diff = DGys[...,:,0]*Weights
+        else:
+            diff = np.einsum(&#39;ij,i-&gt;ij&#39;,DGys,Weights)
+        return Gys, diff   
+    
+    def importance_sampling_2d(self, N, pdf = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+
+        ys = np.random.rand(N,self.d)
+
+        Gys = self.__call__(ys)
+
+        DGys = self._eval_omega(ys)
+         
+        det = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
+        
+        return Gys, det
+    
+    
+
+    def importance_sampling_3d(self, N, pdf = None, bounds = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+        if bounds ==None:
+            bounds = ((0,1),(0,1),(0,1))
+            
+        ys = np.random.rand(N,self.d)*np.array([bounds[0][1]-bounds[0][0],bounds[1][1]-bounds[1][0],bounds[2][1]-bounds[2][0]]) + np.array([bounds[0][0],bounds[1][0],bounds[2][0]])       
+        Gys = self.__call__(ys)
+
+        DGys = self._eval_omega(ys)
+         
+        det = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
+        det = det/det.size*(bounds[0][1]-bounds[0][0])*(bounds[1][1]-bounds[1][0])*(bounds[2][1]-bounds[2][0])
+        
+
+            
+        return Gys, det
+    
+    def sample_inside(self, N, pdf=None):
+        
+        if pdf is None:
+            ys = np.random.rand(N, self.d)
+            # ys = jax.random.uniform(self.rand_key, (N, self.d))
+            xs = self.__call__(ys)
+        else:
+            pass
+            # Gy = self.__call__(ys)
+        return xs
+    
+    
+    
+    def sample_boundary(self, d, end, N, normalize=True, pdf=None):
+        
+        if pdf == None:
+            y = np.random.rand(N,self.d)
+            y[:,d] = end
+            Bs = [b(y[:,i]) for i,b in enumerate(self.basis)]
+            dBs = [b(y[:,i], derivative  = True) for i,b in enumerate(self.basis)]
+
+            pts = self.__call__(y)
+            pts_tangent = []
+            for i in range(self.d):
+                if i!=d:
+                    ds = [False]*self.d
+                    ds[i] = True
+                    
+                    v = self._eval_derivative(y, i)
+                    if normalize:
+                        v = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+                    pts_tangent += [v[:,None,:]]
+            #v = self._eval_derivative(y, d)
+            #norm = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+            return pts, np.concatenate(tuple(pts_tangent),1)#, norm</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="pinns.geometry.Patch" href="#pinns.geometry.Patch">Patch</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="pinns.geometry.PatchNURBS.importance_sampling"><code class="name flex">
+<span>def <span class="ident">importance_sampling</span></span>(<span>self, N, pdf=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def importance_sampling(self, N, pdf = None):
+    
+    if pdf is None:
+        pdf = lambda x: 1.0
+        
+    vol_ref = 1.0
+    for i  in self.bounds:
+        vol_ref *= i[1]-i[0]
+        
+    ys = np.random.rand(N,self.d)*np.array([i[1]-i[0] for i in self.bounds]) + np.array([i[0] for i in self.bounds])       
+    Gys = self.__call__(ys)
+    
+    DGys = self._eval_omega(ys)
+    
+    if self.d == 3 and self.dembedding == 3:
+        diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
+    elif self.d==2 and self.dembedding == 2:
+        diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
+    elif self.d==2 and self.dembedding==3:
+        diff = tangent2normal_3d(DGys)
+    elif self.d==1:
+        diff = DGys[...,:,0] 
+    else:
+        diff = DGys
+    return Gys, diff*vol_ref/N</code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.PatchNURBS.importance_sampling_2d"><code class="name flex">
+<span>def <span class="ident">importance_sampling_2d</span></span>(<span>self, N, pdf=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def importance_sampling_2d(self, N, pdf = None):
+    
+    if pdf is None:
+        pdf = lambda x: 1.0
+
+    ys = np.random.rand(N,self.d)
+
+    Gys = self.__call__(ys)
+
+    DGys = self._eval_omega(ys)
+     
+    det = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
+    
+    return Gys, det</code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.PatchNURBS.importance_sampling_3d"><code class="name flex">
+<span>def <span class="ident">importance_sampling_3d</span></span>(<span>self, N, pdf=None, bounds=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def importance_sampling_3d(self, N, pdf = None, bounds = None):
+    
+    if pdf is None:
+        pdf = lambda x: 1.0
+    if bounds ==None:
+        bounds = ((0,1),(0,1),(0,1))
+        
+    ys = np.random.rand(N,self.d)*np.array([bounds[0][1]-bounds[0][0],bounds[1][1]-bounds[1][0],bounds[2][1]-bounds[2][0]]) + np.array([bounds[0][0],bounds[1][0],bounds[2][0]])       
+    Gys = self.__call__(ys)
+
+    DGys = self._eval_omega(ys)
+     
+    det = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
+    det = det/det.size*(bounds[0][1]-bounds[0][0])*(bounds[1][1]-bounds[1][0])*(bounds[2][1]-bounds[2][0])
+    
+
+        
+    return Gys, det</code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.PatchNURBS.quadrature"><code class="name flex">
+<span>def <span class="ident">quadrature</span></span>(<span>self, N=32, knots='leg')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def quadrature(self, N = 32, knots = &#39;leg&#39;):
+    
+   
+   
+    
+    Knots = [(np.polynomial.legendre.leggauss(N)[0]+1)*0.5*(self.bounds[i][1]-self.bounds[i][0])+self.bounds[i][0] for i in range(self.d)]
+    Ws = [np.polynomial.legendre.leggauss(N)[1]*0.5*(self.bounds[i][1]-self.bounds[i][0]) for i in range(self.d)]
+    Knots = np.meshgrid(*Knots)
+    ys = np.concatenate(tuple([k.flatten()[:,None] for k in Knots]),-1)
+    
+    Weights = Ws[0]
+    for i in range(1,self.d):
+        Weights = np.kron(Weights, Ws[i])
+               
+    Gys = self.__call__(ys)
+    
+    DGys = self._eval_omega(ys)
+    
+    if self.d == 3 and self.dembedding == 3:
+        diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )*Weights
+    elif self.d==2 and self.dembedding == 2:
+        diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])*Weights
+    elif self.d==2 and self.dembedding==3:
+        diff = np.einsum(&#39;ij,i-&gt;ij&#39;,tangent2normal_3d(DGys),Weights)
+    elif self.d==1:
+        diff = DGys[...,:,0]*Weights
+    else:
+        diff = np.einsum(&#39;ij,i-&gt;ij&#39;,DGys,Weights)
+    return Gys, diff   </code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.PatchNURBS.sample_boundary"><code class="name flex">
+<span>def <span class="ident">sample_boundary</span></span>(<span>self, d, end, N, normalize=True, pdf=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sample_boundary(self, d, end, N, normalize=True, pdf=None):
+    
+    if pdf == None:
+        y = np.random.rand(N,self.d)
+        y[:,d] = end
+        Bs = [b(y[:,i]) for i,b in enumerate(self.basis)]
+        dBs = [b(y[:,i], derivative  = True) for i,b in enumerate(self.basis)]
+
+        pts = self.__call__(y)
+        pts_tangent = []
+        for i in range(self.d):
+            if i!=d:
+                ds = [False]*self.d
+                ds[i] = True
+                
+                v = self._eval_derivative(y, i)
+                if normalize:
+                    v = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+                pts_tangent += [v[:,None,:]]
+        #v = self._eval_derivative(y, d)
+        #norm = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+        return pts, np.concatenate(tuple(pts_tangent),1)#, norm</code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.PatchNURBS.sample_inside"><code class="name flex">
+<span>def <span class="ident">sample_inside</span></span>(<span>self, N, pdf=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sample_inside(self, N, pdf=None):
+    
+    if pdf is None:
+        ys = np.random.rand(N, self.d)
+        # ys = jax.random.uniform(self.rand_key, (N, self.d))
+        xs = self.__call__(ys)
+    else:
+        pass
+        # Gy = self.__call__(ys)
+    return xs</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pinns.geometry.PatchNURBSParam"><code class="flex name class">
+<span>class <span class="ident">PatchNURBSParam</span></span>
+<span>(</span><span>basis: list[<a title="pinns.bspline.BSplineBasisJAX" href="bspline.html#pinns.bspline.BSplineBasisJAX">BSplineBasisJAX</a>], knots: Union[numpy.ndarray, jaxlib.xla_extension.DeviceArrayBase, Callable], weights: Union[numpy.ndarray, jaxlib.xla_extension.DeviceArrayBase, Callable], dparam: int, dembedding: int, rand_key: <function PRNGKey at 0x7f17a621b760>, bounds=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PatchNURBSParam(Patch):
+    __d : int
+    __dembedding : int
+    __dparam: int
+    __basis : list[BSplineBasisJAX]
+    __weights: Callable | Array
+    __knots: Callable | Array
+    __bounds: list[tuple[float,float]]
+    __N: list[int]
+    
+    def __init__(self, basis : list[BSplineBasisJAX], knots : Array | Callable, weights: Array | Callable, dparam : int, dembedding :int, rand_key: jax.random.PRNGKey, bounds = None):
+        super(PatchNURBSParam, self).__init__(rand_key)
+        
+        if not ((dparam&gt;0 and callable(weights) and callable(knots)) or (dparam==0 and not callable(knots) and not callable(weights))):
+            raise Exception(&#34;The weights and knots are callable iff the number of parameters is greater than 0.&#34;)
+        
+        self.__d = len(basis)
+        self.__basis = basis
+        self.__knots = knots 
+        self.__weights = weights
+        self.__dembedding = dembedding
+        self.__dparam = dparam
+        self.__N = [b.n for b in basis]
+        
+        if bounds == None:
+            self.__bounds = [(b.knots[0],b.knots[-1]) for b in basis]
+        else:
+            self.__bounds = bounds
+            
+    def __call__(self, y: Array, params: Array|None = None, differential: bool =False) -&gt; Array | tuple[Array, Array]:
+          
+        Bs = [b(y[:,i]).T for i,b in enumerate(self.__basis)]
+
+        if self.__dparam == 0:
+            den = jnp.einsum(&#39;mi,i...-&gt;m...&#39;,Bs[0],self.__weights)
+            for i in range(1,self.__d):
+                den = jnp.einsum(&#39;mi,mi...-&gt;m...&#39;,Bs[i],den)
+        else:
+            def tmp(w, *bs):  # type: ignore
+                den = jnp.einsum(&#39;i,i...-&gt;...&#39;,bs[0],w)
+                for i in range(1,self.__d):
+                    den = jnp.einsum(&#39;i,i...-&gt;...&#39;,bs[i],den)
+                
+                return den
+            den = jax.vmap(lambda x , *args: tmp(self.__weights(x), *args),(0))(params, *Bs)
+            
+                
+        if self.__dparam == 0:
+            xs = jnp.einsum(&#39;mi,i...-&gt;m...&#39;,Bs[0],jnp.einsum(&#39;...i,...-&gt;...i&#39;,self.__knots,self.__weights))
+            for i in range(1,self.__d):
+                xs = jnp.einsum(&#39;mi,mi...-&gt;m...&#39;,Bs[i],xs)
+        else:
+            def tmp(w,k, *bs):
+                xs = jnp.einsum(&#39;i,i...-&gt;...&#39;,bs[0],jnp.einsum(&#39;...i,...-&gt;...i&#39;,k,w))
+                for i in range(1,self.__d):
+                    xs = jnp.einsum(&#39;i,i...-&gt;...&#39;,bs[i],xs)
+                return xs
+                    
+            xs = jax.vmap(lambda x, *args: tmp(self.__weights(x), self.__knots(x), *args))(params,*Bs)
+        Gys = jnp.einsum(&#39;...i,...-&gt;...i&#39;,xs,1/den)
+        
+        if differential:
+            DGys = self._eval_omega(y, params)
+            Weights = 1
+            if self.__d == 3 and self.__dembedding == 3:
+                diff = jnp.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )*Weights
+            elif self.__d==2 and self.__dembedding == 2:
+                diff = jnp.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])*Weights
+            elif self.__d==2 and self.__dembedding==3:
+                def tmp(tangents):
+                    result1 = tangents[...,1,0]*tangents[...,2,1]-tangents[...,2,0]*tangents[...,1,1]
+                    result2 = tangents[...,2,0]*tangents[...,0,1]-tangents[...,0,0]*tangents[...,2,1]
+                    result3 = tangents[...,0,0]*tangents[...,1,1]-tangents[...,1,0]*tangents[...,0,1]
+                    return jnp.concatenate((result1[...,None], result2[...,None], result3[...,None]),-1)
+                diff = tmp(DGys) # jnp.einsum(&#39;ij,i-&gt;ij&#39;,tmp(DGys),Weights)
+            elif self.__d==1:
+                diff = DGys[...,:,0]*Weights
+            else:
+                diff = DGys # jnp.einsum(&#39;ij,i-&gt;ij&#39;,DGys,Weights)
+            
+        if differential:
+            return Gys, diff   
+        else: return Gys
+    
+         
+
+    def __repr__(self):
+        if self.__d == 1:
+            s = &#39;NURBS curve&#39;
+        elif self.__d == 2:
+            s = &#39;NURBS surface&#39;
+        elif self.__d == 3:
+            s = &#39;NURBS volume&#39;
+        else: 
+            s = &#39;NURBS instance&#39;
+        
+        s += &#39; embedded in a &#39;+str(self.__dembedding)+&#39;D space depending on &#39; + str(self.__dparam) + &#39; parameters.\n&#39;
+        s += &#39;Basis:\n&#39; 
+        for b in self.__basis:
+            s+=str(b)+&#39;\n&#39;
+        
+        return s
+        
+    def __getitem__(self, key):
+        
+        if len(key) != self.__d+self.__dparam:
+            raise Exception(&#39;Invalid number of dimensions. It must equal the number of spacial dimensions + number of parameters.&#39;)
+        
+        axes = []
+        basis_new = []
+        bounds_new = []
+        
+        
+        weights_mult = jnp.ones(self.__N)
+        transform = False
+        for k in range(self.__d):
+            id = key[k]
+            if isinstance(id,int) or isinstance(id,float):
+                if self.__bounds[k][0]&lt;=id and id&lt;=self.__bounds[k][1]:
+                    axes.append(k)
+                    B = self.__basis[k](np.array([id])).flatten()
+                    s = tuple([None]*k+[slice(None,None,None)]+[None]*(self.__d-k-1))
+                    B = B[s]
+                    weights_mult = weights_mult*B
+                    transform = True                    
+                else:
+                    raise Exception(&#34;Value must be inside the domain of the BSpline basis.&#34;)
+            elif isinstance(id,slice):
+                basis_new.append(self.__basis[k])
+                start = id.start if id.start!=None else self.__bounds[k][0]
+                stop = id.stop if id.stop!=None else self.__bounds[k][1]
+                bounds_new.append((start,stop))
+            else:
+                raise Exception(&#34;Only slices and scalars are permitted&#34;)
+            
+        if self.__dparam == 0:
+            weights_new = jnp.sum(self.__weights*weights_mult,axis=tuple(axes))
+            knots_new = jnp.sum(self.__knots*(self.__weights*weights_mult)[...,None], axis=tuple(axes))
+            knots_new = knots_new/weights_new[...,None]
+        else:
+            weights_new = lambda *args: jnp.sum(self.__weights(*args)*weights_mult, axis=tuple(axes))
+            knots_new = lambda *args: jnp.sum(self.__knots(*args)*(self.__weights(*args)*weights_mult)[...,None], axis=tuple(axes))/weights_new(*args)[...,None]
+               
+            params_take = []
+            vect = []
+            
+            for k in range(self.__dparam):
+                id = key[k+self.__d]
+                if isinstance(id,int) or isinstance(id,float):
+                    vect.append(float(id))
+                elif isinstance(id,slice) and (id.start == None and id.stop==None and id.step==None):
+                    params_take.append(k)
+                    vect.append(0.0)
+                else:
+                    raise Exception(&#34;Only slices and scalars are permitted&#34;)
+                
+            E = np.eye(self.__dparam)[tuple(params_take),:]
+            vect = np.array(vect)
+            
+            if len(params_take)!=0:
+                weights_new = lambda ps: jnp.sum(self.__weights(jnp.einsum(&#39;...i,ij-&gt;...j&#39;,ps,E)+vect)*weights_mult, axis=tuple(axes))
+                knots_new = lambda ps: jnp.sum(self.__knots(jnp.einsum(&#39;...i,ij-&gt;...j&#39;,ps,E)+vect)*(self.__weights(jnp.einsum(&#39;...i,ij-&gt;...j&#39;,ps,E)+vect)*weights_mult)[...,None], axis=tuple(axes))/weights_new(jnp.einsum(&#39;...i,ij-&gt;...j&#39;,ps,E)+vect)[...,None]
+            else:
+                weights_new = jnp.sum(self.__weights(vect)*weights_mult, axis=tuple(axes))
+                knots_new =  jnp.sum(self.__knots(vect)*(self.__weights(vect)*weights_mult)[...,None], axis=tuple(axes))/weights_new[...,None]
+            param_new = len(params_take)
+        
+        return PatchNURBSParam(basis_new, knots_new, weights_new, param_new, self.__dembedding, self.rand_key, bounds=bounds_new)
+        
+    def _eval_derivative(self, y: Array, params: Array|None, dim: int)-&gt;Array:
+        
+        Bs = []
+        dBs =[]
+        
+        for i in range(len(self.__basis)):
+                Bs.append(self.__basis[i](y[...,i]).T)
+                dBs.append(self.__basis[i](y[:,i], derivative = (dim ==i)).T)
+
+        if self.__dparam == 0:
+        
+            den = jnp.einsum(&#39;im,i...-&gt;m...&#39;,Bs[0],self.__weights)
+            for i in range(1,self.__d):
+                den = jnp.einsum(&#39;im,mi...-&gt;m...&#39;,Bs[i],den)
+            den = jnp.tile(den[...,None],self.__dembedding)
+
+            Dden = jnp.einsum(&#39;im,i...-&gt;m...&#39;,dBs[0],self.__weights)
+            for i in range(1,self.__d):
+                Dden = jnp.einsum(&#39;im,mi...-&gt;m...&#39;,dBs[i],Dden)
+            Dden = jnp.tile(Dden[...,None],self.__dembedding)
+
+            xs = jnp.einsum(&#39;im,i...-&gt;m...&#39;,Bs[0],jnp.einsum(&#39;...i,...-&gt;...i&#39;,self.__knots,self.__weights))
+            for i in range(1,self.__d):
+                xs = jnp.einsum(&#39;im,mi...-&gt;m...&#39;,Bs[i],xs)
+            
+            Dxs = jnp.einsum(&#39;im,i...-&gt;m...&#39;,dBs[0],jnp.einsum(&#39;...i,...-&gt;...i&#39;,self.__knots,self.__weights))
+            for i in range(1,self.__d):
+                Dxs = jnp.einsum(&#39;im,mi...-&gt;m...&#39;,dBs[i],Dxs)
+        else:
+            def tmp(w, *bs):
+                den = jnp.einsum(&#39;i,i...-&gt;...&#39;,bs[0],w)
+                for i in range(1,self.__d):
+                    den = jnp.einsum(&#39;i,i...-&gt;...&#39;,bs[i],den)
+                den = jnp.tile(den[...,None],self.__dembedding)
+                return den
+            
+            tmp_jit = jax.vmap(lambda x , *args: tmp(self.__weights(x), *args))
+            den = tmp_jit(params, *Bs)
+            Dden = tmp_jit(params, *dBs)
+            
+            def tmp(w,k, *bs):
+                xs = jnp.einsum(&#39;i,i...-&gt;...&#39;,bs[0],jnp.einsum(&#39;...i,...-&gt;...i&#39;,k,w))
+                for i in range(1,self.__d):
+                    xs = jnp.einsum(&#39;i,i...-&gt;...&#39;,bs[i],xs)
+                return xs
+            
+            tmp_jit = jax.vmap(lambda x, *args: tmp(self.__weights(x), self.__knots(x), *args)) 
+            xs = tmp_jit(params,*Bs)
+            Dxs = tmp_jit(params,*dBs)
+            
+        return (Dxs*den-xs*Dden)/(den**2)
+    
+    def GetJacobian(self, y: Array, params: Array | None) -&gt; jax.numpy.DeviceArray:
+        &#34;&#34;&#34;
+        Evaluate the Jacobian of the geometry transformation
+
+        Args:
+            y (jax.numpy.array): the positions in the reference domain. Has the shape N x d.
+
+        Returns:
+            jax.numpy.array: _description_
+        &#34;&#34;&#34;
+        
+        lst = []
+        for d in range(self.d):
+            lst.append(self._eval_derivative(y,params, d)[:,:,None])
+
+        return jnp.concatenate(tuple(lst),-1)
+        
+    def GetMetricTensors(self, y: Array, params: Array) -&gt; tuple[jnp.DeviceArray,jnp.DeviceArray]:
+        
+        
+        DGys = self.GetJacobian(y, params)
+        Inv = jnp.linalg.inv(DGys)
+        omega = jnp.abs(jnp.linalg.det(DGys))
+        K = jnp.einsum(&#39;mij,mjk,m-&gt;mik&#39;,Inv,jnp.transpose(Inv,[0,2,1]),omega)
+  
+        return (omega,K)
+    
+    def _eval_omega(self,y, params):
+        &#34;&#34;&#34;
+        Evaluate the derivative of the parametrization (jacobian).
+        y[...,i,j] = \partial_y
+        
+        Args:
+            y (numpy.array): the points
+
+        Returns:
+            numpy.array: _description_
+        &#34;&#34;&#34;
+        lst = []
+        for d in range(self.__d):
+            lst.append(self._eval_derivative(y, params, d)[:,:,None])
+
+        return jnp.concatenate(tuple(lst),-1)
+
+    
+    def importance_sampling(self, N, pdf = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+            
+        vol_ref = 1.0
+        for i  in self.bounds:
+            vol_ref *= i[1]-i[0]
+            
+        ys = np.random.rand(N,self.d)*np.array([i[1]-i[0] for i in self.bounds]) + np.array([i[0] for i in self.bounds])       
+        Gys = self.__call__(ys)
+        
+        DGys = self._eval_omega(ys)
+        
+        if self.d == 3 and self.dembedding == 3:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
+        elif self.d==2 and self.dembedding == 2:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
+        elif self.d==2 and self.dembedding==3:
+            diff = tangent2normal_3d(DGys)
+        elif self.d==1:
+            diff = DGys[...,:,0] 
+        else:
+            diff = DGys
+        return Gys, diff*vol_ref/N
+     
+    def quadrature(self, N = 32, knots = &#39;leg&#39;):
+        
+       
+       
+        
+        Knots = [(np.polynomial.legendre.leggauss(N)[0]+1)*0.5*(self.bounds[i][1]-self.bounds[i][0])+self.bounds[i][0] for i in range(self.d)]
+        Ws = [np.polynomial.legendre.leggauss(N)[1]*0.5*(self.bounds[i][1]-self.bounds[i][0]) for i in range(self.d)]
+        Knots = np.meshgrid(*Knots)
+        ys = np.concatenate(tuple([k.flatten()[:,None] for k in Knots]),-1)
+        
+        Weights = Ws[0]
+        for i in range(1,self.d):
+            Weights = np.kron(Weights, Ws[i])
+                   
+        Gys = self.__call__(ys)
+        
+        DGys = self._eval_omega(ys)
+        
+        if self.d == 3 and self.dembedding == 3:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )*Weights
+        elif self.d==2 and self.dembedding == 2:
+            diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])*Weights
+        elif self.d==2 and self.dembedding==3:
+            diff = np.einsum(&#39;ij,i-&gt;ij&#39;,tangent2normal_3d(DGys),Weights)
+        elif self.d==1:
+            diff = DGys[...,:,0]*Weights
+        else:
+            diff = np.einsum(&#39;ij,i-&gt;ij&#39;,DGys,Weights)
+        return Gys, diff   
+    
+    def importance_sampling_2d(self, N, pdf = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+
+        ys = np.random.rand(N,self.d)
+
+        Gys = self.__call__(ys)
+
+        DGys = self._eval_omega(ys)
+         
+        det = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
+        
+        return Gys, det
+    
+    
+
+    def importance_sampling_3d(self, N, pdf = None, bounds = None):
+        
+        if pdf is None:
+            pdf = lambda x: 1.0
+        if bounds ==None:
+            bounds = ((0,1),(0,1),(0,1))
+            
+        ys = np.random.rand(N,self.d)*np.array([bounds[0][1]-bounds[0][0],bounds[1][1]-bounds[1][0],bounds[2][1]-bounds[2][0]]) + np.array([bounds[0][0],bounds[1][0],bounds[2][0]])       
+        Gys = self.__call__(ys)
+
+        DGys = self._eval_omega(ys)
+         
+        det = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
+        det = det/det.size*(bounds[0][1]-bounds[0][0])*(bounds[1][1]-bounds[1][0])*(bounds[2][1]-bounds[2][0])
+        
+
+            
+        return Gys, det
+    
+    def sample_inside(self, N, pdf=None):
+        
+        if pdf is None:
+            ys = np.random.rand(N, self.d)
+            # ys = jax.random.uniform(self.rand_key, (N, self.d))
+            xs = self.__call__(ys)
+        else:
+            pass
+            # Gy = self.__call__(ys)
+        return xs
+    
+    
+    
+    def sample_boundary(self, d, end, N, normalize=True, pdf=None):
+        
+        if pdf == None:
+            y = np.random.rand(N,self.d)
+            y[:,d] = end
+            Bs = [b(y[:,i]) for i,b in enumerate(self.basis)]
+            dBs = [b(y[:,i], derivative  = True) for i,b in enumerate(self.basis)]
+
+            pts = self.__call__(y)
+            pts_tangent = []
+            for i in range(self.d):
+                if i!=d:
+                    ds = [False]*self.d
+                    ds[i] = True
+                    
+                    v = self._eval_derivative(y, i)
+                    if normalize:
+                        v = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+                    pts_tangent += [v[:,None,:]]
+            #v = self._eval_derivative(y, d)
+            #norm = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+            return pts, np.concatenate(tuple(pts_tangent),1)#, norm</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="pinns.geometry.Patch" href="#pinns.geometry.Patch">Patch</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="pinns.geometry.PatchNURBSParam.GetJacobian"><code class="name flex">
+<span>def <span class="ident">GetJacobian</span></span>(<span>self, y: numpy.ndarray | jaxlib.xla_extension.DeviceArrayBase, params: numpy.ndarray | jaxlib.xla_extension.DeviceArrayBase | None) ‑> jaxlib.xla_extension.DeviceArrayBase</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Evaluate the Jacobian of the geometry transformation</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>y</code></strong> :&ensp;<code>jax.numpy.array</code></dt>
+<dd>the positions in the reference domain. Has the shape N x d.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>jax.numpy.array</code></dt>
+<dd><em>description</em></dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def GetJacobian(self, y: Array, params: Array | None) -&gt; jax.numpy.DeviceArray:
+    &#34;&#34;&#34;
+    Evaluate the Jacobian of the geometry transformation
+
+    Args:
+        y (jax.numpy.array): the positions in the reference domain. Has the shape N x d.
+
+    Returns:
+        jax.numpy.array: _description_
+    &#34;&#34;&#34;
+    
+    lst = []
+    for d in range(self.d):
+        lst.append(self._eval_derivative(y,params, d)[:,:,None])
+
+    return jnp.concatenate(tuple(lst),-1)</code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.PatchNURBSParam.GetMetricTensors"><code class="name flex">
+<span>def <span class="ident">GetMetricTensors</span></span>(<span>self, y: numpy.ndarray | jaxlib.xla_extension.DeviceArrayBase, params: numpy.ndarray | jaxlib.xla_extension.DeviceArrayBase) ‑> tuple[jaxlib.xla_extension.DeviceArrayBase, jaxlib.xla_extension.DeviceArrayBase]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def GetMetricTensors(self, y: Array, params: Array) -&gt; tuple[jnp.DeviceArray,jnp.DeviceArray]:
+    
+    
+    DGys = self.GetJacobian(y, params)
+    Inv = jnp.linalg.inv(DGys)
+    omega = jnp.abs(jnp.linalg.det(DGys))
+    K = jnp.einsum(&#39;mij,mjk,m-&gt;mik&#39;,Inv,jnp.transpose(Inv,[0,2,1]),omega)
+
+    return (omega,K)</code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.PatchNURBSParam.importance_sampling"><code class="name flex">
+<span>def <span class="ident">importance_sampling</span></span>(<span>self, N, pdf=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def importance_sampling(self, N, pdf = None):
+    
+    if pdf is None:
+        pdf = lambda x: 1.0
+        
+    vol_ref = 1.0
+    for i  in self.bounds:
+        vol_ref *= i[1]-i[0]
+        
+    ys = np.random.rand(N,self.d)*np.array([i[1]-i[0] for i in self.bounds]) + np.array([i[0] for i in self.bounds])       
+    Gys = self.__call__(ys)
+    
+    DGys = self._eval_omega(ys)
+    
+    if self.d == 3 and self.dembedding == 3:
+        diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
+    elif self.d==2 and self.dembedding == 2:
+        diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
+    elif self.d==2 and self.dembedding==3:
+        diff = tangent2normal_3d(DGys)
+    elif self.d==1:
+        diff = DGys[...,:,0] 
+    else:
+        diff = DGys
+    return Gys, diff*vol_ref/N</code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.PatchNURBSParam.importance_sampling_2d"><code class="name flex">
+<span>def <span class="ident">importance_sampling_2d</span></span>(<span>self, N, pdf=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def importance_sampling_2d(self, N, pdf = None):
+    
+    if pdf is None:
+        pdf = lambda x: 1.0
+
+    ys = np.random.rand(N,self.d)
+
+    Gys = self.__call__(ys)
+
+    DGys = self._eval_omega(ys)
+     
+    det = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])
+    
+    return Gys, det</code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.PatchNURBSParam.importance_sampling_3d"><code class="name flex">
+<span>def <span class="ident">importance_sampling_3d</span></span>(<span>self, N, pdf=None, bounds=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def importance_sampling_3d(self, N, pdf = None, bounds = None):
+    
+    if pdf is None:
+        pdf = lambda x: 1.0
+    if bounds ==None:
+        bounds = ((0,1),(0,1),(0,1))
+        
+    ys = np.random.rand(N,self.d)*np.array([bounds[0][1]-bounds[0][0],bounds[1][1]-bounds[1][0],bounds[2][1]-bounds[2][0]]) + np.array([bounds[0][0],bounds[1][0],bounds[2][0]])       
+    Gys = self.__call__(ys)
+
+    DGys = self._eval_omega(ys)
+     
+    det = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )
+    det = det/det.size*(bounds[0][1]-bounds[0][0])*(bounds[1][1]-bounds[1][0])*(bounds[2][1]-bounds[2][0])
+    
+
+        
+    return Gys, det</code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.PatchNURBSParam.quadrature"><code class="name flex">
+<span>def <span class="ident">quadrature</span></span>(<span>self, N=32, knots='leg')</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def quadrature(self, N = 32, knots = &#39;leg&#39;):
+    
+   
+   
+    
+    Knots = [(np.polynomial.legendre.leggauss(N)[0]+1)*0.5*(self.bounds[i][1]-self.bounds[i][0])+self.bounds[i][0] for i in range(self.d)]
+    Ws = [np.polynomial.legendre.leggauss(N)[1]*0.5*(self.bounds[i][1]-self.bounds[i][0]) for i in range(self.d)]
+    Knots = np.meshgrid(*Knots)
+    ys = np.concatenate(tuple([k.flatten()[:,None] for k in Knots]),-1)
+    
+    Weights = Ws[0]
+    for i in range(1,self.d):
+        Weights = np.kron(Weights, Ws[i])
+               
+    Gys = self.__call__(ys)
+    
+    DGys = self._eval_omega(ys)
+    
+    if self.d == 3 and self.dembedding == 3:
+        diff = np.abs(DGys[:,0,0]*DGys[:,1,1]*DGys[:,2,2] + DGys[:,0,1]*DGys[:,1,2]*DGys[:,2,0]+DGys[:,0,2]*DGys[:,1,0]*DGys[:,2,1] - DGys[:,0,2]*DGys[:,1,1]*DGys[:,2,0] - DGys[:,0,0]*DGys[:,1,2]*DGys[:,2,1] - DGys[:,0,1]*DGys[:,1,0]*DGys[:,2,2] )*Weights
+    elif self.d==2 and self.dembedding == 2:
+        diff = np.abs(DGys[:,0,0]*DGys[:,1,1] -  DGys[:,0,1]*DGys[:,1,0])*Weights
+    elif self.d==2 and self.dembedding==3:
+        diff = np.einsum(&#39;ij,i-&gt;ij&#39;,tangent2normal_3d(DGys),Weights)
+    elif self.d==1:
+        diff = DGys[...,:,0]*Weights
+    else:
+        diff = np.einsum(&#39;ij,i-&gt;ij&#39;,DGys,Weights)
+    return Gys, diff   </code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.PatchNURBSParam.sample_boundary"><code class="name flex">
+<span>def <span class="ident">sample_boundary</span></span>(<span>self, d, end, N, normalize=True, pdf=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sample_boundary(self, d, end, N, normalize=True, pdf=None):
+    
+    if pdf == None:
+        y = np.random.rand(N,self.d)
+        y[:,d] = end
+        Bs = [b(y[:,i]) for i,b in enumerate(self.basis)]
+        dBs = [b(y[:,i], derivative  = True) for i,b in enumerate(self.basis)]
+
+        pts = self.__call__(y)
+        pts_tangent = []
+        for i in range(self.d):
+            if i!=d:
+                ds = [False]*self.d
+                ds[i] = True
+                
+                v = self._eval_derivative(y, i)
+                if normalize:
+                    v = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+                pts_tangent += [v[:,None,:]]
+        #v = self._eval_derivative(y, d)
+        #norm = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
+        return pts, np.concatenate(tuple(pts_tangent),1)#, norm</code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.PatchNURBSParam.sample_inside"><code class="name flex">
+<span>def <span class="ident">sample_inside</span></span>(<span>self, N, pdf=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sample_inside(self, N, pdf=None):
+    
+    if pdf is None:
+        ys = np.random.rand(N, self.d)
+        # ys = jax.random.uniform(self.rand_key, (N, self.d))
+        xs = self.__call__(ys)
+    else:
+        pass
+        # Gy = self.__call__(ys)
+    return xs</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pinns.geometry.PatchParametrized"><code class="flex name class">
+<span>class <span class="ident">PatchParametrized</span></span>
+<span>(</span><span>parametrization, dims, rand_key)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PatchParametrized(Patch):
+
+    def __init__(self, parametrization, dims, rand_key):
+        super(PatchParametrized, self).__init__(rand_key)
+        self.dims = dims
+        self._parametrization = parametrization
+        self._parametrization_in = jax.jit(parametrization)
+        self._parametrization_bd = jax.jit(parametrization)
+        self._parametrization_bd_jacobian = jax.jit(jax.jacfwd(parametrization))
+
+    def sample_inside(self, N, pdf=None):
+
+        if pdf is None:
+            ys = jax.random.uniform(self.rand_key, (N, self.dims))
+            xs = self._parametrization_in(ys)
+
+        return xs
+
+    def sample_boundary(self, d, end, N, tangent = False, normal = False, pdf=None):
+        
+        if pdf is None:
+            ys = jax.random.uniform(self.rand_key, (N, self.dims))
+            ys = ys.at[:,d].set(end)
+            xs = self._parametrization_bd(ys)
+
+        return xs</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="pinns.geometry.Patch" href="#pinns.geometry.Patch">Patch</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="pinns.geometry.PatchParametrized.sample_boundary"><code class="name flex">
+<span>def <span class="ident">sample_boundary</span></span>(<span>self, d, end, N, tangent=False, normal=False, pdf=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sample_boundary(self, d, end, N, tangent = False, normal = False, pdf=None):
+    
+    if pdf is None:
+        ys = jax.random.uniform(self.rand_key, (N, self.dims))
+        ys = ys.at[:,d].set(end)
+        xs = self._parametrization_bd(ys)
+
+    return xs</code></pre>
+</details>
+</dd>
+<dt id="pinns.geometry.PatchParametrized.sample_inside"><code class="name flex">
+<span>def <span class="ident">sample_inside</span></span>(<span>self, N, pdf=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sample_inside(self, N, pdf=None):
+
+    if pdf is None:
+        ys = jax.random.uniform(self.rand_key, (N, self.dims))
+        xs = self._parametrization_in(ys)
+
+    return xs</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="pinns" href="index.html">pinns</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="pinns.geometry.normalize" href="#pinns.geometry.normalize">normalize</a></code></li>
+<li><code><a title="pinns.geometry.tangent2normal_2d" href="#pinns.geometry.tangent2normal_2d">tangent2normal_2d</a></code></li>
+<li><code><a title="pinns.geometry.tangent2normal_3d" href="#pinns.geometry.tangent2normal_3d">tangent2normal_3d</a></code></li>
+<li><code><a title="pinns.geometry.tensor_product_integration" href="#pinns.geometry.tensor_product_integration">tensor_product_integration</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="pinns.geometry.AffineTransformation" href="#pinns.geometry.AffineTransformation">AffineTransformation</a></code></h4>
+<ul class="">
+<li><code><a title="pinns.geometry.AffineTransformation.metric_coefficients" href="#pinns.geometry.AffineTransformation.metric_coefficients">metric_coefficients</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pinns.geometry.Patch" href="#pinns.geometry.Patch">Patch</a></code></h4>
+<ul class="">
+<li><code><a title="pinns.geometry.Patch.sample_boundary" href="#pinns.geometry.Patch.sample_boundary">sample_boundary</a></code></li>
+<li><code><a title="pinns.geometry.Patch.sample_inside" href="#pinns.geometry.Patch.sample_inside">sample_inside</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pinns.geometry.PatchNURBS" href="#pinns.geometry.PatchNURBS">PatchNURBS</a></code></h4>
+<ul class="">
+<li><code><a title="pinns.geometry.PatchNURBS.importance_sampling" href="#pinns.geometry.PatchNURBS.importance_sampling">importance_sampling</a></code></li>
+<li><code><a title="pinns.geometry.PatchNURBS.importance_sampling_2d" href="#pinns.geometry.PatchNURBS.importance_sampling_2d">importance_sampling_2d</a></code></li>
+<li><code><a title="pinns.geometry.PatchNURBS.importance_sampling_3d" href="#pinns.geometry.PatchNURBS.importance_sampling_3d">importance_sampling_3d</a></code></li>
+<li><code><a title="pinns.geometry.PatchNURBS.quadrature" href="#pinns.geometry.PatchNURBS.quadrature">quadrature</a></code></li>
+<li><code><a title="pinns.geometry.PatchNURBS.sample_boundary" href="#pinns.geometry.PatchNURBS.sample_boundary">sample_boundary</a></code></li>
+<li><code><a title="pinns.geometry.PatchNURBS.sample_inside" href="#pinns.geometry.PatchNURBS.sample_inside">sample_inside</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pinns.geometry.PatchNURBSParam" href="#pinns.geometry.PatchNURBSParam">PatchNURBSParam</a></code></h4>
+<ul class="">
+<li><code><a title="pinns.geometry.PatchNURBSParam.GetJacobian" href="#pinns.geometry.PatchNURBSParam.GetJacobian">GetJacobian</a></code></li>
+<li><code><a title="pinns.geometry.PatchNURBSParam.GetMetricTensors" href="#pinns.geometry.PatchNURBSParam.GetMetricTensors">GetMetricTensors</a></code></li>
+<li><code><a title="pinns.geometry.PatchNURBSParam.importance_sampling" href="#pinns.geometry.PatchNURBSParam.importance_sampling">importance_sampling</a></code></li>
+<li><code><a title="pinns.geometry.PatchNURBSParam.importance_sampling_2d" href="#pinns.geometry.PatchNURBSParam.importance_sampling_2d">importance_sampling_2d</a></code></li>
+<li><code><a title="pinns.geometry.PatchNURBSParam.importance_sampling_3d" href="#pinns.geometry.PatchNURBSParam.importance_sampling_3d">importance_sampling_3d</a></code></li>
+<li><code><a title="pinns.geometry.PatchNURBSParam.quadrature" href="#pinns.geometry.PatchNURBSParam.quadrature">quadrature</a></code></li>
+<li><code><a title="pinns.geometry.PatchNURBSParam.sample_boundary" href="#pinns.geometry.PatchNURBSParam.sample_boundary">sample_boundary</a></code></li>
+<li><code><a title="pinns.geometry.PatchNURBSParam.sample_inside" href="#pinns.geometry.PatchNURBSParam.sample_inside">sample_inside</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pinns.geometry.PatchParametrized" href="#pinns.geometry.PatchParametrized">PatchParametrized</a></code></h4>
+<ul class="">
+<li><code><a title="pinns.geometry.PatchParametrized.sample_boundary" href="#pinns.geometry.PatchParametrized.sample_boundary">sample_boundary</a></code></li>
+<li><code><a title="pinns.geometry.PatchParametrized.sample_inside" href="#pinns.geometry.PatchParametrized.sample_inside">sample_inside</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

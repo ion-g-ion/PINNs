@@ -33,8 +33,8 @@ class TestOperators(unittest.TestCase):
         
         x = jnp.array(np.random.rand(100,8))
         y = jnp.array(np.random.rand(100,8))
-        gc = grad_computedx(x,y)
-        gr = grad_referencex(x,y)
+        gc = grad_computedx(x, y)
+        gr = grad_referencex(x, y)
         error = jnp.linalg.norm(gc-gr)
         self.assertLess(error.to_py(),1e-13,"pinns.operators.gradient error: wrong gradient for 2 arguments (first wrong).")
         
@@ -113,5 +113,23 @@ class TestOperators(unittest.TestCase):
         error = jnp.linalg.norm(cc-cr)
         self.assertLess(error.to_py(),1e-13,"pinns.operators.curl3d error: wrong curl.")
         
+    def test_jacobian(self):
+        
+        func = lambda x: jnp.concatenate( ( (x[...,0]*jnp.cos(2*np.pi*x[...,1]))[...,None] , (x[...,0]*jnp.cos(2*np.pi*x[...,1]))[...,None] ) , -1)
+        jac_reference = lambda x: np.concatenate( (-2*x[...,2][...,None],-2*x[...,0][...,None],-2*x[...,1][...,None]) ,-1)
+        def jac_reference(x):
+            j1 = np.concatenate(( (jnp.cos(2*np.pi*x[...,1]))[...,None] , (jnp.sin(2*np.pi*x[...,1]))[...,None] ),-1)
+            j2 = np.concatenate(( (-2*np.pi*x[...,0]*jnp.sin(2*np.pi*x[...,1]))[...,None] , (2*np.pi*x[...,0]*jnp.cos(2*np.pi*x[...,1]))[...,None] ),-1)
+            return np.concatenate((j1[...,None],j2[...,None]),-1)
+
+        jac_computed = pinns.operators.jacobian(func)
+        x = jnp.array(np.random.rand(128,2))
+
+        jr = jac_reference(x)
+        jc = jac_computed(x)
+
+        error = jnp.linalg.norm(cc-cr)
+        self.assertLess(error.to_py(),1e-13,"pinns.operators.jacobian error: wrong jacobian.")
+    
 if __name__ == '__main__':
     unittest.main()

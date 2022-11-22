@@ -1,0 +1,1164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>pinns.bspline API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>pinns.bspline</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python"># import jax
+# import jax.numpy as jnp
+# import numpy as np
+# 
+# class BSplineBasis():
+#     
+#     def __init__(self, knots, deg):
+#         self.deg = deg
+#         self.n = knots.size+deg-1
+#         self.knots = np.concatenate(( np.ones(deg)*knots[0], knots , np.ones(deg)*knots[-1] ))
+#         
+#     def _eval_basis(self,x):
+# 
+#         result = np.zeros((x.shape[0],self.knots.size-1))
+#         
+#         for i in range(result.shape[1]):
+#             if self.knots[-1]&lt;=self.knots[i+1] and self.knots[i]&lt;self.knots[-1]:
+#                 idx = np.logical_and(x&gt;=self.knots[i], x&lt;=self.knots[i+1]) 
+#             else:
+#                 idx = np.logical_and(x&gt;=self.knots[i], x&lt;self.knots[i+1])
+#             # result = result.at[idx,i].set(1.0)
+#             result[idx,i] = 1.0
+#         
+#         for d in range(self.deg):
+#             for i in range(result.shape[1]-d-1):
+#                 a = result[:,i]*(x-self.knots[i])/(self.knots[i+d+1]-self.knots[i])
+#                 b = result[:,i+1]*(self.knots[i+d+2]-x)/(self.knots[i+d+2]-self.knots[i+1])
+#                 result_new = result.copy()
+#                 # result_new = result_new.at[:,i].set(0.0)
+#                 result_new[:,i] = 0.0
+#                 if (self.knots[i+d+1]-self.knots[i]) != 0:
+#                     # result_new = result_new.at[:,i].set( result_new[:,i] + a )
+#                     result_new[:,i] = result_new[:,i] + a
+#                 if (self.knots[i+d+2]-self.knots[i+1])!=0:
+#                     # result_new = result_new.at[:,i].set( result_new[:,i] + b )
+#                     result_new[:,i] = result_new[:,i] + b
+#                 result = result_new.copy() 
+#         # result[x==self.knots[-1],self.n-1] = 1.0
+#         return result[:,:self.n]
+#            
+#     def _eval_basis_derivative(self,x):
+# 
+#         result = np.zeros((x.shape[0],self.knots.size-1))
+#         
+#         for i in range(result.shape[1]):
+#             idx = np.logical_and(x&gt;=self.knots[i], x&lt;=self.knots[i+1]) if self.knots[-1]&lt;=self.knots[i+1] and self.knots[i]&lt;self.knots[-1] else jnp.logical_and(x&gt;=self.knots[i], x&lt;self.knots[i+1])
+#             # result = result.at[idx,i].set(1.0)
+#             result[idx,i] = 1.0
+#         #result[x==self.knots[-1],-1] = 1.0
+#         
+#         for d in range(self.deg):
+#             for i in range(result.shape[1]-d-1):
+#                 if d == self.deg-1:
+#                     a = self.deg*result[:,i]*(1)/(self.knots[i+d+1]-self.knots[i])
+#                     b = self.deg*result[:,i+1]*(-1)/(self.knots[i+d+2]-self.knots[i+1])
+#                 else:
+#                     a = result[:,i]*(x-self.knots[i])/(self.knots[i+d+1]-self.knots[i])
+#                     b = result[:,i+1]*(self.knots[i+d+2]-x)/(self.knots[i+d+2]-self.knots[i+1])
+#                 result_new = result.copy()
+#                 # result_new = result_new.at[:,i].set(0.0)
+#                 result_new[:,i] = 0.0
+#                 if (self.knots[i+d+1]-self.knots[i]) != 0:
+#                     # result_new  = result_new.at[:,i].set(result_new[:,i] + a)
+#                     result_new[:,i] = result_new[:,i] + a
+#                 if (self.knots[i+d+2]-self.knots[i+1])!=0:
+#                     # result_new = result_new.at[:,i].set(result_new[:,i] + b)
+#                     result_new[:,i] = result_new[:,i] + b
+#                 result = result_new.copy() 
+#                 
+#         # result[x==self.knots[-1],self.n-1] = 1.0
+#         return result[:,:self.n]
+#             
+#     def __call__(self, x, derivative = False):
+#         &#34;&#34;&#34;
+#         Evaluates the basis at the given points x.
+#         Args:
+#             x (torch.tensor): vector of size M
+#             derivative (bool, optional): evaluate the derivative of the basis or not. Defaults to False.
+#         Returns:
+#             torch.tensor: a matrix of size MxN
+#         &#34;&#34;&#34;
+#         if derivative:
+#             return self._eval_basis_derivative(x)
+#         else:
+#             return self._eval_basis(x)
+#    
+#     def interpolation_points(self):
+# 
+#         pts = np.array([np.sum(self.knots[i+1:i+self.deg+1]) for i in range(self.n)])/(self.deg)
+#         Mat = self.__call__(pts)
+#         return pts, Mat
+
+
+from scipy.interpolate import BSpline
+import scipy.interpolate
+import numpy as np
+
+
+class BSplineBasis:
+    
+    def __init__(self,knots,deg,ends = (True,True)):
+        &#34;&#34;&#34;
+        Univariate BSpline basis class.
+
+        Args:
+            knots (numpy.array): _description_
+            deg (int): _description_
+            ends (tuple, optional): _description_. Defaults to (True,True).
+        &#34;&#34;&#34;
+        self.N=knots.size+deg-1
+        self.deg=deg
+        self.knots=np.hstack( ( np.ones(deg)*knots[0] , knots , np.ones(deg)*knots[-1] ) )
+        self.spl = []
+        self.dspl = []
+        self.interval = (np.min(knots),np.max(knots))
+        for i in range(self.N):
+            c=np.zeros(self.N)
+            c[i]=1
+            self.spl.append(BSpline(self.knots,c,self.deg))
+            self.dspl.append(scipy.interpolate.splder( BSpline(self.knots,c,self.deg) ))
+        
+        self.compact_support_bsp = np.zeros((self.N,2))
+        for i in range(self.N):
+            self.compact_support_bsp[i,0] = self.knots[i]
+            self.compact_support_bsp[i,1] = self.knots[i+self.deg+1]
+            
+        int_bsp_bsp = np.zeros((self.N,self.N))
+        int_bsp = np.zeros((self.N,1))
+        # int_bsp_v = np.zeros((self.Nz,1))
+        
+        Pts, Ws =np.polynomial.legendre.leggauss(20)
+        for i in range(self.N):
+            a=self.compact_support_bsp[i,0]
+            b=self.compact_support_bsp[i,1]
+
+            for k in range(self.knots.size-1):
+                if self.knots[k]&gt;=a and self.knots[k+1]&lt;=b:
+                    pts = self.knots[k]+(Pts+1)*0.5*(self.knots[k+1]-self.knots[k])
+                    ws = Ws*(self.knots[k+1]-self.knots[k])/2
+                    int_bsp[i,0] += np.sum( self.__call__(pts,i) * ws )
+                    
+            for j in range(i,self.N):
+                a=self.compact_support_bsp[j,0]
+                b=self.compact_support_bsp[i,1]
+                if b&gt;a:
+                    for k in range(self.knots.size-1):
+                        if self.knots[k]&gt;=a and self.knots[k+1]&lt;=b:
+                            pts = self.knots[k]+(Pts+1)*0.5*(self.knots[k+1]-self.knots[k])
+                            ws = Ws*(self.knots[k+1]-self.knots[k])/2
+                            int_bsp_bsp[i,j] += np.sum(  self.__call__(pts,i) *self.__call__(pts,j) * ws )
+                            # int_bspp[i,j] += np.sum( self.bspp(pts)[i,:]* self.bspp(pts)[j,:]*ws )
+                    if i!=j:
+                        int_bsp_bsp[j,i] = int_bsp_bsp[i,j]
+                        # int_bspp[j,i] = int_bspp[i,j]
+                    
+        
+        self.int_bsp_bsp = int_bsp_bsp
+        # self.int_bspp_bspp = int_bspp
+        self.int_bsp = int_bsp
+        
+    
+    def __call__(self,x,i=None,derivative=False):
+        if i==None:
+            if derivative:
+                ret = np.array([self.dspl[i](x) for i in range(self.N)])
+                return ret
+            else:
+                ret = np.array([self.spl[i](x) for i in range(self.N)])
+                return ret
+        else:
+            if derivative:
+                 return self.dspl[i](x)
+            else:
+                return self.spl[i](x)
+            
+    def __repr__(self) -&gt; str:
+        return &#39;B-Spline basis of degree &#39;+str(self.deg)+&#39; and dimension &#39;+str(self.N)
+     
+    def greville(self):
+        return np.array([np.sum(self.knots[i+1:i+self.deg+1]) for i in range(self.N)])/(self.deg)
+        # return np.array([np.sum(self.knots[i+2:i+self.deg+2]) for i in range(self.N)])/(self.deg-1)
+        
+    def interpolating_points(self):
+        pts = np.array([np.sum(self.knots[i+1:i+self.deg+1]) for i in range(self.N)])/(self.deg)
+        Mat = self.__call__(pts)
+        return pts, Mat
+        
+    def abscissae(self):
+        return self.greville()
+
+    def quadrature_points(self,mult = 1):
+        pts = []
+        ws = []
+        Pts, Ws = np.polynomial.legendre.leggauss(mult)
+        for k in range(self.knots.size-1):
+            if self.knots[k+1]&gt;self.knots[k]:
+                pts += list(self.knots[k]+(Pts+1)*0.5*(self.knots[k+1]-self.knots[k]))
+                ws += list(Ws*(self.knots[k+1]-self.knots[k])/2)
+        pts = np.array(pts)
+        ws = np.array(ws)
+        
+        return pts, ws
+            
+    def eval_all(self,c,x):
+        c=np.hstack((c,np.zeros(self.deg-2)))
+        return BSpline(self.knots,c,self.deg)(x)
+    
+    def plot(self,derivative = False):
+        
+        for i in range(self.N):
+            x=np.linspace(self.compact_support_bsp[i,0],self.compact_support_bsp[i,1],500)
+            # plt.plot(x,self.__call__(x,i,derivative))
+    def derivative(self):
+        bd = scipy.interpolate.splder(BSpline(self.knots,np.zeros(self.N+self.deg-1)+1,self.deg))
+        return BSplineBasis(np.unique(bd.t), bd.k)
+    def integrate(self):
+        BI = np.zeros((self.N+1,self.N+1))
+        BII = np.zeros((self.N+1,self.N+1))
+        a = self.knots[0]
+        b = self.knots[-1]
+        pts, ws =np.polynomial.legendre.leggauss(128)
+        pts = a+(pts+1)*0.5*(b-a)
+        for i in range(self.N+1):
+            for j in range(i,self.N+1):
+                BI[i,j] = np.sum( self.eval_single(i,pts)*self.eval_single(j,pts)*ws*(b-a)/2 )
+                BI[j,i] = BI[i,j]
+        return BII,BI
+
+
+import jax.numpy as jnp
+import jax 
+import jax.lax
+
+class JaxPiecewiseLinear():
+    
+    def __init__(self, knots):
+        self.N = knots.size
+        self.knots = knots
+        
+    def __call__(self, x, dofs):
+        
+        ret = 0*x
+        for i in range(self.N-1):
+            idx = jnp.logical_and(x&gt;=self.konts[i],x&lt;self.knots[i+1])
+            ret = ret.at[idx].set( 1 )
+
+
+class BSplineBasisJAX():
+    
+    __deg : int 
+    __n: int 
+    __knots: jax.numpy.DeviceArray
+    
+    def __init__(self, knots: np.ndarray, deg: int):
+        &#34;&#34;&#34;_summary_
+
+        Args:
+            knots (np.ndarray): the knots of the basis (without padding).
+            deg (int): the degree of the basis.
+        &#34;&#34;&#34;
+        self.__deg = deg
+        self.__n = knots.size+deg-1
+        self.__knots = jnp.array(np.concatenate(( np.ones(deg)*knots[0], knots , np.ones(deg)*knots[-1] )))
+        
+
+    @property
+    def knots(self) -&gt; jax.numpy.DeviceArray:
+        &#34;&#34;&#34;
+        Return the knots as a `jax.numpy.DeviceArray`.
+
+        Returns:
+            jax.numpy.DeviceArray: the knots
+        &#34;&#34;&#34;
+        return self.__knots
+    
+    @property
+    def deg(self) -&gt; int:
+        &#34;&#34;&#34;
+        The degree of the B-spline basis.
+
+        Returns:
+            int: degree.
+        &#34;&#34;&#34;
+        return self.__deg
+    
+    @property
+    def n(self) -&gt; int:
+        &#34;&#34;&#34;
+        The dimension of the B-spline basis.
+
+        Returns:
+            int: _description_
+        &#34;&#34;&#34;
+        return self.__n
+    
+    def __repr__(self) -&gt; str:
+        return &#39;B-Spline basis of degree &#39;+str(self.__deg)+&#39; and dimension &#39;+str(self.__n)
+    
+    def _eval_basis(self, x):
+
+        result = jnp.zeros((x.shape[0],self.__knots.size-1))
+        
+        for i in range(self.__knots.size-1):
+
+            
+            tmp1 = jnp.where(jnp.logical_and(x&gt;=self.__knots[i], x&lt;=self.__knots[i+1]),1.0,0.0)
+            tmp2 = jnp.where(jnp.logical_and(x&gt;=self.__knots[i], x&lt; self.__knots[i+1]),1.0,0.0)
+            result_new = jnp.where(i==self.__n-1, tmp1, tmp2)
+            # if self.__knots[-1]&lt;=self.__knots[i+1] and self.__knots[i]&lt;self.__knots[-1]:
+            #     idx = jnp.logical_and(x&gt;=self.__knots[i], x&lt;=self.__knots[i+1]) 
+            # else:
+            #     idx = jnp.logical_and(x&gt;=self.__knots[i], x&lt;self.__knots[i+1])
+            result = result.at[:,i].set(result_new)
+            # result[idx,i] = 1.0
+        
+        for d in range(self.__deg):
+            for i in range(result.shape[1]-d-1):
+                a = result[:,i]*(x-self.__knots[i])/(self.__knots[i+d+1]-self.__knots[i])
+                b = result[:,i+1]*(self.__knots[i+d+2]-x)/(self.__knots[i+d+2]-self.__knots[i+1])
+                result_new = result.copy()
+                result_new = result_new.at[:,i].set(0.0)
+                # result_new[:,i] = 0.0
+                
+                result_new = jax.lax.cond((self.__knots[i+d+1]-self.__knots[i]) != 0, lambda : result_new.at[:,i].set( result_new[:,i] + a ), lambda : result_new)
+                result_new = jax.lax.cond((self.__knots[i+d+2]-self.__knots[i+1])!=0, lambda : result_new.at[:,i].set( result_new[:,i] + b ), lambda : result_new)
+                
+                # if (self.__knots[i+d+1]-self.__knots[i]) != 0:
+                #     result_new = result_new.at[:,i].set( result_new[:,i] + a )
+                #     # result_new[:,i] = result_new[:,i] + a
+                # if (self.__knots[i+d+2]-self.__knots[i+1])!=0:
+                #     result_new = result_new.at[:,i].set( result_new[:,i] + b )
+                #     # result_new[:,i] = result_new[:,i] + b
+                result = result_new.copy() 
+        # result[x==self.knots[-1],self.n-1] = 1.0
+        return result[:,:self.__n].T
+           
+    def _eval_basis_derivative(self,x):
+
+        result = jnp.zeros((x.shape[0],self.__knots.size-1))
+        
+        for i in range(result.shape[1]):
+            tmp1 = jnp.where(jnp.logical_and(x&gt;=self.__knots[i], x&lt;=self.__knots[i+1]),1.0,0.0)
+            tmp2 = jnp.where(jnp.logical_and(x&gt;=self.__knots[i], x&lt; self.__knots[i+1]),1.0,0.0)
+            result_new = jnp.where(i==self.__n-1, tmp1, tmp2)
+            # if self.__knots[-1]&lt;=self.__knots[i+1] and self.__knots[i]&lt;self.__knots[-1]:
+            #     idx = jnp.logical_and(x&gt;=self.__knots[i], x&lt;=self.__knots[i+1]) 
+            # else:
+            #     idx = jnp.logical_and(x&gt;=self.__knots[i], x&lt;self.__knots[i+1])
+            result = result.at[:,i].set(result_new)
+            
+            #    idx = np.logical_and(x&gt;=self.__knots[i], x&lt;=self.__knots[i+1]) if self.__knots[-1]&lt;=self.__knots[i+1] and self.__knots[i]&lt;self.__knots[-1] else jnp.logical_and(x&gt;=self.__knots[i], x&lt;self.__knots[i+1])
+            #    # result = result.at[idx,i].set(1.0)
+            #    result[idx,i] = 1.0
+        #result[x==self.knots[-1],-1] = 1.0
+        
+        for d in range(self.__deg):
+            for i in range(result.shape[1]-d-1):
+                if d == self.__deg-1:
+                    a = self.__deg*result[:,i]*(1)/(self.__knots[i+d+1]-self.__knots[i])
+                    b = self.__deg*result[:,i+1]*(-1)/(self.__knots[i+d+2]-self.__knots[i+1])
+                else:
+                    a = result[:,i]*(x-self.__knots[i])/(self.__knots[i+d+1]-self.__knots[i])
+                    b = result[:,i+1]*(self.__knots[i+d+2]-x)/(self.__knots[i+d+2]-self.__knots[i+1])
+                result_new = result.copy()
+                result_new = result_new.at[:,i].set(0.0)
+                # result_new[:,i] = 0.0
+
+                #   if (self.__knots[i+d+1]-self.__knots[i]) != 0:
+                #       result_new  = result_new.at[:,i].set(result_new[:,i] + a)
+                #       # result_new[:,i] = result_new[:,i] + a
+                #   if (self.__knots[i+d+2]-self.__knots[i+1])!=0:
+                #       result_new = result_new.at[:,i].set(result_new[:,i] + b)
+                #       # result_new[:,i] = result_new[:,i] + b
+
+                result_new = jax.lax.cond((self.__knots[i+d+1]-self.__knots[i]) != 0, lambda : result_new.at[:,i].set( result_new[:,i] + a ), lambda : result_new)
+                result_new = jax.lax.cond((self.__knots[i+d+2]-self.__knots[i+1])!=0, lambda : result_new.at[:,i].set( result_new[:,i] + b ), lambda : result_new)
+
+                result = result_new.copy() 
+                
+        # result[x==self.knots[-1],self.n-1] = 1.0
+        return result[:,:self.__n].T
+            
+    def __call__(self, x : jax.numpy.DeviceArray|np.ndarray, derivative = False) -&gt; jax.numpy.DeviceArray:
+        &#34;&#34;&#34;
+        Evaluate the B-splines for the given points.
+
+        Args:
+            x (jax.numpy.DeviceArray | np.ndarray): the points where the basis is evaluated. Has to be vector of shape `(m,)`.
+            derivative (bool, optional): evaluete the basis or its derivative. Defaults to False.
+
+        Returns:
+            jax.numpy.DeviceArray: the B-splines evaluated for x. Has the shape `(n,m)`, where `n` is the dimension of the basis.
+        &#34;&#34;&#34;
+        if derivative:
+            return self._eval_basis_derivative(x)
+        else:
+            return self._eval_basis(x)
+   
+    def interpolating_points(self) -&gt; tuple[jax.numpy.DeviceArray, jax.numpy.DeviceArray]:
+        &#34;&#34;&#34;
+        Return the intepolating points and the basis evaluated in these points.
+        The resulting matrix is nonsingular.
+        
+        Example:
+        ```
+        
+        ```
+
+
+        Returns:
+            tuple[jax.numpy.DeviceArray, jax.numpy.DeviceArray]: the points as a vector and the matrix resulted from evaluating the basis for these points. 
+        &#34;&#34;&#34;
+        pts = jnp.array([jnp.sum(self.__knots[i+1:i+self.__deg+1]) for i in range(self.n)])/(self.__deg)
+        Mat = self.__call__(pts)
+        return pts, Mat
+    
+    def quadrature_points(self,mult = 1):
+        pts = []
+        ws = []
+        Pts, Ws = np.polynomial.legendre.leggauss(mult)
+        for k in range(self.__knots.size-1):
+            if self.__knots[k+1]&gt;self.__knots[k]:
+                pts += list(self.__knots[k]+(Pts+1)*0.5*(self.__knots[k+1]-self.__knots[k]))
+                ws += list(Ws*(self.__knots[k+1]-self.__knots[k])/2)
+        pts = np.array(pts)
+        ws = np.array(ws)
+        
+        return pts, ws</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="pinns.bspline.BSplineBasis"><code class="flex name class">
+<span>class <span class="ident">BSplineBasis</span></span>
+<span>(</span><span>knots, deg, ends=(True, True))</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Univariate BSpline basis class.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>knots</code></strong> :&ensp;<code>numpy.array</code></dt>
+<dd><em>description</em></dd>
+<dt><strong><code>deg</code></strong> :&ensp;<code>int</code></dt>
+<dd><em>description</em></dd>
+<dt><strong><code>ends</code></strong> :&ensp;<code>tuple</code>, optional</dt>
+<dd><em>description</em>. Defaults to (True,True).</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BSplineBasis:
+    
+    def __init__(self,knots,deg,ends = (True,True)):
+        &#34;&#34;&#34;
+        Univariate BSpline basis class.
+
+        Args:
+            knots (numpy.array): _description_
+            deg (int): _description_
+            ends (tuple, optional): _description_. Defaults to (True,True).
+        &#34;&#34;&#34;
+        self.N=knots.size+deg-1
+        self.deg=deg
+        self.knots=np.hstack( ( np.ones(deg)*knots[0] , knots , np.ones(deg)*knots[-1] ) )
+        self.spl = []
+        self.dspl = []
+        self.interval = (np.min(knots),np.max(knots))
+        for i in range(self.N):
+            c=np.zeros(self.N)
+            c[i]=1
+            self.spl.append(BSpline(self.knots,c,self.deg))
+            self.dspl.append(scipy.interpolate.splder( BSpline(self.knots,c,self.deg) ))
+        
+        self.compact_support_bsp = np.zeros((self.N,2))
+        for i in range(self.N):
+            self.compact_support_bsp[i,0] = self.knots[i]
+            self.compact_support_bsp[i,1] = self.knots[i+self.deg+1]
+            
+        int_bsp_bsp = np.zeros((self.N,self.N))
+        int_bsp = np.zeros((self.N,1))
+        # int_bsp_v = np.zeros((self.Nz,1))
+        
+        Pts, Ws =np.polynomial.legendre.leggauss(20)
+        for i in range(self.N):
+            a=self.compact_support_bsp[i,0]
+            b=self.compact_support_bsp[i,1]
+
+            for k in range(self.knots.size-1):
+                if self.knots[k]&gt;=a and self.knots[k+1]&lt;=b:
+                    pts = self.knots[k]+(Pts+1)*0.5*(self.knots[k+1]-self.knots[k])
+                    ws = Ws*(self.knots[k+1]-self.knots[k])/2
+                    int_bsp[i,0] += np.sum( self.__call__(pts,i) * ws )
+                    
+            for j in range(i,self.N):
+                a=self.compact_support_bsp[j,0]
+                b=self.compact_support_bsp[i,1]
+                if b&gt;a:
+                    for k in range(self.knots.size-1):
+                        if self.knots[k]&gt;=a and self.knots[k+1]&lt;=b:
+                            pts = self.knots[k]+(Pts+1)*0.5*(self.knots[k+1]-self.knots[k])
+                            ws = Ws*(self.knots[k+1]-self.knots[k])/2
+                            int_bsp_bsp[i,j] += np.sum(  self.__call__(pts,i) *self.__call__(pts,j) * ws )
+                            # int_bspp[i,j] += np.sum( self.bspp(pts)[i,:]* self.bspp(pts)[j,:]*ws )
+                    if i!=j:
+                        int_bsp_bsp[j,i] = int_bsp_bsp[i,j]
+                        # int_bspp[j,i] = int_bspp[i,j]
+                    
+        
+        self.int_bsp_bsp = int_bsp_bsp
+        # self.int_bspp_bspp = int_bspp
+        self.int_bsp = int_bsp
+        
+    
+    def __call__(self,x,i=None,derivative=False):
+        if i==None:
+            if derivative:
+                ret = np.array([self.dspl[i](x) for i in range(self.N)])
+                return ret
+            else:
+                ret = np.array([self.spl[i](x) for i in range(self.N)])
+                return ret
+        else:
+            if derivative:
+                 return self.dspl[i](x)
+            else:
+                return self.spl[i](x)
+            
+    def __repr__(self) -&gt; str:
+        return &#39;B-Spline basis of degree &#39;+str(self.deg)+&#39; and dimension &#39;+str(self.N)
+     
+    def greville(self):
+        return np.array([np.sum(self.knots[i+1:i+self.deg+1]) for i in range(self.N)])/(self.deg)
+        # return np.array([np.sum(self.knots[i+2:i+self.deg+2]) for i in range(self.N)])/(self.deg-1)
+        
+    def interpolating_points(self):
+        pts = np.array([np.sum(self.knots[i+1:i+self.deg+1]) for i in range(self.N)])/(self.deg)
+        Mat = self.__call__(pts)
+        return pts, Mat
+        
+    def abscissae(self):
+        return self.greville()
+
+    def quadrature_points(self,mult = 1):
+        pts = []
+        ws = []
+        Pts, Ws = np.polynomial.legendre.leggauss(mult)
+        for k in range(self.knots.size-1):
+            if self.knots[k+1]&gt;self.knots[k]:
+                pts += list(self.knots[k]+(Pts+1)*0.5*(self.knots[k+1]-self.knots[k]))
+                ws += list(Ws*(self.knots[k+1]-self.knots[k])/2)
+        pts = np.array(pts)
+        ws = np.array(ws)
+        
+        return pts, ws
+            
+    def eval_all(self,c,x):
+        c=np.hstack((c,np.zeros(self.deg-2)))
+        return BSpline(self.knots,c,self.deg)(x)
+    
+    def plot(self,derivative = False):
+        
+        for i in range(self.N):
+            x=np.linspace(self.compact_support_bsp[i,0],self.compact_support_bsp[i,1],500)
+            # plt.plot(x,self.__call__(x,i,derivative))
+    def derivative(self):
+        bd = scipy.interpolate.splder(BSpline(self.knots,np.zeros(self.N+self.deg-1)+1,self.deg))
+        return BSplineBasis(np.unique(bd.t), bd.k)
+    def integrate(self):
+        BI = np.zeros((self.N+1,self.N+1))
+        BII = np.zeros((self.N+1,self.N+1))
+        a = self.knots[0]
+        b = self.knots[-1]
+        pts, ws =np.polynomial.legendre.leggauss(128)
+        pts = a+(pts+1)*0.5*(b-a)
+        for i in range(self.N+1):
+            for j in range(i,self.N+1):
+                BI[i,j] = np.sum( self.eval_single(i,pts)*self.eval_single(j,pts)*ws*(b-a)/2 )
+                BI[j,i] = BI[i,j]
+        return BII,BI</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="pinns.bspline.BSplineBasis.abscissae"><code class="name flex">
+<span>def <span class="ident">abscissae</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def abscissae(self):
+    return self.greville()</code></pre>
+</details>
+</dd>
+<dt id="pinns.bspline.BSplineBasis.derivative"><code class="name flex">
+<span>def <span class="ident">derivative</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def derivative(self):
+    bd = scipy.interpolate.splder(BSpline(self.knots,np.zeros(self.N+self.deg-1)+1,self.deg))
+    return BSplineBasis(np.unique(bd.t), bd.k)</code></pre>
+</details>
+</dd>
+<dt id="pinns.bspline.BSplineBasis.eval_all"><code class="name flex">
+<span>def <span class="ident">eval_all</span></span>(<span>self, c, x)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def eval_all(self,c,x):
+    c=np.hstack((c,np.zeros(self.deg-2)))
+    return BSpline(self.knots,c,self.deg)(x)</code></pre>
+</details>
+</dd>
+<dt id="pinns.bspline.BSplineBasis.greville"><code class="name flex">
+<span>def <span class="ident">greville</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def greville(self):
+    return np.array([np.sum(self.knots[i+1:i+self.deg+1]) for i in range(self.N)])/(self.deg)
+    # return np.array([np.sum(self.knots[i+2:i+self.deg+2]) for i in range(self.N)])/(self.deg-1)</code></pre>
+</details>
+</dd>
+<dt id="pinns.bspline.BSplineBasis.integrate"><code class="name flex">
+<span>def <span class="ident">integrate</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def integrate(self):
+    BI = np.zeros((self.N+1,self.N+1))
+    BII = np.zeros((self.N+1,self.N+1))
+    a = self.knots[0]
+    b = self.knots[-1]
+    pts, ws =np.polynomial.legendre.leggauss(128)
+    pts = a+(pts+1)*0.5*(b-a)
+    for i in range(self.N+1):
+        for j in range(i,self.N+1):
+            BI[i,j] = np.sum( self.eval_single(i,pts)*self.eval_single(j,pts)*ws*(b-a)/2 )
+            BI[j,i] = BI[i,j]
+    return BII,BI</code></pre>
+</details>
+</dd>
+<dt id="pinns.bspline.BSplineBasis.interpolating_points"><code class="name flex">
+<span>def <span class="ident">interpolating_points</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def interpolating_points(self):
+    pts = np.array([np.sum(self.knots[i+1:i+self.deg+1]) for i in range(self.N)])/(self.deg)
+    Mat = self.__call__(pts)
+    return pts, Mat</code></pre>
+</details>
+</dd>
+<dt id="pinns.bspline.BSplineBasis.plot"><code class="name flex">
+<span>def <span class="ident">plot</span></span>(<span>self, derivative=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot(self,derivative = False):
+    
+    for i in range(self.N):
+        x=np.linspace(self.compact_support_bsp[i,0],self.compact_support_bsp[i,1],500)
+        # plt.plot(x,self.__call__(x,i,derivative))</code></pre>
+</details>
+</dd>
+<dt id="pinns.bspline.BSplineBasis.quadrature_points"><code class="name flex">
+<span>def <span class="ident">quadrature_points</span></span>(<span>self, mult=1)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def quadrature_points(self,mult = 1):
+    pts = []
+    ws = []
+    Pts, Ws = np.polynomial.legendre.leggauss(mult)
+    for k in range(self.knots.size-1):
+        if self.knots[k+1]&gt;self.knots[k]:
+            pts += list(self.knots[k]+(Pts+1)*0.5*(self.knots[k+1]-self.knots[k]))
+            ws += list(Ws*(self.knots[k+1]-self.knots[k])/2)
+    pts = np.array(pts)
+    ws = np.array(ws)
+    
+    return pts, ws</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pinns.bspline.BSplineBasisJAX"><code class="flex name class">
+<span>class <span class="ident">BSplineBasisJAX</span></span>
+<span>(</span><span>knots: numpy.ndarray, deg: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p><em>summary</em></p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>knots</code></strong> :&ensp;<code>np.ndarray</code></dt>
+<dd>the knots of the basis (without padding).</dd>
+<dt><strong><code>deg</code></strong> :&ensp;<code>int</code></dt>
+<dd>the degree of the basis.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BSplineBasisJAX():
+    
+    __deg : int 
+    __n: int 
+    __knots: jax.numpy.DeviceArray
+    
+    def __init__(self, knots: np.ndarray, deg: int):
+        &#34;&#34;&#34;_summary_
+
+        Args:
+            knots (np.ndarray): the knots of the basis (without padding).
+            deg (int): the degree of the basis.
+        &#34;&#34;&#34;
+        self.__deg = deg
+        self.__n = knots.size+deg-1
+        self.__knots = jnp.array(np.concatenate(( np.ones(deg)*knots[0], knots , np.ones(deg)*knots[-1] )))
+        
+
+    @property
+    def knots(self) -&gt; jax.numpy.DeviceArray:
+        &#34;&#34;&#34;
+        Return the knots as a `jax.numpy.DeviceArray`.
+
+        Returns:
+            jax.numpy.DeviceArray: the knots
+        &#34;&#34;&#34;
+        return self.__knots
+    
+    @property
+    def deg(self) -&gt; int:
+        &#34;&#34;&#34;
+        The degree of the B-spline basis.
+
+        Returns:
+            int: degree.
+        &#34;&#34;&#34;
+        return self.__deg
+    
+    @property
+    def n(self) -&gt; int:
+        &#34;&#34;&#34;
+        The dimension of the B-spline basis.
+
+        Returns:
+            int: _description_
+        &#34;&#34;&#34;
+        return self.__n
+    
+    def __repr__(self) -&gt; str:
+        return &#39;B-Spline basis of degree &#39;+str(self.__deg)+&#39; and dimension &#39;+str(self.__n)
+    
+    def _eval_basis(self, x):
+
+        result = jnp.zeros((x.shape[0],self.__knots.size-1))
+        
+        for i in range(self.__knots.size-1):
+
+            
+            tmp1 = jnp.where(jnp.logical_and(x&gt;=self.__knots[i], x&lt;=self.__knots[i+1]),1.0,0.0)
+            tmp2 = jnp.where(jnp.logical_and(x&gt;=self.__knots[i], x&lt; self.__knots[i+1]),1.0,0.0)
+            result_new = jnp.where(i==self.__n-1, tmp1, tmp2)
+            # if self.__knots[-1]&lt;=self.__knots[i+1] and self.__knots[i]&lt;self.__knots[-1]:
+            #     idx = jnp.logical_and(x&gt;=self.__knots[i], x&lt;=self.__knots[i+1]) 
+            # else:
+            #     idx = jnp.logical_and(x&gt;=self.__knots[i], x&lt;self.__knots[i+1])
+            result = result.at[:,i].set(result_new)
+            # result[idx,i] = 1.0
+        
+        for d in range(self.__deg):
+            for i in range(result.shape[1]-d-1):
+                a = result[:,i]*(x-self.__knots[i])/(self.__knots[i+d+1]-self.__knots[i])
+                b = result[:,i+1]*(self.__knots[i+d+2]-x)/(self.__knots[i+d+2]-self.__knots[i+1])
+                result_new = result.copy()
+                result_new = result_new.at[:,i].set(0.0)
+                # result_new[:,i] = 0.0
+                
+                result_new = jax.lax.cond((self.__knots[i+d+1]-self.__knots[i]) != 0, lambda : result_new.at[:,i].set( result_new[:,i] + a ), lambda : result_new)
+                result_new = jax.lax.cond((self.__knots[i+d+2]-self.__knots[i+1])!=0, lambda : result_new.at[:,i].set( result_new[:,i] + b ), lambda : result_new)
+                
+                # if (self.__knots[i+d+1]-self.__knots[i]) != 0:
+                #     result_new = result_new.at[:,i].set( result_new[:,i] + a )
+                #     # result_new[:,i] = result_new[:,i] + a
+                # if (self.__knots[i+d+2]-self.__knots[i+1])!=0:
+                #     result_new = result_new.at[:,i].set( result_new[:,i] + b )
+                #     # result_new[:,i] = result_new[:,i] + b
+                result = result_new.copy() 
+        # result[x==self.knots[-1],self.n-1] = 1.0
+        return result[:,:self.__n].T
+           
+    def _eval_basis_derivative(self,x):
+
+        result = jnp.zeros((x.shape[0],self.__knots.size-1))
+        
+        for i in range(result.shape[1]):
+            tmp1 = jnp.where(jnp.logical_and(x&gt;=self.__knots[i], x&lt;=self.__knots[i+1]),1.0,0.0)
+            tmp2 = jnp.where(jnp.logical_and(x&gt;=self.__knots[i], x&lt; self.__knots[i+1]),1.0,0.0)
+            result_new = jnp.where(i==self.__n-1, tmp1, tmp2)
+            # if self.__knots[-1]&lt;=self.__knots[i+1] and self.__knots[i]&lt;self.__knots[-1]:
+            #     idx = jnp.logical_and(x&gt;=self.__knots[i], x&lt;=self.__knots[i+1]) 
+            # else:
+            #     idx = jnp.logical_and(x&gt;=self.__knots[i], x&lt;self.__knots[i+1])
+            result = result.at[:,i].set(result_new)
+            
+            #    idx = np.logical_and(x&gt;=self.__knots[i], x&lt;=self.__knots[i+1]) if self.__knots[-1]&lt;=self.__knots[i+1] and self.__knots[i]&lt;self.__knots[-1] else jnp.logical_and(x&gt;=self.__knots[i], x&lt;self.__knots[i+1])
+            #    # result = result.at[idx,i].set(1.0)
+            #    result[idx,i] = 1.0
+        #result[x==self.knots[-1],-1] = 1.0
+        
+        for d in range(self.__deg):
+            for i in range(result.shape[1]-d-1):
+                if d == self.__deg-1:
+                    a = self.__deg*result[:,i]*(1)/(self.__knots[i+d+1]-self.__knots[i])
+                    b = self.__deg*result[:,i+1]*(-1)/(self.__knots[i+d+2]-self.__knots[i+1])
+                else:
+                    a = result[:,i]*(x-self.__knots[i])/(self.__knots[i+d+1]-self.__knots[i])
+                    b = result[:,i+1]*(self.__knots[i+d+2]-x)/(self.__knots[i+d+2]-self.__knots[i+1])
+                result_new = result.copy()
+                result_new = result_new.at[:,i].set(0.0)
+                # result_new[:,i] = 0.0
+
+                #   if (self.__knots[i+d+1]-self.__knots[i]) != 0:
+                #       result_new  = result_new.at[:,i].set(result_new[:,i] + a)
+                #       # result_new[:,i] = result_new[:,i] + a
+                #   if (self.__knots[i+d+2]-self.__knots[i+1])!=0:
+                #       result_new = result_new.at[:,i].set(result_new[:,i] + b)
+                #       # result_new[:,i] = result_new[:,i] + b
+
+                result_new = jax.lax.cond((self.__knots[i+d+1]-self.__knots[i]) != 0, lambda : result_new.at[:,i].set( result_new[:,i] + a ), lambda : result_new)
+                result_new = jax.lax.cond((self.__knots[i+d+2]-self.__knots[i+1])!=0, lambda : result_new.at[:,i].set( result_new[:,i] + b ), lambda : result_new)
+
+                result = result_new.copy() 
+                
+        # result[x==self.knots[-1],self.n-1] = 1.0
+        return result[:,:self.__n].T
+            
+    def __call__(self, x : jax.numpy.DeviceArray|np.ndarray, derivative = False) -&gt; jax.numpy.DeviceArray:
+        &#34;&#34;&#34;
+        Evaluate the B-splines for the given points.
+
+        Args:
+            x (jax.numpy.DeviceArray | np.ndarray): the points where the basis is evaluated. Has to be vector of shape `(m,)`.
+            derivative (bool, optional): evaluete the basis or its derivative. Defaults to False.
+
+        Returns:
+            jax.numpy.DeviceArray: the B-splines evaluated for x. Has the shape `(n,m)`, where `n` is the dimension of the basis.
+        &#34;&#34;&#34;
+        if derivative:
+            return self._eval_basis_derivative(x)
+        else:
+            return self._eval_basis(x)
+   
+    def interpolating_points(self) -&gt; tuple[jax.numpy.DeviceArray, jax.numpy.DeviceArray]:
+        &#34;&#34;&#34;
+        Return the intepolating points and the basis evaluated in these points.
+        The resulting matrix is nonsingular.
+        
+        Example:
+        ```
+        
+        ```
+
+
+        Returns:
+            tuple[jax.numpy.DeviceArray, jax.numpy.DeviceArray]: the points as a vector and the matrix resulted from evaluating the basis for these points. 
+        &#34;&#34;&#34;
+        pts = jnp.array([jnp.sum(self.__knots[i+1:i+self.__deg+1]) for i in range(self.n)])/(self.__deg)
+        Mat = self.__call__(pts)
+        return pts, Mat
+    
+    def quadrature_points(self,mult = 1):
+        pts = []
+        ws = []
+        Pts, Ws = np.polynomial.legendre.leggauss(mult)
+        for k in range(self.__knots.size-1):
+            if self.__knots[k+1]&gt;self.__knots[k]:
+                pts += list(self.__knots[k]+(Pts+1)*0.5*(self.__knots[k+1]-self.__knots[k]))
+                ws += list(Ws*(self.__knots[k+1]-self.__knots[k])/2)
+        pts = np.array(pts)
+        ws = np.array(ws)
+        
+        return pts, ws</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="pinns.bspline.BSplineBasisJAX.deg"><code class="name">var <span class="ident">deg</span> : int</code></dt>
+<dd>
+<div class="desc"><p>The degree of the B-spline basis.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd>degree.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def deg(self) -&gt; int:
+    &#34;&#34;&#34;
+    The degree of the B-spline basis.
+
+    Returns:
+        int: degree.
+    &#34;&#34;&#34;
+    return self.__deg</code></pre>
+</details>
+</dd>
+<dt id="pinns.bspline.BSplineBasisJAX.knots"><code class="name">var <span class="ident">knots</span> : jaxlib.xla_extension.DeviceArrayBase</code></dt>
+<dd>
+<div class="desc"><p>Return the knots as a <code>jax.numpy.DeviceArray</code>.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>jax.numpy.DeviceArray</code></dt>
+<dd>the knots</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def knots(self) -&gt; jax.numpy.DeviceArray:
+    &#34;&#34;&#34;
+    Return the knots as a `jax.numpy.DeviceArray`.
+
+    Returns:
+        jax.numpy.DeviceArray: the knots
+    &#34;&#34;&#34;
+    return self.__knots</code></pre>
+</details>
+</dd>
+<dt id="pinns.bspline.BSplineBasisJAX.n"><code class="name">var <span class="ident">n</span> : int</code></dt>
+<dd>
+<div class="desc"><p>The dimension of the B-spline basis.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>int</code></dt>
+<dd><em>description</em></dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def n(self) -&gt; int:
+    &#34;&#34;&#34;
+    The dimension of the B-spline basis.
+
+    Returns:
+        int: _description_
+    &#34;&#34;&#34;
+    return self.__n</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pinns.bspline.BSplineBasisJAX.interpolating_points"><code class="name flex">
+<span>def <span class="ident">interpolating_points</span></span>(<span>self) ‑> tuple[jaxlib.xla_extension.DeviceArrayBase, jaxlib.xla_extension.DeviceArrayBase]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the intepolating points and the basis evaluated in these points.
+The resulting matrix is nonsingular.</p>
+<p>Example:</p>
+<pre><code>
+</code></pre>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>tuple[jax.numpy.DeviceArray, jax.numpy.DeviceArray]</code></dt>
+<dd>the points as a vector and the matrix resulted from evaluating the basis for these points.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def interpolating_points(self) -&gt; tuple[jax.numpy.DeviceArray, jax.numpy.DeviceArray]:
+    &#34;&#34;&#34;
+    Return the intepolating points and the basis evaluated in these points.
+    The resulting matrix is nonsingular.
+    
+    Example:
+    ```
+    
+    ```
+
+
+    Returns:
+        tuple[jax.numpy.DeviceArray, jax.numpy.DeviceArray]: the points as a vector and the matrix resulted from evaluating the basis for these points. 
+    &#34;&#34;&#34;
+    pts = jnp.array([jnp.sum(self.__knots[i+1:i+self.__deg+1]) for i in range(self.n)])/(self.__deg)
+    Mat = self.__call__(pts)
+    return pts, Mat</code></pre>
+</details>
+</dd>
+<dt id="pinns.bspline.BSplineBasisJAX.quadrature_points"><code class="name flex">
+<span>def <span class="ident">quadrature_points</span></span>(<span>self, mult=1)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def quadrature_points(self,mult = 1):
+    pts = []
+    ws = []
+    Pts, Ws = np.polynomial.legendre.leggauss(mult)
+    for k in range(self.__knots.size-1):
+        if self.__knots[k+1]&gt;self.__knots[k]:
+            pts += list(self.__knots[k]+(Pts+1)*0.5*(self.__knots[k+1]-self.__knots[k]))
+            ws += list(Ws*(self.__knots[k+1]-self.__knots[k])/2)
+    pts = np.array(pts)
+    ws = np.array(ws)
+    
+    return pts, ws</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="pinns.bspline.JaxPiecewiseLinear"><code class="flex name class">
+<span>class <span class="ident">JaxPiecewiseLinear</span></span>
+<span>(</span><span>knots)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class JaxPiecewiseLinear():
+    
+    def __init__(self, knots):
+        self.N = knots.size
+        self.knots = knots
+        
+    def __call__(self, x, dofs):
+        
+        ret = 0*x
+        for i in range(self.N-1):
+            idx = jnp.logical_and(x&gt;=self.konts[i],x&lt;self.knots[i+1])
+            ret = ret.at[idx].set( 1 )</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="pinns" href="index.html">pinns</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="pinns.bspline.BSplineBasis" href="#pinns.bspline.BSplineBasis">BSplineBasis</a></code></h4>
+<ul class="">
+<li><code><a title="pinns.bspline.BSplineBasis.abscissae" href="#pinns.bspline.BSplineBasis.abscissae">abscissae</a></code></li>
+<li><code><a title="pinns.bspline.BSplineBasis.derivative" href="#pinns.bspline.BSplineBasis.derivative">derivative</a></code></li>
+<li><code><a title="pinns.bspline.BSplineBasis.eval_all" href="#pinns.bspline.BSplineBasis.eval_all">eval_all</a></code></li>
+<li><code><a title="pinns.bspline.BSplineBasis.greville" href="#pinns.bspline.BSplineBasis.greville">greville</a></code></li>
+<li><code><a title="pinns.bspline.BSplineBasis.integrate" href="#pinns.bspline.BSplineBasis.integrate">integrate</a></code></li>
+<li><code><a title="pinns.bspline.BSplineBasis.interpolating_points" href="#pinns.bspline.BSplineBasis.interpolating_points">interpolating_points</a></code></li>
+<li><code><a title="pinns.bspline.BSplineBasis.plot" href="#pinns.bspline.BSplineBasis.plot">plot</a></code></li>
+<li><code><a title="pinns.bspline.BSplineBasis.quadrature_points" href="#pinns.bspline.BSplineBasis.quadrature_points">quadrature_points</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pinns.bspline.BSplineBasisJAX" href="#pinns.bspline.BSplineBasisJAX">BSplineBasisJAX</a></code></h4>
+<ul class="">
+<li><code><a title="pinns.bspline.BSplineBasisJAX.deg" href="#pinns.bspline.BSplineBasisJAX.deg">deg</a></code></li>
+<li><code><a title="pinns.bspline.BSplineBasisJAX.interpolating_points" href="#pinns.bspline.BSplineBasisJAX.interpolating_points">interpolating_points</a></code></li>
+<li><code><a title="pinns.bspline.BSplineBasisJAX.knots" href="#pinns.bspline.BSplineBasisJAX.knots">knots</a></code></li>
+<li><code><a title="pinns.bspline.BSplineBasisJAX.n" href="#pinns.bspline.BSplineBasisJAX.n">n</a></code></li>
+<li><code><a title="pinns.bspline.BSplineBasisJAX.quadrature_points" href="#pinns.bspline.BSplineBasisJAX.quadrature_points">quadrature_points</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="pinns.bspline.JaxPiecewiseLinear" href="#pinns.bspline.JaxPiecewiseLinear">JaxPiecewiseLinear</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

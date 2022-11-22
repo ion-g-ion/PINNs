@@ -247,23 +247,54 @@ class JaxPiecewiseLinear():
 
 class BSplineBasisJAX():
     
-    def __init__(self, knots: np.array, deg: int):
+    __deg : int 
+    __n: int 
+    __knots: jax.numpy.DeviceArray
+    
+    def __init__(self, knots: np.ndarray, deg: int):
+        """_summary_
+
+        Args:
+            knots (np.ndarray): the knots of the basis (without padding).
+            deg (int): the degree of the basis.
+        """
         self.__deg = deg
         self.__n = knots.size+deg-1
         self.__knots = jnp.array(np.concatenate(( np.ones(deg)*knots[0], knots , np.ones(deg)*knots[-1] )))
         
 
     @property
-    def knots(self):
+    def knots(self) -> jax.numpy.DeviceArray:
+        """
+        Return the knots as a `jax.numpy.DeviceArray`.
+
+        Returns:
+            jax.numpy.DeviceArray: the knots
+        """
         return self.__knots
     
     @property
-    def deg(self):
+    def deg(self) -> int:
+        """
+        The degree of the B-spline basis.
+
+        Returns:
+            int: degree.
+        """
         return self.__deg
     
     @property
-    def n(self):
+    def n(self) -> int:
+        """
+        The dimension of the B-spline basis.
+
+        Returns:
+            int: _description_
+        """
         return self.__n
+    
+    def __repr__(self) -> str:
+        return 'B-Spline basis of degree '+str(self.__deg)+' and dimension '+str(self.__n)
     
     def _eval_basis(self, x):
 
@@ -349,22 +380,49 @@ class BSplineBasisJAX():
         # result[x==self.knots[-1],self.n-1] = 1.0
         return result[:,:self.__n].T
             
-    def __call__(self, x, derivative = False):
+    def __call__(self, x : jax.numpy.DeviceArray|np.ndarray, derivative = False) -> jax.numpy.DeviceArray:
         """
-        Evaluates the basis at the given points x.
+        Evaluate the B-splines for the given points.
+
         Args:
-            x (torch.tensor): vector of size M
-            derivative (bool, optional): evaluate the derivative of the basis or not. Defaults to False.
+            x (jax.numpy.DeviceArray | np.ndarray): the points where the basis is evaluated. Has to be vector of shape `(m,)`.
+            derivative (bool, optional): evaluete the basis or its derivative. Defaults to False.
+
         Returns:
-            torch.tensor: a matrix of size MxN
+            jax.numpy.DeviceArray: the B-splines evaluated for x. Has the shape `(n,m)`, where `n` is the dimension of the basis.
         """
         if derivative:
             return self._eval_basis_derivative(x)
         else:
             return self._eval_basis(x)
    
-    def interpolation_points(self):
+    def interpolating_points(self) -> tuple[jax.numpy.DeviceArray, jax.numpy.DeviceArray]:
+        """
+        Return the intepolating points and the basis evaluated in these points.
+        The resulting matrix is nonsingular.
+        
+        Example:
+        ```
+        
+        ```
 
-        pts = np.array([np.sum(self.__knots[i+1:i+self.__deg+1]) for i in range(self.n)])/(self.__deg)
+
+        Returns:
+            tuple[jax.numpy.DeviceArray, jax.numpy.DeviceArray]: the points as a vector and the matrix resulted from evaluating the basis for these points. 
+        """
+        pts = jnp.array([jnp.sum(self.__knots[i+1:i+self.__deg+1]) for i in range(self.n)])/(self.__deg)
         Mat = self.__call__(pts)
         return pts, Mat
+    
+    def quadrature_points(self,mult = 1):
+        pts = []
+        ws = []
+        Pts, Ws = np.polynomial.legendre.leggauss(mult)
+        for k in range(self.__knots.size-1):
+            if self.__knots[k+1]>self.__knots[k]:
+                pts += list(self.__knots[k]+(Pts+1)*0.5*(self.__knots[k+1]-self.__knots[k]))
+                ws += list(Ws*(self.__knots[k+1]-self.__knots[k])/2)
+        pts = np.array(pts)
+        ws = np.array(ws)
+        
+        return pts, ws
