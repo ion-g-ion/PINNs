@@ -517,6 +517,7 @@ class PatchNURBSParam(Patch):
             weights_new = jnp.sum(self.__weights*weights_mult,axis=tuple(axes))
             knots_new = jnp.sum(self.__knots*(self.__weights*weights_mult)[...,None], axis=tuple(axes))
             knots_new = knots_new/weights_new[...,None]
+            param_new = 0
         else:
             weights_new = lambda *args: jnp.sum(self.__weights(*args)*weights_mult, axis=tuple(axes))
             knots_new = lambda *args: jnp.sum(self.__knots(*args)*(self.__weights(*args)*weights_mult)[...,None], axis=tuple(axes))/weights_new(*args)[...,None]
