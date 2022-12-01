@@ -53,6 +53,7 @@ class Patch():
     def __call__(self,y):
         pass
 
+    def get_boundaries
 class PatchParametrized(Patch):
 
     def __init__(self, parametrization, dims, rand_key):
@@ -156,6 +157,8 @@ class PatchNURBS(Patch):
         knots = self.knots.copy()
         weights = self.weights.copy()
         
+
+            
         axes = [] 
         for k, id in enumerate(key):
             if isinstance(id,int) or isinstance(id,float):
@@ -490,6 +493,8 @@ class PatchNURBSParam(Patch):
         basis_new = []
         bounds_new = []
         
+        if isinstance(key[-1], ellipsis):
+            key = key[:-1]+[slice(None,None,None)]*self.__dparam
         
         weights_mult = jnp.ones(self.__N)
         transform = False
@@ -511,7 +516,7 @@ class PatchNURBSParam(Patch):
                 stop = id.stop if id.stop!=None else self.__bounds[k][1]
                 bounds_new.append((start,stop))
             else:
-                raise Exception("Only slices and scalars are permitted")
+                raise Exception("Only slices, scalars and ellipsis are permitted")
             
         if self.__dparam == 0:
             weights_new = jnp.sum(self.__weights*weights_mult,axis=tuple(axes))
@@ -533,7 +538,7 @@ class PatchNURBSParam(Patch):
                     params_take.append(k)
                     vect.append(0.0)
                 else:
-                    raise Exception("Only slices and scalars are permitted")
+                    raise Exception("Only slices, scalars and ellipsis are permitted")
                 
             E = np.eye(self.__dparam)[tuple(params_take),:]
             vect = np.array(vect)
