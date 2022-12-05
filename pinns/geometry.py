@@ -53,7 +53,6 @@ class Patch():
     def __call__(self,y):
         pass
 
-    def get_boundaries
 class PatchParametrized(Patch):
 
     def __init__(self, parametrization, dims, rand_key):
