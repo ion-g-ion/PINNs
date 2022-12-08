@@ -2,7 +2,6 @@ import fenics as fe
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import vedo.dolfin
 
 class FEM:
     
@@ -22,7 +21,7 @@ class FEM:
     def mesh(self):
         return self.__mesh
     
-    def solve(self, meshsize = 0.1, verb = True):
+    def solve(self, meshsize = 0.1, verb = False):
         
         # Mesh creation
         path='./'
@@ -108,12 +107,17 @@ class FEM:
         # Solver
         # --------------------
         u = fe.Function(V)
+        if verb: print('Assembling the system...',flush=True)
         A_ass, L_ass = fe.assemble_system(a, l, bc)
 
+        if verb: print('Solving the system...',flush=True)
         # fe.solve(A_ass, u.vector(), L_ass,"gmres")
-        fe.solve(A_ass, u.vector(), L_ass,)
+        fe.solve(A_ass, u.vector(), L_ass,'petsc')
         
         self.__u = u
+        
+        if verb: print('System solved!!!')
+        # print('Volume ',fe.assemble(fe.Constant(1.0)*dx))
         
         self.__solved = True
 
@@ -134,7 +138,7 @@ class FEM:
     
 if __name__ == "__main__":
     fem = FEM()
-    fem.solve(meshsize = 0.1)
+    fem.solve(0.1, True)
     
     
     
@@ -157,5 +161,5 @@ if __name__ == "__main__":
     #        axes=1,
     #        viewup='z',
     #        interactive=0)
-    fe.plot(fem.mesh)
-    plt.show()
+    # fe.plot(fem.mesh)
+    # plt.show()

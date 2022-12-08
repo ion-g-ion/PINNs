@@ -297,7 +297,7 @@ class BSplineBasisJAX():
         return 'B-Spline basis of degree '+str(self.__deg)+' and dimension '+str(self.__n)
     
     def _eval_basis(self, x):
-
+        x = jnp.array(x)
         result = jnp.zeros((x.shape[0],self.__knots.size-1))
         
         for i in range(self.__knots.size-1):
@@ -336,6 +336,8 @@ class BSplineBasisJAX():
            
     def _eval_basis_derivative(self,x):
 
+        x = jnp.array(x)
+        
         result = jnp.zeros((x.shape[0],self.__knots.size-1))
         
         for i in range(result.shape[1]):
@@ -392,9 +394,9 @@ class BSplineBasisJAX():
             jax.numpy.DeviceArray: the B-splines evaluated for x. Has the shape `(n,m)`, where `n` is the dimension of the basis.
         """
         if derivative:
-            return self._eval_basis_derivative(x)
+            return self._eval_basis_derivative(jnp.array(x))
         else:
-            return self._eval_basis(x)
+            return self._eval_basis(jnp.array(x))
    
     def interpolating_points(self) -> tuple[jax.numpy.DeviceArray, jax.numpy.DeviceArray]:
         """
