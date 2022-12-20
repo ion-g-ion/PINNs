@@ -11,14 +11,14 @@ d = 0.5;
 
 Point(0) = {r,0,0,meshsize/1};
 Point(1) = {0,0,0,meshsize};
-Point(2) = {0,0,r,meshsize/5};
+Point(2) = {0,0,r,meshsize/2};
 Point(3) = {r,d,0,meshsize/1};
 Point(4) = {0,d,0,meshsize};
-Point(5) = {0,d,r,meshsize/5};
+Point(5) = {0,d,r,meshsize/2};
 Point(6) = {R,0,0,meshsize/1};
-Point(7) = {0,0,R,meshsize/5};
+Point(7) = {0,0,R,meshsize/2};
 Point(8) = {R,d,0,meshsize/1};
-Point(9) = {0,d,R,meshsize/5};//+
+Point(9) = {0,d,R,meshsize/2};//+
 
 Point(10) = {r+Rp,R+d,r,meshsize};
 Point(12) = {-(R-r),d,r,meshsize};

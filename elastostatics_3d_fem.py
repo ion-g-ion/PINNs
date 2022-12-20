@@ -2,16 +2,20 @@ import fenics as fe
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import datetime 
+import plotly.figure_factory as ff
+import plotly.express as px
 
 class FEM:
     
-    def __init__(self, E =  0.02e5, nu = 0.1, rho = 0.1, g = 9.81):
+    def __init__(self, E =  0.02e5, nu = 0.1, rho = 0.1, g = 9.81, params = [0,0,0,0,0,0]):
         self.__E = E
         self.__nu = nu
         self.__rho = rho
         self.__g = g
         self.__solved = False
         self.__u = None
+        self.__params = params 
         
     @property
     def u(self):
@@ -111,9 +115,31 @@ class FEM:
         A_ass, L_ass = fe.assemble_system(a, l, bc)
 
         if verb: print('Solving the system...',flush=True)
-        # fe.solve(A_ass, u.vector(), L_ass,"gmres")
-        fe.solve(A_ass, u.vector(), L_ass,'petsc')
         
+        # solver = fe.KrylovSolver("cg", "ml_amg")
+        # solver.parameters["relative_tolerance"] = 5e-6
+        # solver.parameters["maximum_iterations"] = 1000
+        # solver.parameters["monitor_convergence"] = True
+
+
+        
+
+        tme_current = datetime.datetime.now()
+        
+        solver = fe.KrylovSolver("cg")
+        solver.parameters["relative_tolerance"] = 1e-10
+        solver.parameters["maximum_iterations"] = 10000
+        solver.parameters["monitor_convergence"] = False
+        solver.solve(A_ass, u.vector(), L_ass)
+
+
+        # fe.solve(A_ass, u.vector(), L_ass,"gmres")
+        # possible solvers "mumps", "cg", "petsc"
+        
+        # fe.solve(A_ass, u.vector(), L_ass, solver_parameters={"linear_solver": "cg", "relative_tolerance": 1e-6}, form_compiler_parameters={"optimize": True})
+        tme_current = datetime.datetime.now() - tme_current
+
+        if verb: print('\truntime ',tme_current)
         self.__u = u
         
         if verb: print('System solved!!!')
@@ -138,17 +164,19 @@ class FEM:
     
 if __name__ == "__main__":
     fem = FEM()
-    fem.solve(0.1, True)
+    fem.solve(0.1, False)
     
     
     
     xs = np.meshgrid(np.linspace(-1,3,32), np.linspace(-3,3,32), np.linspace(0,2,32))
     
     dis = fem(np.concatenate((xs[0].flatten()[...,None],xs[1].flatten()[...,None],xs[2].flatten()[...,None]),-1))
-    
+    color = np.sqrt(dis[:,0] + dis[:,1] + dis[:,2])
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
     ax.quiver(xs[0].flatten(), xs[1].flatten(), xs[2].flatten(), dis[:,0], dis[:,1], dis[:,2])
+
+    print('DoFs %d'%(fem.u.vector().size()))
     # plt.figure()
     # plt.quiver(xs[0].flatten(), xs[1].flatten(), dis[:,0], dis[:,1])
     
@@ -163,3 +191,6 @@ if __name__ == "__main__":
     #        interactive=0)
     # fe.plot(fem.mesh)
     # plt.show()
+
+
+    px.scatter_3d(x=xs[0].flatten(), y=xs[1].flatten(), z=xs[2].flatten(), color=color)
