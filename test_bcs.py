@@ -9,7 +9,9 @@ def test_dirichlet():
     """
     Test applying the Dirichlet 0 mask
     """
-    init, nn =  pinns.pinns.DirichletMask(2, [(0,2), (0,1), (0,1)]*3, [{'dim': 0, 'end': -1}, {'dim': 1, 'end': 0}])
+
+    ann = stax.Dense(2)
+    init, nn =  pinns.pinns.DirichletMask(ann, 2, [(0,2), (0,1), (0,1)]*3, [{'dim': 0, 'end': -1}, {'dim': 1, 'end': 0}])
     ws = init(jax.random.PRNGKey(1234), (3,))[1]
     
     grid = np.meshgrid(np.linspace(0,2, 20), np.linspace(0,1, 20), np.linspace(0,1, 20), indexing = 'ij')

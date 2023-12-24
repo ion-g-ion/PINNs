@@ -2,6 +2,7 @@ from ast import arguments
 import jax
 import jax.numpy as jnp
 from typing import Sequence, Callable, Any, Literal
+
 def _aux_curl_2d(J,*x):
     j = J(*x)
     return (j[...,1,0]-j[...,0,1])[...,None]

@@ -1,6 +1,8 @@
 """
 
 """
-from .pinns import PINN, FunctionNN
-from . import operators, bspline, geometry
-
+__all__ = ['PINN', 'FunctionSpaceNN', 'PatchConnectivity', 'assemble_function', 'connectivity_to_interfaces']
+from .pinns import PINN, FunctionSpaceNN, PatchConnectivity, assemble_function, connectivity_to_interfaces, DirichletMask
+from . import geometry 
+from . import functions
+from . import extras

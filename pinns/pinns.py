@@ -6,43 +6,49 @@ import matplotlib.pyplot as plt
 import datetime
 import jax.scipy.optimize
 import jax.flatten_util
-from typing import Tuple, Callable, Union
+from typing import Tuple, Callable, Union, Dict, List, Set, TypedDict, Sequence, Any
 import functools
+from .geometry import PatchNURBS, PatchNURBSParam
 
         
-class FunctionNN():
-    _bounds: Tuple[Tuple[int]]
-    _nn: callable
-    _init: callable
-    _d: int # input dimension
-    _dparam:int
+class FunctionSpaceNN():
+    __bounds: Tuple[Tuple[float, float]]
+    __nn: callable 
+    __init: callable
+    __d: int 
+    __dparam: int
     
-    def __init__(self, nn, nn_init, bounds: Tuple[Tuple[int]], n_params: int=0):
-        self._bounds = bounds
-        self._nn = nn 
-        self._init = nn_init 
-        self._d = len(bounds)
-        self._dparam = n_params
+    def __init__(self, nn_pair: Tuple[callable], bounds: Tuple[Tuple[float]], nparams: int=0, mask: Tuple[Callable]|None=None):
         
-    def __call__(self, ws, x, *params) -> jax.Array:
-        return self._nn(ws, x, *params)
+        self.__nn = nn_pair[1]
+        self.__init = nn_pair[0]
+        self.__bounds = bounds 
+        self.__d = len(bounds)
+        self.__dparam = nparams
+        
+    @property 
+    def neural_network(self) -> callable:
+        return self.__nn
     
-    def face_function(self, axis_self, end_self, axis_other, end_other, bounds_other: Tuple[Tuple[int]], decay_fun: callable=lambda x: x) -> callable:
-                
-        endpositive = bounds_other[axis_other][end_other]
-        endzero = bounds_other[axis_other][-1 if end_other == 0 else 0]
-        faux = lambda x: decay_fun((x-endzero)/(endpositive-endzero))
-        
-        mask = np.ones((self._d,))
-        mask[axis_self] = 0
-        offset = np.zeros((self._d,))
-        offset[axis_self] = self._bounds[axis_self][0 if end_self==0 else 1]
-        fret = lambda ws, x, *args: self._nn(ws, x*mask+offset, *args)*faux(x[...,axis_other])[...,None]
-        
-        return fret
-        
+    @property
+    def bounds(self) -> Tuple[Tuple[float, float]]:
+        """
+        Return the bounds/definition domain of the NN functions.
 
-    def interface_function(self, axis_self: Tuple[int], end_self: Tuple[int], axis_other: Tuple[int], end_other: Tuple[int], bounds_other: Tuple[Tuple[float]], decay_fun: callable=lambda x: x) -> callable:
+        Returns:
+            Tuple[Tuple[float, float]]: the intervals.
+        """
+        return self.__bounds
+    
+    def init_weights(self, rnd_key: jax.random.KeyArray):
+        if self.__dparam == 0:
+            return self.__init(rnd_key, (self.__d,))[1]
+        else:
+            return self.__init(rnd_key, ((-1, self.__d), (-1, self.__dparam)))[1]
+    
+
+
+    def interface_function(self, axis_self: Tuple[int], end_self: Tuple[int], axis_other: Tuple[int], end_other: Tuple[int], bounds_other: Tuple[Tuple[float]], axis_correspondence: Tuple[int, int], decay_fun: callable=lambda x: x) -> callable:
         """
         Return an interface function for the given NN function.
 
@@ -57,30 +63,87 @@ class FunctionNN():
         Returns:
             callable: the function. Takes as input the weights of the NN, the input of the NN and eventually batch parameters.
         """
-        assert isinstance(axis_self, tuple) and all([isinstance(i, int) and i>=0 and i<self._d for i in axis_self]), "Check the axis_self argument."
+        assert isinstance(axis_self, tuple) and all([isinstance(i, int) and i>=0 and i<self.__d for i in axis_self]), "Check the axis_self argument."
         assert isinstance(end_self, tuple) and all([isinstance(i, int) and (i==0 or i==-1) for i in end_self]), "Check the end_self argument."
-        assert isinstance(axis_other, tuple) and all([isinstance(i, int) and i>=0 and i<self._d for i in axis_other]), "Check the axis_other argument."
+        assert isinstance(axis_other, tuple) and all([isinstance(i, int) and i>=0 and i<self.__d for i in axis_other]), "Check the axis_other argument."
         assert isinstance(end_other, tuple) and all([isinstance(i, int) and (i==0 or i==-1) for i in end_other]), "Check the end_other argument."
          
         endpositive = np.array([bounds_other[a][e] for a,e in zip(axis_other, end_other)])
         endzero = np.array([bounds_other[a][-1 if e == 0 else 0] for a, e in zip(axis_other, end_other)])
         faux = lambda x: decay_fun((x-endzero)/(endpositive-endzero))
         
-        mask = np.ones((self._d,))
-        mask[list(axis_self)] = 0
-        offset = np.zeros((self._d,))
-        offset[list(axis_self)] = np.array([self._bounds[a][0 if e==0 else 1] for a, e in zip(axis_self, end_self)])
-        fret = lambda ws, x, *args: self._nn(ws, x*mask+offset, *args)*jnp.prod(faux(x[...,list(axis_other)]), axis=-1)[...,None]
+        #mask = np.ones((self.__d,))
+        #mask[list(axis_self)] = 0
+        perm = [a[0] for a in axis_correspondence]
+        mask = np.array([(0.0 if k in axis_self else 1.0) for k in range(self.__d)])
+        offset = np.zeros((self.__d,))
+        offset[list(axis_self)] = np.array([self.__bounds[a][0 if e==0 else 1] for a, e in zip(axis_self, end_self)])
+        
+        scale_other = np.zeros((self.__d,))
+        offset_other = np.zeros((self.__d,))
+        scale_self = np.zeros((self.__d,))
+        offset_self = np.zeros((self.__d,))
+        for k in range(self.__d):
+            if axis_correspondence[k][1] == 1: 
+                scale_other[k] = 1/(bounds_other[k][1]-bounds_other[k][0])
+                offset_other[k] = -bounds_other[k][0]/(bounds_other[k][1]-bounds_other[k][0])
+            else:
+                scale_other[k] = -1/(bounds_other[k][1]-bounds_other[k][0])
+                offset_other[k] = bounds_other[k][1]/(bounds_other[k][1]-bounds_other[k][0])
+            
+            scale_self[k] = (self.__bounds[k][1]-self.__bounds[k][0])
+            offset_self[k] = self.__bounds[k][0]
+            
+        alpha = scale_other[perm]*scale_self*mask
+        beta = offset_other[perm]*scale_self*mask+ offset_self*mask+offset
+
+        fret = lambda ws, x, *args: self.__nn(ws, x[..., perm]*alpha+beta, *args)*jnp.prod(faux(x[...,list(axis_other)]), axis=-1)[...,None]
         
         return fret
+
+PatchConnectivity = TypedDict('PatchConnectivity', {'first': str, 'second': str, 'axis_first': Tuple[int], 'axis_second': Tuple[int], 'end_first': Tuple[int], 'end_second': Tuple[int], 'axis_permutation': Tuple[Tuple[int,int]]})
+
+
+def assemble_function(space_this: FunctionSpaceNN, name_this: str, interfaces: dict) -> Callable:
+
+    def f(ws, x, *args):
+        acc = space_this.neural_network(ws[name_this], x, *args)
+        for c in interfaces:
+            acc += interfaces[c](ws[c], x, *args)
+        return acc
+    return f
         
+def connectivity_to_interfaces(spaces: Dict[str, FunctionSpaceNN], connectivity: Sequence[PatchConnectivity], decay_fun: Callable = lambda x: x) -> Dict[str, Callable]:
+    ret = dict()
+    for name in spaces:
+        interfaces = dict()
+        for c in connectivity:
+            if c['first'] == name:
+                axes = c['axis_permutation']
+                # permute in this case
+                # axes = tuple((a[0], axes[a[0]][1]) for a in axes)
+                interfaces[c['second']] = spaces[c['second']].interface_function(c['axis_second'], c['end_second'], c['axis_first'], c['end_first'], spaces[name].bounds, axes, decay_fun )
+            elif c['second'] == name:
+                axes = c['axis_permutation']
+                 # permute in this case
+                axes = tuple((a[0], axes[a[0]][1]) for a in axes)
+                interfaces[c['first']] = spaces[c['first']].interface_function(c['axis_first'], c['end_first'], c['axis_second'], c['end_second'], spaces[name].bounds, axes, decay_fun )
+        ret[name] = assemble_function(spaces[name], name, interfaces)
+    return ret
+           
+
 class PINN():
-    
-    def __init__(self):
+    __patches: Dict[str, PatchNURBS | PatchNURBSParam] | None
+    weights: Dict 
+     
+    def __init__(self, patches: Dict[str, PatchNURBS | PatchNURBSParam] | None): 
         self.neural_networks = {}
         self.neural_networks_initializers = {}
-        self.weights = {}
-        pass
+        self.__patches = patches
+    
+    @property 
+    def patches(self) -> Dict[str, PatchNURBS | PatchNURBSParam] | None:
+        return self.__patches
     
     def add_neural_network(self, name, ann, input_shape):
         
@@ -104,7 +167,22 @@ class PINN():
         self.weights_unravel = weights_unravel
         return weights_vector
          
-    def loss(self,w):
+    def points_MonteCarlo(self, N, key, facets = dict()):        
+
+        points = {}
+
+        for name in self.__patches:
+            
+            bounds = np.array(self.__patches[name].domain)
+            ys = jax.random.uniform(key ,(N,self.__patches[name].d))*(bounds[:,1]-bounds[:,0]) + bounds[:,0]
+            Weights = jnp.ones((N,))*np.prod(bounds[:,1]-bounds[:,0])/ys.shape[0]
+             
+            omega, DGys, Gr, K = self.__patches[name].GetMetricTensors(ys)
+            points[name] = {'pts': ys, 'ws': Weights, 'dV': omega, 'Jac': DGys, 'JacInv': Gr, 'InnerGradProd': K}
+
+        return points
+    
+    def loss(self, training_parameters: Any):
         pass
     
     def train(self, method = 'ADAM'):
@@ -130,21 +208,19 @@ class PINN():
 def monom(x: jax.numpy.array, d: int, bound: float, deg: float = 1.0, out_dims: int = 1):
     return jnp.tile(((x[...,d]-bound)**deg)[...,None],out_dims)
 
-def DirichletMask(out_dims, domain: list[tuple[float, float]], conditions: list[dict], alpha = 1.0):
-  """Layer constructor function for a dense (fully-connected) layer."""
+def DirichletMask(nn_tuple: Tuple[Callable], out_dims: int | Tuple[int], domain: list[tuple[float, float]], conditions: list[dict], alpha = 1.0):
+  """Layer constructor function for the boundary condition."""
   def init_fun(rng, input_shape):
-    output_shape = input_shape
-    return output_shape, tuple()
+    return nn_tuple[0](rng, input_shape)
+
   def apply_fun(params, inputs, **kwargs):
     res = 1
     for c in conditions:
         res = res * ((inputs[..., c['dim']]-(domain[c['dim']][0] if c['end'] == 0 else domain[c['dim']][1]))**alpha)[...,None]
-    return jnp.tile(res, out_dims)
+    return jnp.tile(res, out_dims)*nn_tuple[1](params, inputs, **kwargs)
   return init_fun, apply_fun
 
 
-        
-        
 def face_function(axis_this: int, end_this: int, axis_other: int, end_other: int, bounds: tuple[tuple[int]], decay_fun: callable, shape_out: tuple[int]=(1,)) -> callable:
     
     pass
