@@ -9,7 +9,7 @@ fe.parameters["allow_extrapolation"] = True
 
 class FEM:
     
-    def __init__(self, E =  0.02e5, nu = 0.1, rho = 0.4, g = 9.81, params = [0,0,0,0,0,0]):
+    def __init__(self, E =  0.02e5, nu = 0.1, rho = 0.2, g = 9.81, params = [0,0,0,0,0,0]):
         self.__E = E
         self.__nu = nu
         self.__rho = rho
@@ -158,7 +158,7 @@ class FEM:
     
 if __name__ == "__main__":
     fem = FEM()
-    fem.solve(0.1, False)
+    fem.solve(0.075, False)
     
     
     

@@ -98,11 +98,14 @@ pv_objects[1].save('obj2.vtk')
 pv_objects[2].save('obj3.vtk')
 pv_objects[3].save('obj4.vtk')
 
-plotter = pv.Plotter(window_size=(600, 400))
-plotter.background_color = 'w'
-plotter.enable_anti_aliasing()
-plotter.add_mesh(obj, show_edges=True)
-#plotter.show()
+try:
+    plotter = pv.Plotter(window_size=(600, 400))
+    plotter.background_color = 'w'
+    plotter.enable_anti_aliasing()
+    plotter.add_mesh(obj, show_edges=True)
+    #plotter.show()
+except:
+    print('Cannot plot')
 
 nl = 32
 acti =  stax.elementwise(lambda x: jax.nn.leaky_relu(x)**2)
@@ -269,8 +272,10 @@ obj = obj.merge(pv_objects[2])
 obj = obj.merge(pv_objects[3])
 obj.save('solution.vtk')
 
-
-plotter = pv.Plotter(window_size=(600, 400))
-plotter.background_color = 'w'
-plotter.enable_anti_aliasing()
-plotter.add_mesh(obj, show_edges=True)
+try:
+    plotter = pv.Plotter(window_size=(600, 400))
+    plotter.background_color = 'w'
+    plotter.enable_anti_aliasing()
+    plotter.add_mesh(obj, show_edges=True)
+except:
+    print('Cannot plot')
