@@ -8,9 +8,22 @@ This repository implements:
 
 ## UNDER DEVELOPMENT ##
 
-## Documentation
+## Requirements 
+
+The following packages are needed: 
+
+ * jax 
+ * numpy 
+ * pyvista 
+
+ Optional for computing reference solutions:
+
+ * fenics
+
+ ## Documentation
 
 Documentation can be found here and can be generated using:
+
 ```
 pdoc3 --html pinns -o docs/ --config latex_math=True --force 
 ```

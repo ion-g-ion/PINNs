@@ -249,7 +249,7 @@ class BSplineBasisJAX():
     
     __deg : int 
     __n: int 
-    __knots: jax.numpy.DeviceArray
+    __knots: jax.Array
     
     def __init__(self, knots: np.ndarray, deg: int):
         """_summary_
@@ -264,12 +264,12 @@ class BSplineBasisJAX():
         
 
     @property
-    def knots(self) -> jax.numpy.DeviceArray:
+    def knots(self) -> jax.Array:
         """
-        Return the knots as a `jax.numpy.DeviceArray`.
+        Return the knots as a `jax.Array`.
 
         Returns:
-            jax.numpy.DeviceArray: the knots
+            jax.Array: the knots
         """
         return self.__knots
     
@@ -382,23 +382,23 @@ class BSplineBasisJAX():
         # result[x==self.knots[-1],self.n-1] = 1.0
         return result[:,:self.__n].T
             
-    def __call__(self, x : jax.numpy.DeviceArray|np.ndarray, derivative = False) -> jax.numpy.DeviceArray:
+    def __call__(self, x : jax.Array|np.ndarray, derivative = False) -> jax.Array:
         """
         Evaluate the B-splines for the given points.
 
         Args:
-            x (jax.numpy.DeviceArray | np.ndarray): the points where the basis is evaluated. Has to be vector of shape `(m,)`.
+            x (jax.Array | np.ndarray): the points where the basis is evaluated. Has to be vector of shape `(m,)`.
             derivative (bool, optional): evaluete the basis or its derivative. Defaults to False.
 
         Returns:
-            jax.numpy.DeviceArray: the B-splines evaluated for x. Has the shape `(n,m)`, where `n` is the dimension of the basis.
+            jax.Array: the B-splines evaluated for x. Has the shape `(n,m)`, where `n` is the dimension of the basis.
         """
         if derivative:
             return self._eval_basis_derivative(jnp.array(x))
         else:
             return self._eval_basis(jnp.array(x))
    
-    def interpolating_points(self) -> tuple[jax.numpy.DeviceArray, jax.numpy.DeviceArray]:
+    def interpolating_points(self) -> tuple[jax.Array, jax.Array]:
         """
         Return the intepolating points and the basis evaluated in these points.
         The resulting matrix is nonsingular.
@@ -410,7 +410,7 @@ class BSplineBasisJAX():
 
 
         Returns:
-            tuple[jax.numpy.DeviceArray, jax.numpy.DeviceArray]: the points as a vector and the matrix resulted from evaluating the basis for these points. 
+            tuple[jax.Array, jax.Array]: the points as a vector and the matrix resulted from evaluating the basis for these points. 
         """
         pts = jnp.array([jnp.sum(self.__knots[i+1:i+self.__deg+1]) for i in range(self.n)])/(self.__deg)
         Mat = self.__call__(pts)
