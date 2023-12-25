@@ -130,53 +130,73 @@ class Pinn(pinns.PINN):
         
         self.lamda = E*nu/(1+nu)/(1-2*nu)
         self.mu = E/2/(1+nu)
-        
+
         rho = 0.2
         g = 9.81
         self.rho = rho
         
         self.f = np.array([0,0,-g*rho]) 
+        self.energy = lambda F,C,J,params: params[0]*jnp.sum(F**2, axis=(-2,-1)) + params[1]*jnp.abs(J)**2*jnp.sum(jnp.linalg.inv(F)**2, axis=(-1,-2)) + params[2]*J**2 - params[3]*jnp.log(jnp.abs(J))+params[4]
+        self.energy = lambda F,C,J,params: 0.5*self.mu*(C[...,0,0]+C[...,1,1]+C[...,2,2]-3)-self.mu*jnp.log(jnp.abs(J))+0.5*self.lamda*jnp.log(jnp.abs(J))**2
+        
+        self.a = 0.5*self.mu
+        self.b = 0.0
+        self.c = 0.0
+        self.d = self.mu
+        self.e = -1.5*self.mu
+
         super(Pinn, self).__init__({names[0]: geom1, names[1]: geom2, names[2]: geom3, names[3]: geom4})
-    
+   
+ 
     def loss(self, training_parameters, points):
+        names = ['obj1', 'obj2', 'obj3', 'obj4']
+        # jacs1 = pinns.functions.jacobian(lambda x : self.solutions['obj1'](training_parameters, x))(points['obj1']['pts'])
+        # jacs2 = pinns.functions.jacobian(lambda x : self.solutions['obj2'](training_parameters, x))(points['obj2']['pts'])
+        # jacs3 = pinns.functions.jacobian(lambda x : self.solutions['obj3'](training_parameters, x))(points['obj3']['pts'])
+        # jacs4 = pinns.functions.jacobian(lambda x : self.solutions['obj4'](training_parameters, x))(points['obj4']['pts'])
         
-        jacs1 = pinns.functions.jacobian(lambda x : self.solutions['obj1'](training_parameters, x))(points['obj1']['pts'])
-        jacs2 = pinns.functions.jacobian(lambda x : self.solutions['obj2'](training_parameters, x))(points['obj2']['pts'])
-        jacs3 = pinns.functions.jacobian(lambda x : self.solutions['obj3'](training_parameters, x))(points['obj3']['pts'])
-        jacs4 = pinns.functions.jacobian(lambda x : self.solutions['obj4'](training_parameters, x))(points['obj4']['pts'])
-        
-        jacs_x1 = jnp.einsum('mij,mjk->mik', jacs1, points['obj1']['JacInv'])
-        jacs_x2 = jnp.einsum('mij,mjk->mik', jacs2, points['obj2']['JacInv'])
-        jacs_x3 = jnp.einsum('mij,mjk->mik', jacs3, points['obj3']['JacInv'])
-        jacs_x4 = jnp.einsum('mij,mjk->mik', jacs4, points['obj4']['JacInv'])
+        # jacs_x1 = jnp.einsum('mij,mjk->mik', jacs1, points['obj1']['JacInv'])
+        # jacs_x2 = jnp.einsum('mij,mjk->mik', jacs2, points['obj2']['JacInv'])
+        # jacs_x3 = jnp.einsum('mij,mjk->mik', jacs3, points['obj3']['JacInv'])
+        # jacs_x4 = jnp.einsum('mij,mjk->mik', jacs4, points['obj4']['JacInv'])
 
-        divs_x1 = (jacs_x1[...,0,0] + jacs_x1[...,1,1] + jacs_x1[...,2,2])[...,None]
-        divs_x2 = (jacs_x2[...,0,0] + jacs_x2[...,1,1] + jacs_x2[...,2,2])[...,None]
-        divs_x3 = (jacs_x3[...,0,0] + jacs_x3[...,1,1] + jacs_x3[...,2,2])[...,None]
-        divs_x4 = (jacs_x4[...,0,0] + jacs_x4[...,1,1] + jacs_x4[...,2,2])[...,None]
+        # divs_x1 = (jacs_x1[...,0,0] + jacs_x1[...,1,1] + jacs_x1[...,2,2])[...,None]
+        # divs_x2 = (jacs_x2[...,0,0] + jacs_x2[...,1,1] + jacs_x2[...,2,2])[...,None]
+        # divs_x3 = (jacs_x3[...,0,0] + jacs_x3[...,1,1] + jacs_x3[...,2,2])[...,None]
+        # divs_x4 = (jacs_x4[...,0,0] + jacs_x4[...,1,1] + jacs_x4[...,2,2])[...,None]
         
-        strain1 = 0.5 * (jacs_x1 + jnp.transpose(jacs_x1,[0,2,1]))
-        strain2 = 0.5 * (jacs_x2 + jnp.transpose(jacs_x2,[0,2,1]))
-        strain3 = 0.5 * (jacs_x3 + jnp.transpose(jacs_x3,[0,2,1]))
-        strain4 = 0.5 * (jacs_x4 + jnp.transpose(jacs_x4,[0,2,1]))
+        # strain1 = 0.5 * (jacs_x1 + jnp.transpose(jacs_x1,[0,2,1]))
+        # strain2 = 0.5 * (jacs_x2 + jnp.transpose(jacs_x2,[0,2,1]))
+        # strain3 = 0.5 * (jacs_x3 + jnp.transpose(jacs_x3,[0,2,1]))
+        # strain4 = 0.5 * (jacs_x4 + jnp.transpose(jacs_x4,[0,2,1]))
         
-        stress1 = self.lamda * jnp.einsum('ij,jkl->ikl', divs_x1, jnp.eye(3)[None,...]) + 2 * self.mu * strain1
-        stress2 = self.lamda * jnp.einsum('ij,jkl->ikl', divs_x2, jnp.eye(3)[None,...]) + 2 * self.mu * strain2
-        stress3 = self.lamda * jnp.einsum('ij,jkl->ikl', divs_x3, jnp.eye(3)[None,...]) + 2 * self.mu * strain3
-        stress4 = self.lamda * jnp.einsum('ij,jkl->ikl', divs_x4, jnp.eye(3)[None,...]) + 2 * self.mu * strain4
+        # stress1 = self.lamda * jnp.einsum('ij,jkl->ikl', divs_x1, jnp.eye(3)[None,...]) + 2 * self.mu * strain1
+        # stress2 = self.lamda * jnp.einsum('ij,jkl->ikl', divs_x2, jnp.eye(3)[None,...]) + 2 * self.mu * strain2
+        # stress3 = self.lamda * jnp.einsum('ij,jkl->ikl', divs_x3, jnp.eye(3)[None,...]) + 2 * self.mu * strain3
+        # stress4 = self.lamda * jnp.einsum('ij,jkl->ikl', divs_x4, jnp.eye(3)[None,...]) + 2 * self.mu * strain4
         
         
 
-        a1 = 0.5*jnp.dot(jnp.einsum('mij,mij->m', stress1, strain1), points['obj1']['ws'] * points['obj1']['dV']) 
-        a2 = 0.5*jnp.dot(jnp.einsum('mij,mij->m', stress2, strain2), points['obj2']['ws'] * points['obj2']['dV']) 
-        a3 = 0.5*jnp.dot(jnp.einsum('mij,mij->m', stress3, strain3), points['obj3']['ws'] * points['obj3']['dV']) 
-        a4 = 0.5*jnp.dot(jnp.einsum('mij,mij->m', stress4, strain4), points['obj4']['ws'] * points['obj4']['dV']) 
-        rhs1 = jnp.dot(jnp.einsum('k,mk->m', self.f, self.solutions['obj1'](training_parameters, points['obj1']['pts'])), points['obj1']['dV'] * points['obj1']['ws'])
-        rhs2 = jnp.dot(jnp.einsum('k,mk->m', self.f, self.solutions['obj2'](training_parameters, points['obj2']['pts'])), points['obj2']['dV'] * points['obj2']['ws'])
-        rhs3 = jnp.dot(jnp.einsum('k,mk->m', self.f, self.solutions['obj3'](training_parameters, points['obj3']['pts'])), points['obj3']['dV'] * points['obj3']['ws'])
-        rhs4 = jnp.dot(jnp.einsum('k,mk->m', self.f, self.solutions['obj4'](training_parameters, points['obj4']['pts'])), points['obj4']['dV'] * points['obj4']['ws'])
+        # a1 = 0.5*jnp.dot(jnp.einsum('mij,mij->m', stress1, strain1), points['obj1']['ws'] * points['obj1']['dV']) 
+        # a2 = 0.5*jnp.dot(jnp.einsum('mij,mij->m', stress2, strain2), points['obj2']['ws'] * points['obj2']['dV']) 
+        # a3 = 0.5*jnp.dot(jnp.einsum('mij,mij->m', stress3, strain3), points['obj3']['ws'] * points['obj3']['dV']) 
+        # a4 = 0.5*jnp.dot(jnp.einsum('mij,mij->m', stress4, strain4), points['obj4']['ws'] * points['obj4']['dV']) 
+        # rhs1 = jnp.dot(jnp.einsum('k,mk->m', self.f, self.solutions['obj1'](training_parameters, points['obj1']['pts'])), points['obj1']['dV'] * points['obj1']['ws'])
+        # rhs2 = jnp.dot(jnp.einsum('k,mk->m', self.f, self.solutions['obj2'](training_parameters, points['obj2']['pts'])), points['obj2']['dV'] * points['obj2']['ws'])
+        # rhs3 = jnp.dot(jnp.einsum('k,mk->m', self.f, self.solutions['obj3'](training_parameters, points['obj3']['pts'])), points['obj3']['dV'] * points['obj3']['ws'])
+        # rhs4 = jnp.dot(jnp.einsum('k,mk->m', self.f, self.solutions['obj4'](training_parameters, points['obj4']['pts'])), points['obj4']['dV'] * points['obj4']['ws'])
         
-        return a1+a2+a3+a4-rhs1-rhs2-rhs3-rhs4
+        jacs = [pinns.functions.jacobian(lambda x : self.solutions[n](training_parameters, x))(points[n]['pts']) for n in names]
+        jacs_x = [jnp.einsum('mij,mjk->mik', jacs[i], points[names[i]]['JacInv']) for i in range(4)]
+        Fs = [jnp.eye(3)+jacs_x[i] for i in range(4)]
+        Cs = [jnp.einsum('mij,mik->mjk', Fs[i], Fs[i]) for i in range(4)]
+        
+        dets = [jnp.linalg.det(Fs[i]) for i in range(4)]
+        
+        Es = [jnp.dot(self.energy(Fs[i], Cs[i], dets[i], [self.a, self.b,self.c,self.d,self.e]), points[names[i]]['dV'] * points[names[i]]['ws']) for i in range(4)]
+        rhss = [jnp.dot(dets[i] * jnp.einsum('k,mk->m', self.f, self.solutions[names[i]](training_parameters, points[names[i]]['pts'])), points[names[i]]['dV'] * points[names[i]]['ws']) for i in range(4)] 
+
+        return sum(Es) - sum(rhss)
         
         
         
