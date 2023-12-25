@@ -1,8 +1,8 @@
 """
 
 """
-__all__ = ['PINN', 'FunctionSpaceNN', 'PatchConnectivity', 'assemble_function', 'connectivity_to_interfaces']
-from .pinns import PINN, FunctionSpaceNN, PatchConnectivity, assemble_function, connectivity_to_interfaces, DirichletMask
+__all__ = ['PINN', 'FunctionSpaceNN', 'assemble_function', 'connectivity_to_interfaces']
+from .pinns import PINN, FunctionSpaceNN, assemble_function, connectivity_to_interfaces, DirichletMask
 from . import geometry 
 from . import functions
 from . import extras

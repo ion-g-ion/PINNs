@@ -393,11 +393,33 @@ class PatchNURBSParam(Patch):
     __N: list[int]
 
     @property
-    def d(self):
+    def d(self) -> int:
+        """
+        The dimension of the manifold.
+
+        Returns:
+            int: the number of dimensions.
+        """
         return self.__d
 
+    @property 
+    def dembedding(self) -> int:
+        """
+        Returns the number of dimensions where the patch lives.
+
+        Returns:
+            int: the number of dimensions.
+        """
+        return self.__dembedding
+    
     @property
     def domain(self) -> list[tuple[float, float]]:
+        """
+        The definition domain of the patch. Without parameters.
+
+        Returns:
+            list[tuple[float, float]]: tuple of intervals.
+        """
         return self.__bounds
 
     def knots(self, params: Array | None = None) -> Array:
@@ -829,3 +851,5 @@ class PatchNURBSParam(Patch):
             # v = self._eval_derivative(y, d)
             # norm = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
             return pts, np.concatenate(tuple(pts_tangent), 1)  # , norm
+        
+Patch = PatchNURBS | PatchNURBSParam

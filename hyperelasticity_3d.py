@@ -76,16 +76,19 @@ def create_geometry(key, scale = 1):
 
     
 geom1, geom2, geom3, geom4 = create_geometry(rnd_key)
-geoms = [geom1, geom2, geom3, geom4]
-
 names = ['obj1', 'obj2', 'obj3', 'obj4']
+geoms = {names[0]: geom1, names[1]: geom2, names[2]: geom3, names[3]: geom4}
+
 connectivity = [
-    pinns.PatchConnectivity(first='obj1', second='obj2', axis_first=(2,), axis_second=(2,), end_first=(-1,), end_second=(0,), axis_permutation=((0,1),(1,1),(2,1))),
-    pinns.PatchConnectivity(first='obj2', second='obj3', axis_first=(1,), axis_second=(1,), end_first=(0,), end_second=(-1,), axis_permutation=((0,1),(1,1),(2,1))),
-    pinns.PatchConnectivity(first='obj2', second='obj4', axis_first=(1,), axis_second=(1,), end_first=(-1,), end_second=(0,), axis_permutation=((0,1),(1,1),(2,1))),
-    pinns.PatchConnectivity(first='obj1', second='obj3', axis_first=(1,2), axis_second=(1,2), end_first=(0,-1), end_second=(-1,0), axis_permutation=((0,1),(1,1),(2,1))),
-    pinns.PatchConnectivity(first='obj1', second='obj4', axis_first=(1,2), axis_second=(1,2), end_first=(-1,-1), end_second=(0,0), axis_permutation=((0,1),(1,1),(2,1))),
+    pinns.geometry.PatchConnectivity(first='obj1', second='obj2', axis_first=(2,), axis_second=(2,), end_first=(-1,), end_second=(0,), axis_permutation=((0,1),(1,1),(2,1))),
+    pinns.geometry.PatchConnectivity(first='obj2', second='obj3', axis_first=(1,), axis_second=(1,), end_first=(0,), end_second=(-1,), axis_permutation=((0,1),(1,1),(2,1))),
+    pinns.geometry.PatchConnectivity(first='obj2', second='obj4', axis_first=(1,), axis_second=(1,), end_first=(-1,), end_second=(0,), axis_permutation=((0,1),(1,1),(2,1))),
+    pinns.geometry.PatchConnectivity(first='obj1', second='obj3', axis_first=(1,2), axis_second=(1,2), end_first=(0,-1), end_second=(-1,0), axis_permutation=((0,1),(1,1),(2,1))),
+    pinns.geometry.PatchConnectivity(first='obj1', second='obj4', axis_first=(1,2), axis_second=(1,2), end_first=(-1,-1), end_second=(0,0), axis_permutation=((0,1),(1,1),(2,1))),
 ]
+
+import sys 
+sys.exit()
 
 pv_objects = [pinns.extras.plot(g, {'y0': lambda y: y[...,0], 'y1': lambda y: y[...,1], 'y2': lambda y: y[...,2]}, N= 16) for g in geoms]
 
@@ -195,7 +198,7 @@ class Pinn(pinns.PINN):
         Cs = [jnp.einsum('mij,mik->mjk', Fs[i], Fs[i]) for i in range(4)]
         
         dets = [jnp.linalg.det(Fs[i]) for i in range(4)]
-        
+         
         Es = [jnp.dot(self.energy(Fs[i], Cs[i], dets[i], [self.a, self.b,self.c,self.d,self.e]), points[names[i]]['dV'] * points[names[i]]['ws']) for i in range(4)]
         rhss = [jnp.dot(dets[i] * jnp.einsum('k,mk->m', self.f, self.solutions[names[i]](training_parameters, points[names[i]]['pts'])), points[names[i]]['dV'] * points[names[i]]['ws']) for i in range(4)] 
 

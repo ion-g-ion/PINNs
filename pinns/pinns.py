@@ -8,8 +8,7 @@ import jax.scipy.optimize
 import jax.flatten_util
 from typing import Tuple, Callable, Union, Dict, List, Set, TypedDict, Sequence, Any
 import functools
-from .geometry import PatchNURBS, PatchNURBSParam
-
+from .geometry import PatchNURBS, PatchNURBSParam, PatchConnectivity 
         
 class FunctionSpaceNN():
     __bounds: Tuple[Tuple[float, float]]
@@ -100,8 +99,6 @@ class FunctionSpaceNN():
         fret = lambda ws, x, *args: self.__nn(ws, x[..., perm]*alpha+beta, *args)*jnp.prod(faux(x[...,list(axis_other)]), axis=-1)[...,None]
         
         return fret
-
-PatchConnectivity = TypedDict('PatchConnectivity', {'first': str, 'second': str, 'axis_first': Tuple[int], 'axis_second': Tuple[int], 'end_first': Tuple[int], 'end_second': Tuple[int], 'axis_permutation': Tuple[Tuple[int,int]]})
 
 
 def assemble_function(space_this: FunctionSpaceNN, name_this: str, interfaces: dict) -> Callable:
@@ -205,30 +202,27 @@ class PINN():
         return l, gr
 
 
-def monom(x: jax.numpy.array, d: int, bound: float, deg: float = 1.0, out_dims: int = 1):
-    return jnp.tile(((x[...,d]-bound)**deg)[...,None],out_dims)
-
-def DirichletMask(nn_tuple: Tuple[Callable], out_dims: int | Tuple[int], domain: list[tuple[float, float]], conditions: list[dict], alpha = 1.0):
-  """Layer constructor function for the boundary condition."""
-  def init_fun(rng, input_shape):
-    return nn_tuple[0](rng, input_shape)
-
-  def apply_fun(params, inputs, **kwargs):
-    res = 1
-    for c in conditions:
-        res = res * ((inputs[..., c['dim']]-(domain[c['dim']][0] if c['end'] == 0 else domain[c['dim']][1]))**alpha)[...,None]
-    return jnp.tile(res, out_dims)*nn_tuple[1](params, inputs, **kwargs)
-  return init_fun, apply_fun
-
-
-def face_function(axis_this: int, end_this: int, axis_other: int, end_other: int, bounds: tuple[tuple[int]], decay_fun: callable, shape_out: tuple[int]=(1,)) -> callable:
+def DirichletMask(nn_tuple: Tuple[Callable], out_dims: int | Tuple[int], domain: list[tuple[float, float]], conditions: list[dict], alpha = 1.0) -> Tuple[Callable, Callable]:
+    """
+    Factory method for a Dirichlet adapted NN.
+    Right now only works with 0 Dirichlet.
     
-    pass
-        
+    Args:
+        nn_tuple (Tuple[Callable]): the init and call tuple. Follows `jax.stax` convention.
+        out_dims (int | Tuple[int]): number of output dimensions.
+        domain (list[tuple[float, float]]): the domain where the NN is defined.
+        conditions (list[dict]): the boundary conditions. A dictionary of tyoe `{'dim': int, 'end': +-1}`. Deciding across which axis and what end the boundary condition is applied.
+        alpha (float, optional): decay. Defaults to 1.0.
 
-def edge_function(dim: int, decay_fun: callable = lambda x: x, shape_out: tuple[int] =(1,)) -> callable:
-    
-    def func():
-        pass
-    
-    return func 
+    Returns:
+        Tuple[Callable, Callable]: resulting initializer and call functions.
+    """
+    def init_fun(rng, input_shape):
+        return nn_tuple[0](rng, input_shape)
+
+    def apply_fun(params, inputs, **kwargs):
+        res = 1
+        for c in conditions:
+            res = res * ((inputs[..., c['dim']]-(domain[c['dim']][0] if c['end'] == 0 else domain[c['dim']][1]))**alpha)[...,None]
+        return jnp.tile(res, out_dims)*nn_tuple[1](params, inputs, **kwargs)
+    return init_fun, apply_fun
