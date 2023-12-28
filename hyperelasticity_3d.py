@@ -87,10 +87,10 @@ connectivity = [
     pinns.geometry.PatchConnectivity(first='obj1', second='obj4', axis_first=(1,2), axis_second=(1,2), end_first=(-1,-1), end_second=(0,0), axis_permutation=((0,1),(1,1),(2,1))),
 ]
 
-import sys 
-sys.exit()
+#connectivity = pinns.geometry.match_patches(geoms)
+#assert len(connectivity) == 5
 
-pv_objects = [pinns.extras.plot(g, {'y0': lambda y: y[...,0], 'y1': lambda y: y[...,1], 'y2': lambda y: y[...,2]}, N= 16) for g in geoms]
+pv_objects = [pinns.extras.plot(g, {'y0': lambda y: y[...,0], 'y1': lambda y: y[...,1], 'y2': lambda y: y[...,2]}, N= 16) for g in geoms.values()]
 
 obj = pv_objects[0].merge(pv_objects[1])
 obj = obj.merge(pv_objects[2])
@@ -156,55 +156,19 @@ class Pinn(pinns.PINN):
  
     def loss(self, training_parameters, points):
         names = ['obj1', 'obj2', 'obj3', 'obj4']
-        # jacs1 = pinns.functions.jacobian(lambda x : self.solutions['obj1'](training_parameters, x))(points['obj1']['pts'])
-        # jacs2 = pinns.functions.jacobian(lambda x : self.solutions['obj2'](training_parameters, x))(points['obj2']['pts'])
-        # jacs3 = pinns.functions.jacobian(lambda x : self.solutions['obj3'](training_parameters, x))(points['obj3']['pts'])
-        # jacs4 = pinns.functions.jacobian(lambda x : self.solutions['obj4'](training_parameters, x))(points['obj4']['pts'])
-        
-        # jacs_x1 = jnp.einsum('mij,mjk->mik', jacs1, points['obj1']['JacInv'])
-        # jacs_x2 = jnp.einsum('mij,mjk->mik', jacs2, points['obj2']['JacInv'])
-        # jacs_x3 = jnp.einsum('mij,mjk->mik', jacs3, points['obj3']['JacInv'])
-        # jacs_x4 = jnp.einsum('mij,mjk->mik', jacs4, points['obj4']['JacInv'])
 
-        # divs_x1 = (jacs_x1[...,0,0] + jacs_x1[...,1,1] + jacs_x1[...,2,2])[...,None]
-        # divs_x2 = (jacs_x2[...,0,0] + jacs_x2[...,1,1] + jacs_x2[...,2,2])[...,None]
-        # divs_x3 = (jacs_x3[...,0,0] + jacs_x3[...,1,1] + jacs_x3[...,2,2])[...,None]
-        # divs_x4 = (jacs_x4[...,0,0] + jacs_x4[...,1,1] + jacs_x4[...,2,2])[...,None]
-        
-        # strain1 = 0.5 * (jacs_x1 + jnp.transpose(jacs_x1,[0,2,1]))
-        # strain2 = 0.5 * (jacs_x2 + jnp.transpose(jacs_x2,[0,2,1]))
-        # strain3 = 0.5 * (jacs_x3 + jnp.transpose(jacs_x3,[0,2,1]))
-        # strain4 = 0.5 * (jacs_x4 + jnp.transpose(jacs_x4,[0,2,1]))
-        
-        # stress1 = self.lamda * jnp.einsum('ij,jkl->ikl', divs_x1, jnp.eye(3)[None,...]) + 2 * self.mu * strain1
-        # stress2 = self.lamda * jnp.einsum('ij,jkl->ikl', divs_x2, jnp.eye(3)[None,...]) + 2 * self.mu * strain2
-        # stress3 = self.lamda * jnp.einsum('ij,jkl->ikl', divs_x3, jnp.eye(3)[None,...]) + 2 * self.mu * strain3
-        # stress4 = self.lamda * jnp.einsum('ij,jkl->ikl', divs_x4, jnp.eye(3)[None,...]) + 2 * self.mu * strain4
-        
-        
-
-        # a1 = 0.5*jnp.dot(jnp.einsum('mij,mij->m', stress1, strain1), points['obj1']['ws'] * points['obj1']['dV']) 
-        # a2 = 0.5*jnp.dot(jnp.einsum('mij,mij->m', stress2, strain2), points['obj2']['ws'] * points['obj2']['dV']) 
-        # a3 = 0.5*jnp.dot(jnp.einsum('mij,mij->m', stress3, strain3), points['obj3']['ws'] * points['obj3']['dV']) 
-        # a4 = 0.5*jnp.dot(jnp.einsum('mij,mij->m', stress4, strain4), points['obj4']['ws'] * points['obj4']['dV']) 
-        # rhs1 = jnp.dot(jnp.einsum('k,mk->m', self.f, self.solutions['obj1'](training_parameters, points['obj1']['pts'])), points['obj1']['dV'] * points['obj1']['ws'])
-        # rhs2 = jnp.dot(jnp.einsum('k,mk->m', self.f, self.solutions['obj2'](training_parameters, points['obj2']['pts'])), points['obj2']['dV'] * points['obj2']['ws'])
-        # rhs3 = jnp.dot(jnp.einsum('k,mk->m', self.f, self.solutions['obj3'](training_parameters, points['obj3']['pts'])), points['obj3']['dV'] * points['obj3']['ws'])
-        # rhs4 = jnp.dot(jnp.einsum('k,mk->m', self.f, self.solutions['obj4'](training_parameters, points['obj4']['pts'])), points['obj4']['dV'] * points['obj4']['ws'])
-        
-        jacs = [pinns.functions.jacobian(lambda x : self.solutions[n](training_parameters, x))(points[n]['pts']) for n in names]
-        jacs_x = [jnp.einsum('mij,mjk->mik', jacs[i], points[names[i]]['JacInv']) for i in range(4)]
+        jacs = [pinns.functions.jacobian(lambda x : self.solutions[n](training_parameters, x))(points[n].points_reference) for n in names]
+        jacs_x = [points[names[i]].jacobian_transformation(jacs[i]) for i in range(4)]
         Fs = [jnp.eye(3)+jacs_x[i] for i in range(4)]
         Cs = [jnp.einsum('mij,mik->mjk', Fs[i], Fs[i]) for i in range(4)]
         
         dets = [jnp.linalg.det(Fs[i]) for i in range(4)]
          
-        Es = [jnp.dot(self.energy(Fs[i], Cs[i], dets[i], [self.a, self.b,self.c,self.d,self.e]), points[names[i]]['dV'] * points[names[i]]['ws']) for i in range(4)]
-        rhss = [jnp.dot(dets[i] * jnp.einsum('k,mk->m', self.f, self.solutions[names[i]](training_parameters, points[names[i]]['pts'])), points[names[i]]['dV'] * points[names[i]]['ws']) for i in range(4)] 
+        Es = [jnp.dot(self.energy(Fs[i], Cs[i], dets[i], [self.a, self.b,self.c,self.d,self.e]), points[names[i]].dx()) for i in range(4)]
+        rhss = [jnp.dot(dets[i] * jnp.einsum('k,mk->m', self.f, self.solutions[names[i]](training_parameters, points[names[i]].points_reference)), points[names[i]].dx()) for i in range(4)] 
 
         return sum(Es) - sum(rhss)
-        
-        
+    
         
 model = Pinn()  
 dev = jax.devices('gpu')[0] if len(jax.devices('gpu'))>0 else jax.devices('cpu')[0]
@@ -213,14 +177,14 @@ opt_type = 'ADAM'
 
 if opt_type == 'ADAM':
 
-    batch_size = 10000
+    batch_size = 1000
 
     # get_compiled = jax.jit(lambda key: model.get_points_MC(batch_size, key), device = dev)
     # %time pts = get_compiled(jax.random.PRNGKey(1235))
     # %time pts = get_compiled(jax.random.PRNGKey(1111))
 
     lr_opti = optimizers.piecewise_constant([2000,3000,4000,5000,7000], [0.005, 0.005/2, 0.005/4, 0.005/8,0.005/16,0.005/32])
-    lr_opti = optimizers.piecewise_constant([2000,3000,4000,5000], [0.005/2, 0.005/4, 0.005/8,0.005/16,0.005/32])
+    #lr_opti = optimizers.piecewise_constant([2000,3000,4000,5000], [0.005/2, 0.005/4, 0.005/8,0.005/16,0.005/32])
     # lr_opti = optimizers.piecewise_constant([7000], [0.01/2, 0.001])
     opt_init, opt_update, get_params = optimizers.adam(lr_opti)
 
@@ -235,7 +199,9 @@ if opt_type == 'ADAM':
     def step(params, opt_state, key):
         # points = model.get_points_MC(5000)
         points = model.points_MonteCarlo(batch_size, key)
-        loss, grads = loss_grad(params, points)
+        loss = model.loss(params, points)
+        grads = jax.grad(model.loss)(params, points)
+        #loss, grads = loss_grad(params, points)
         opt_state = opt_update(0, grads, opt_state)
 
         params = get_params(opt_state)
@@ -245,7 +211,7 @@ if opt_type == 'ADAM':
     step_compiled = jax.jit(step, device = dev)
     step_compiled(params, opt_state, rnd_key)
 
-    n_epochs = 5000
+    n_epochs = 10000
 
     hist = []
     hist_weights = []
@@ -253,7 +219,7 @@ if opt_type == 'ADAM':
     # min_loss = 10000
     tme = datetime.datetime.now()
     for k in range(n_epochs):    
-        params, opt_state, loss = step_compiled(params, opt_state, jax.random.PRNGKey(np.random.randint(1000)))
+        params, opt_state, loss = step_compiled(params, opt_state, jax.random.PRNGKey(k%1000+0*np.random.randint(1000)))
         
         hist.append(loss)
         
@@ -268,7 +234,7 @@ if opt_type == 'ADAM':
     print('Elapsed time ', tme)
 
     
-pv_objects = [pinns.extras.plot(geoms[i], {'displacement': lambda y: model.solutions[names[i]](weights, y)}, N= 32) for i in range(4)]
+pv_objects = [pinns.extras.plot(geoms[n], {'displacement': lambda y: model.solutions[n](weights, y)}, N= 32) for n in geoms]
 
 obj = pv_objects[0].merge(pv_objects[1])
 obj = obj.merge(pv_objects[2])

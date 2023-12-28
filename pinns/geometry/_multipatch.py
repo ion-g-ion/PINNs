@@ -7,6 +7,17 @@ import itertools
 PatchConnectivity = TypedDict('PatchConnectivity', {'first': str, 'second': str, 'axis_first': Tuple[int], 'axis_second': Tuple[int], 'end_first': Tuple[int], 'end_second': Tuple[int], 'axis_permutation': Tuple[Tuple[int,int]]})
 
 def match_patches(patches: Dict[str, Patch], eps: float=1e-7, verbose: bool=False) -> Sequence[PatchConnectivity]:
+    """
+    Find the connectivitty between the given patches.
+
+    Args:
+        patches (Dict[str, Patch]): dictionary og geometry patches.
+        eps (float, optional): tolerance for finding the match between vertices in the physical domain. Defaults to 1e-7.
+        verbose (bool, optional): show extra info. Defaults to False.
+
+    Returns:
+        Sequence[PatchConnectivity]: the connectivity info.
+    """
     names = list(patches.keys())
     
     conns = []
@@ -76,7 +87,7 @@ def check_match(name1: str, patch1: PatchNURBSParam, name2: str, patch2: PatchNU
     if verbose: print('Coordinate system 2:', coordinate2)
     perm =  []
     for i in range(d):
-        a2 = int(np.where(np.abs(coordinate2[i,:])>eps)[0])
+        a2 = int(np.where(np.abs(coordinate2[i,:])>0.1)[0])
         direction = -1 if coordinate2[i,a2] < 0 else 1
         perm.append((a2, direction))
     perm = tuple(perm)
@@ -94,11 +105,11 @@ def check_match(name1: str, patch1: PatchNURBSParam, name2: str, patch2: PatchNU
     bool2 = np.all(np.array(lst2) == np.array(lst2)[0,:], axis=0)
     
     
-    conn_data['axis_first'] = tuple(np.where(bool1)[0])
-    conn_data['axis_second'] = tuple(np.where(bool2)[0])
+    conn_data['axis_first'] = tuple(int(i) for i in np.where(bool1)[0])
+    conn_data['axis_second'] = tuple(int(i) for i in np.where(bool2)[0])
     
-    conn_data['end_first'] = tuple(-1*np.array(lst1)[0,conn_data['axis_first']])
-    conn_data['end_second'] = tuple(-1*np.array(lst2)[0,conn_data['axis_second']])
+    conn_data['end_first'] = tuple(int(-i) for i in np.array(lst1)[0,conn_data['axis_first']])
+    conn_data['end_second'] = tuple(int(-i) for i in np.array(lst2)[0,conn_data['axis_second']])
     
     if verbose:
         print('Axis first :', conn_data['axis_first'])
