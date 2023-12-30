@@ -102,7 +102,6 @@ class FunctionSpaceNN():
         
         return fret
 
-
 def assemble_function(space_this: FunctionSpaceNN, name_this: str, interfaces: dict) -> Callable:
 
     def f(ws, x, *args):
@@ -130,7 +129,6 @@ def connectivity_to_interfaces(spaces: Dict[str, FunctionSpaceNN], connectivity:
         ret[name] = assemble_function(spaces[name], name, interfaces)
     return ret
            
-
 class IsogeometricForm():
     __d: int
     __de: int
@@ -178,6 +176,13 @@ class IsogeometricForm():
             self.__invjac = jnp.linalg.inv(self.__jac)
         return self.__invjac
     
+    @property
+    def metric_coefficient(self) -> jax.Array:
+        
+        if self.__metric is None:
+            self.__compute_metric()
+            
+        return self.__metric
     
     def  jacobian_transformation(self, jac: jax.Array) -> jax.Array:
         """
@@ -277,12 +282,7 @@ class IsogeometricForm():
     # @property 
     # def dl_vec(self) -> jax.Array:
     #     pass
-        
-        
-
-    
-    
-    
+            
 class PINN():
     __patches: Dict[str, PatchNURBS | PatchNURBSParam] | None
     weights: Dict 
@@ -335,12 +335,27 @@ class PINN():
             #omega, DGys, Gr, K = self.__patches[name].GetMetricTensors(ys)
             #points[name] = {'pts': ys, 'ws': Weights, 'dV': omega, 'Jac': DGys, 'JacInv': Gr, 'InnerGradProd': K}
 
-        for name in facets:
-            patch_name = facets[name]['patch']
-            label = facets[name]['label']
+        for facet in facets:
+            patch_name = facet['patch']
+            label = facet['label']
+            axis = facet['axis']
+            end = facet['end']
+            if 'n' in facet:
+                n = facet['n']
+            else:
+                n = N         
+                
+            selector = [i for i in range(self.__patches[patch_name].d) if i != axis]
+            bounds = np.array(self.__patches[patch_name].domain)
+            bounds[axis,:] = bounds[axis,end]
+            ys = jax.random.uniform(key ,(n,self.__patches[patch_name].d))*(bounds[:, 1]-bounds[:, 0]) + bounds[:, 0]
+            Weights = jnp.ones((n,))*np.prod(bounds[selector,1]-bounds[selector,0])/ys.shape[0]
             
+            DG = self.__patches[patch_name].GetJacobian(ys)[...,:,selector]
+            xs = self.__patches[patch_name](ys)
             
-            
+            points[label] = IsogeometricForm(self.__patches[patch_name].d-1, self.__patches[patch_name].dembedding, ys, xs, DG, Weights, None, None, 1)
+        
             
         return points
     

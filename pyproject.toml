@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pinns"
+authors = [
+    {name = "Ion Gabriel Ion", email = "ion.ion.gabriel@gmail.com"},
+]
+description = "Isogeometric physics informed neural netwoorks"
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["PINNs", "IGA"]
+license = {text = "MIT"}
+classifiers = [
+    "Framework :: JAX",
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "jax",
+    "pyvista",
+    "numpy",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+fem = ["fenics"]
+
+[tool.setuptools]
+packages = ["pinns"]
+
+# [project.scripts]
+# my-script = "my_package.module:function"
