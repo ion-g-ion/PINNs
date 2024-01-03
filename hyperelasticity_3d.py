@@ -87,8 +87,9 @@ connectivity = [
     pinns.geometry.PatchConnectivity(first='obj1', second='obj4', axis_first=(1,2), axis_second=(1,2), end_first=(-1,-1), end_second=(0,0), axis_permutation=((0,1),(1,1),(2,1))),
 ]
 
-#connectivity = pinns.geometry.match_patches(geoms)
-#assert len(connectivity) == 5
+with jax.disable_jit():
+    connectivity = pinns.geometry.match_patches(geoms)
+assert len(connectivity) == 5
 
 pv_objects = [pinns.extras.plot(g, {'y0': lambda y: y[...,0], 'y1': lambda y: y[...,1], 'y2': lambda y: y[...,2]}, N= 16) for g in geoms.values()]
 

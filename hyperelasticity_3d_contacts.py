@@ -150,7 +150,7 @@ class Pinn(pinns.PINN):
         self.c = 0.0
         self.d = self.mu
         self.e = -1.5*self.mu
-        self.Ab = np.diag(np.array([-1.0,1.0,1.0])), np.array([1, -0.5, 0.9])
+        self.Ab = np.diag(np.array([-1.0,1.0,1.0])), np.array([1, -0.5, 0.5])
         self.kpen = 1e3 
         
         super(Pinn, self).__init__({names[0]: geom1, names[1]: geom2, names[2]: geom3, names[3]: geom4})
@@ -215,7 +215,7 @@ if opt_type == 'ADAM':
     step_compiled = jax.jit(step, device = dev)
     step_compiled(params, opt_state, rnd_key)
 
-    n_epochs = 10000
+    n_epochs = 1000
 
     hist = []
     hist_weights = []
