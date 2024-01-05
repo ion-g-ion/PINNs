@@ -15,8 +15,7 @@ import jax.flatten_util
 import scipy
 import scipy.optimize
 
-from jax.config import config
-config.update("jax_enable_x64", False)
+jax.config.update("jax_enable_x64", False)
 rnd_key = jax.random.PRNGKey(1234)
 np.random.seed(14124)
 
@@ -88,7 +87,7 @@ connectivity = [
 ]
 
 with jax.disable_jit():
-    connectivity = pinns.geometry.match_patches(geoms)
+    connectivity = pinns.geometry.match_patches(geoms, verbose=True)
 assert len(connectivity) == 5
 
 pv_objects = [pinns.extras.plot(g, {'y0': lambda y: y[...,0], 'y1': lambda y: y[...,1], 'y2': lambda y: y[...,2]}, N= 16) for g in geoms.values()]

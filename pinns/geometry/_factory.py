@@ -3,6 +3,9 @@ import numpy as np
 from ._geometry import PatchNURBSParam
 from ..functions import BSplineBasisJAX
 from typing import Tuple, Any
+from ._base import rotation_matrix_3d
+
+
 
 
 def box_patch(size: Tuple[float], rand_key: Any, rotation: Tuple[float] | None = None, position: Tuple[float] | None = None, dtype: np.dtype = np.float64) -> PatchNURBSParam:
@@ -26,14 +29,17 @@ def box_patch(size: Tuple[float], rand_key: Any, rotation: Tuple[float] | None =
 
     control_pts = np.zeros([2]*d+[d])
     for i in range(d):
-        idx = [0]*d
+        idx = [slice(None)]*d
         idx[i] = 1
         control_pts[tuple(idx+[i])] = float(size[i])
     control_pts -= np.array(size).astype(dtype)/2
 
     if rotation is not None:
-        Rot = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]]).astype(dtype)
-        control_pts = np.einsum('...n,mn->m', control_pts, Rot)
+        if d==2:
+            Rot = np.array([[np.cos(rotation[0]), -np.sin(rotation[0])],[np.sin(rotation[0]), np.cos(rotation[0])]])
+        elif d==3:
+            Rot = rotation_matrix_3d(rotation)
+        control_pts = np.einsum('...n,mn->...m', control_pts, Rot)
     if position is not None:
         control_pts += np.array(position, dtype=dtype)
     weights = np.ones([2]*d)

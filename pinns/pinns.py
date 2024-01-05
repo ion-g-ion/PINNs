@@ -75,7 +75,7 @@ class FunctionSpaceNN():
         
         #mask = np.ones((self.__d,))
         #mask[list(axis_self)] = 0
-        perm = [a[0] for a in axis_correspondence]
+        perm = [a[0] if a is not None else 0 for a in axis_correspondence]
         mask = np.array([(0.0 if k in axis_self else 1.0) for k in range(self.__d)])
         offset = np.zeros((self.__d,))
         offset[list(axis_self)] = np.array([self.__bounds[a][0 if e==0 else 1] for a, e in zip(axis_self, end_self)])
@@ -85,7 +85,7 @@ class FunctionSpaceNN():
         scale_self = np.zeros((self.__d,))
         offset_self = np.zeros((self.__d,))
         for k in range(self.__d):
-            if axis_correspondence[k][1] == 1: 
+            if axis_correspondence[k]is not None and axis_correspondence[k][1] == 1: 
                 scale_other[k] = 1/(bounds_other[k][1]-bounds_other[k][0])
                 offset_other[k] = -bounds_other[k][0]/(bounds_other[k][1]-bounds_other[k][0])
             else:
@@ -118,13 +118,16 @@ def connectivity_to_interfaces(spaces: Dict[str, FunctionSpaceNN], connectivity:
         for c in connectivity:
             if c['first'] == name:
                 axes = c['axis_permutation']
-                # permute in this case
-                # axes = tuple((a[0], axes[a[0]][1]) for a in axes)
                 interfaces[c['second']] = spaces[c['second']].interface_function(c['axis_second'], c['end_second'], c['axis_first'], c['end_first'], spaces[name].bounds, axes, decay_fun )
             elif c['second'] == name:
                 axes = c['axis_permutation']
                  # permute in this case
-                axes = tuple((a[0], axes[a[0]][1]) for a in axes)
+                axes = [None] * len(axes)
+                for i in range(len(axes)):
+                    if c['axis_permutation'][i] is not None:
+                        axes[c['axis_permutation'][i][0]] = (i, c['axis_permutation'][i][1]) 
+                axes = tuple(axes)
+                #axes = tuple((a[0], axes[a[0]][1]) if a is not None else None for i in range(len(axes)))
                 interfaces[c['first']] = spaces[c['first']].interface_function(c['axis_first'], c['end_first'], c['axis_second'], c['end_second'], spaces[name].bounds, axes, decay_fun )
         ret[name] = assemble_function(spaces[name], name, interfaces)
     return ret

@@ -2,8 +2,8 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from ..functions import BSplineBasisJAX
-from typing import Union, Callable, TypeVar, Generic, Any
-
+from typing import Union, Callable, TypeVar, Generic, Any, Tuple
+from ._base import rotation_matrix_3d
 
 def tangent2normal_2d(tangents):
     rotation = np.array([[0, -1], [1, 0]])
@@ -422,6 +422,10 @@ class PatchNURBSParam(Patch):
         """
         return self.__bounds
 
+    @property
+    def basis(self) -> list[BSplineBasisJAX]:
+        return self.__basis 
+    
     def knots(self, params: Array | None = None) -> Array:
         if params is None:
             return self.__knots
@@ -827,6 +831,37 @@ class PatchNURBSParam(Patch):
             # Gy = self.__call__(ys)
         return xs
 
+    def rotate(self, angles: Tuple[float]):
+        """
+        Rotate this object around the axes.
+
+        Args:
+            angles (Tuple[float]): the angles in radian.
+        """
+        if self.__dparam != 0:
+            pass
+        else:
+            if self.__d==2:
+                Rot = np.array([[np.cos(angles[0]), -np.sin(angles[0])],[np.sin(angles[0]), np.cos(angles[0])]])
+            elif self.__d==3:
+                Rot = rotation_matrix_3d(angles)
+            self.__knots = np.einsum('...n,mn->...m', self.__knots, Rot)
+
+    def translate(self, offset: Tuple[float]):
+        """
+        translate the current object
+
+        Args:
+            offset (Tuple[float]): the offset.
+        """
+        
+        if self.__dparam != 0:
+            pass
+        else:
+            self.__knots += np.array(offset, dtype=self.__knots.dtype)
+            
+        
+                
     def sample_boundary(self, d, end, N, normalize=True, pdf=None):
 
         if pdf == None:
@@ -852,4 +887,4 @@ class PatchNURBSParam(Patch):
             # norm = v/np.tile(np.linalg.norm(v,axis = 1, keepdims=True),self.d)
             return pts, np.concatenate(tuple(pts_tangent), 1)  # , norm
         
-Patch = PatchNURBS | PatchNURBSParam
+
