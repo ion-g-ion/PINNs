@@ -110,7 +110,7 @@ try:
 except:
     print('Cannot plot')
 
-nl = 32
+nl = 25
 acti =  stax.elementwise(lambda x: jax.nn.leaky_relu(x)**2)
 w_init = jax.nn.initializers.normal()
 
@@ -137,7 +137,7 @@ class Pinn(pinns.PINN):
         self.lamda = E*nu/(1+nu)/(1-2*nu)
         self.mu = E/2/(1+nu)
 
-        rho = 0.2
+        rho = 0.15
         g = 9.81
         self.rho = rho
         
@@ -177,7 +177,7 @@ opt_type = 'ADAM'
 
 if opt_type == 'ADAM':
 
-    batch_size = 1000
+    batch_size = 2000
 
     # get_compiled = jax.jit(lambda key: model.get_points_MC(batch_size, key), device = dev)
     # %time pts = get_compiled(jax.random.PRNGKey(1235))
@@ -219,7 +219,7 @@ if opt_type == 'ADAM':
     # min_loss = 10000
     tme = datetime.datetime.now()
     for k in range(n_epochs):    
-        params, opt_state, loss = step_compiled(params, opt_state, jax.random.PRNGKey(k%1000+0*np.random.randint(1000)))
+        params, opt_state, loss = step_compiled(params, opt_state, jax.random.PRNGKey(k%500+0*np.random.randint(1000)))
         
         hist.append(loss)
         
