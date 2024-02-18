@@ -1,5 +1,5 @@
 from typing import Tuple, TypedDict, Sequence, Dict
-from ._geometry import PatchNURBS, PatchNURBSParam, Patch
+from ._geometry import PatchNURBS, PatchBezier, Patch
 import numpy as np
 import itertools 
 
@@ -44,7 +44,7 @@ def match_patches(patches: Dict[str, Patch], eps: float=1e-7, verbose: bool=Fals
     
     return conns
 
-def check_match(name1: str, patch1: PatchNURBSParam, vertices1: list  | None,  name2: str, patch2: PatchNURBSParam, vertices2: list | None, eps: float=1e-7, verbose: bool=True) -> PatchConnectivity | None:
+def check_match(name1: str, patch1: Patch, vertices1: list  | None,  name2: str, patch2: Patch, vertices2: list | None, eps: float=1e-7, verbose: bool=True) -> PatchConnectivity | None:
     
     assert patch1.d == patch2.d, "Patches must ave same dimensionality"
     assert patch1.dembedding == patch2.dembedding, "The patches must live in the same space"
@@ -52,8 +52,11 @@ def check_match(name1: str, patch1: PatchNURBSParam, vertices1: list  | None,  n
     de = patch1.dembedding
     assert d==2 or d==3, "Manifold must be 3d or 2d."
     
-    if verbose: print('\nChecking %s against %s'%(str(name1), str(name2)))
-    
+    if verbose: 
+        print('\nChecking %s against %s'%(str(name1), str(name2)))
+        print("Vertices first:", vertices1)
+        print("Vertices second:", vertices2)
+     
     # list of all vertices
     if vertices1 is None:
         vertices1 = []
@@ -92,8 +95,8 @@ def check_match(name1: str, patch1: PatchNURBSParam, vertices1: list  | None,  n
     middle1 = common[0][0]['point_reference']
     middle2 = common[0][1]['point_reference']
 
-    coordinate1 = np.array(patch1.GetJacobian(middle1).reshape([de, d]))
-    coordinate2 = np.array(patch2.GetJacobian(middle2).reshape([de, d])) 
+    coordinate1 = np.array(patch1(middle1, differential=True).reshape([de, d]))
+    coordinate2 = np.array(patch2(middle2, differential=True).reshape([de, d])) 
     
     coordinate1 = coordinate1 / np.linalg.norm(coordinate1.T, axis=1)
     coordinate2 = coordinate2 / np.linalg.norm(coordinate2.T, axis=1)

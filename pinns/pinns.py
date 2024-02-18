@@ -8,7 +8,7 @@ import jax.scipy.optimize
 import jax.flatten_util
 from typing import Tuple, Callable, Union, Dict, List, Set, TypedDict, Sequence, Any
 import functools
-from .geometry import PatchNURBS, PatchNURBSParam, PatchConnectivity 
+from .geometry import PatchNURBS, Patch, PatchConnectivity, IsogeometricForm
 from .functions import jacobian
         
 
@@ -131,172 +131,17 @@ def connectivity_to_interfaces(spaces: Dict[str, FunctionSpaceNN], connectivity:
                 interfaces[c['first']] = spaces[c['first']].interface_function(c['axis_first'], c['end_first'], c['axis_second'], c['end_second'], spaces[name].bounds, axes, decay_fun )
         ret[name] = assemble_function(spaces[name], name, interfaces)
     return ret
-           
-class IsogeometricForm():
-    __d: int
-    __de: int
-    __ys: jax.Array 
-    __ws: jax.Array
-    __xs: jax.Array
-    __jac: jax.Array
-    __invjac: jax.Array | None
-    __ws_param: jax.Array | None 
-    __param: jax.Array | None
-    __metric: jax.Array | None
-    __omega: jax.Array | None
-    __invert: float
-    
-    def __init__(self, d: int, de: int, points_reference: jax.Array, points: jax.Array, jacobian: jax.Array, weights: jax.Array, parameters: jax.Array | None, weights_parameters: jax.Array | None, inverted: float=1.0):
-        self.__ys = points_reference
-        self.__xs = points
-        self.__ws = weights 
-        self.__d = d
-        self.__de = de
-        self.__jac = jacobian
-        self.__invjac = None
-        self.__metric = None 
-        self.__invert = inverted
-
-    @property 
-    def points_reference(self) -> jax.Array:
-        return self.__ys
-    
-    @property 
-    def points_physical(self) -> jax.Array:
-        return self.__xs
-
-    @property 
-    def weights(self) -> jax.Array:
-        return self.__ws
-    
-    @property
-    def geometry_jacobian(self) -> jax.Array:
-        return self.__jac 
-    
-    @property 
-    def geometry_jacobian_inverse(self) -> jax.Array:
-        if self.__invjac is None:
-            self.__invjac = jnp.linalg.inv(self.__jac)
-        return self.__invjac
-    
-    @property
-    def metric_coefficient(self) -> jax.Array:
-        
-        if self.__metric is None:
-            self.__compute_metric()
-            
-        return self.__metric
-    
-    def  jacobian_transformation(self, jac: jax.Array) -> jax.Array:
-        """
-        Transform the jacobian in the reference domain to the physical.
-        
-        Args:
-            jac (jax.Array): the jacobian in the reference domain evluated on the integration points.
-
-        Returns:
-            jax.Array: the result.
-        """
-        
-        return jnp.einsum('...ij,...jk->...ik', jac, self.geometry_jacobian_inverse)
-    
-    def jacbian_physical(self, f: Callable) -> jax.Array:
-        """
-        Compute the jacobian in the physical domain and evaluate it along the quadrature points.
-
-        Args:
-            f (Callable): the function.
-
-        Returns:
-            jax.Array: the reusult.
-        """
-            
-        pass 
-    
-    def jacobian_reference(self, f: Callable) -> jax.Array:
-        """
-        Compute the jacobian of a function in the reference domain.
-
-        Args:
-            f (Callable): _description_
-
-        Returns:
-            jax.Array: _description_
-        """
-        return jacobian(f)(self.__ys)
-    
-    def __compute_metric(self):
-        if self.__d == self.__de:
-            # volume integral
-            if self.__metric is None:
-                self.__metric = self.__invert * (jnp.linalg.det(self.__jac))[...,None]
-        elif self.__d == 2:
-            if self.__metric is None:
-                self.__metric = self.__invert * jnp.cross(self.__jac[...,0], self.__jac[...,1])
-        elif self.__d == 1 and self.__de == 3:
-            if self.__metric is None:
-                self.__metric = self.__invert * self.__jac
-        elif self.__d == 1 and self.__de == 2:
-            if self.__metric is None:
-                self.__metric = self.__invert * jnp.einsum('mn,kn->km', np.array([[0.0,1.0],[-1.0,0.0]]), self.__jac)
-        else:
-            raise Exception("Metric not really defined for the manifold dimension %d and embedding dimension %d"%(self.__d, self.__de))    
-        
-    
-    def dx(self, vector_field: bool=True) -> jax.Array: 
-        if self.__metric is None:
-            self.__compute_metric()
-        if vector_field == False or self.__d == self.__de:
-            return (jnp.linalg.norm(self.__metric, axis=-1)*self.__ws)
-        else:
-            return self.__metric * self.__ws[...,None]
-
-                
-        
-    
-    # @property
-    # def volume_metric(self):
-    #     if self.__omega is None:
-    #         self.__omega = jnp.abs(jnp.linalg.det(self.__jac))
-    #     return self.__omega
-    
-    # @property 
-    # def dv(self) -> jax.Array:
-    #     if self.__omega is None:
-    #         self.__omega = jnp.abs(jnp.linalg.det(self.__jac))
-    #     return self.__omega*self.__ws
-    
-    # @property 
-    # def ds(self) -> jax.Array:
-    #     if self.__orientation is None:
-    #         if self.__d == 2 and self.__de==3:
-    #             self.__orientation = jnp.cross(self.__jac[...,0], self.__jac[...,1])*self.__invert
-
-    #     
-    
-    # @property
-    # def ds_vec(self) -> jax.Array:
-    #     pass
-    
-    # @property
-    # def dl(self) -> jax.Array:
-    #     pass 
-    
-    # @property 
-    # def dl_vec(self) -> jax.Array:
-    #     pass
-            
 class PINN():
-    __patches: Dict[str, PatchNURBS | PatchNURBSParam] | None
+    __patches: Dict[str, Patch] | None
     weights: Dict 
      
-    def __init__(self, patches: Dict[str, PatchNURBS | PatchNURBSParam] | None): 
+    def __init__(self, patches: Dict[str, Patch] | None): 
         self.neural_networks = {}
         self.neural_networks_initializers = {}
         self.__patches = patches
     
     @property 
-    def patches(self) -> Dict[str, PatchNURBS | PatchNURBSParam] | None:
+    def patches(self) -> Dict[str, Patch] | None:
         return self.__patches
     
     def add_neural_network(self, name, ann, input_shape):
@@ -327,16 +172,18 @@ class PINN():
 
         for name in self.__patches:
             
-            bounds = np.array(self.__patches[name].domain)
-            ys = jax.random.uniform(key ,(N,self.__patches[name].d))*(bounds[:,1]-bounds[:,0]) + bounds[:,0]
-            Weights = jnp.ones((N,))*np.prod(bounds[:,1]-bounds[:,0])/ys.shape[0]
-             
-            DG = self.__patches[name].GetJacobian(ys)
-            xs = self.__patches[name](ys)
+            # bounds = np.array(self.__patches[name].domain)
+            # ys = jax.random.uniform(key ,(N,self.__patches[name].d))*(bounds[:,1]-bounds[:,0]) + bounds[:,0]
+            # Weights = jnp.ones((N,))*np.prod(bounds[:,1]-bounds[:,0])/ys.shape[0]
+            #  
+            # DG = self.__patches[name].GetJacobian(ys)
+            # xs = self.__patches[name](ys)
             
-            points[name] = IsogeometricForm(self.__patches[name].d, self.__patches[name].dembedding, ys, xs, DG, Weights, None, None, 1)
+            # points[name] = IsogeometricForm(self.__patches[name].d, self.__patches[name].dembedding, ys, xs, DG, Weights, None, None, 1)
             #omega, DGys, Gr, K = self.__patches[name].GetMetricTensors(ys)
             #points[name] = {'pts': ys, 'ws': Weights, 'dV': omega, 'Jac': DGys, 'JacInv': Gr, 'InnerGradProd': K}
+
+            points[name] = self.__patches[name].importance_sampling(N, key, None, None, None)
 
         for facet in facets:
             patch_name = facet['patch']

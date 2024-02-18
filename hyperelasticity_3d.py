@@ -33,7 +33,7 @@ def create_geometry(key, scale = 1):
     basis2 = pinns.functions.BSplineBasisJAX(np.array([-1,1]),1)
     basis3 = pinns.functions.BSplineBasisJAX(np.array([-1,1]),2)
 
-    geom1 = pinns.geometry.PatchNURBSParam([basis1, basis2, basis3], knots, weights, 0, 3, key)
+    geom1 = pinns.geometry.PatchNURBS([basis1, basis2, basis3], knots, weights, 0, 3)
     
     knots = np.array( [[[[0,0,r],[-(R-r),0,r]], [[0,d,r],[-(R-r),d,r]]], [[[0,0,R],[-(R-r),0,R]], [[0,d,R],[-(R-r),d,R]]]] )
     weights = np.ones(knots.shape[:3])
@@ -42,7 +42,7 @@ def create_geometry(key, scale = 1):
     basis2 = pinns.functions.BSplineBasisJAX(np.array([-1,1]),1)
     basis3 = pinns.functions.BSplineBasisJAX(np.array([-1,1]),1)
 
-    geom2 = pinns.geometry.PatchNURBSParam([basis1, basis2, basis3], knots, weights, 0, 3, key)
+    geom2 = pinns.geometry.PatchNURBS([basis1, basis2, basis3], knots, weights, 0, 3)
     
     knots = np.array( [[[[r+Rp,-R,r], [-(R-r),-R,r], [-(R-r),0,r]], [[r+Rp,-r,r], [0,-r,r], [0,0,r]]], [[[r+Rp,-R,R], [-(R-r),-R,R], [-(R-r),0,R]], [[r+Rp,-r,R], [0,-r,R], [0,0,R]]]] )
     knots = np.transpose(knots,[0,2,1,3])
@@ -54,7 +54,7 @@ def create_geometry(key, scale = 1):
     basis3 = pinns.functions.BSplineBasisJAX(np.array([-1,1]),1)
     basis2 = pinns.functions.BSplineBasisJAX(np.array([-1,1]),2)
 
-    geom3 = pinns.geometry.PatchNURBSParam([basis1, basis2, basis3], knots, weights, 0, 3, key)
+    geom3 = pinns.geometry.PatchNURBS([basis1, basis2, basis3], knots, weights, 0, 3)
     
     
     knots = np.array( [[[[r+Rp,R+d,r], [-(R-r),R+d,r], [-(R-r),d,r]], [[r+Rp,r+d,r], [0,r+d,r], [0,d,r]]], [[[r+Rp,R+d,R], [-(R-r),R+d,R], [-(R-r),d,R]], [[r+Rp,r+d,R], [0,r+d,R], [0,d,R]]]] )
@@ -69,7 +69,7 @@ def create_geometry(key, scale = 1):
     basis2 = pinns.functions.BSplineBasisJAX(np.array([-1,1]),2)
     basis3 = pinns.functions.BSplineBasisJAX(np.array([-1,1]),1)
 
-    geom4 = pinns.geometry.PatchNURBSParam([basis1, basis2, basis3], knots, weights, 0, 3, key)
+    geom4 = pinns.geometry.PatchNURBS([basis1, basis2, basis3], knots, weights, 0, 3)
     
     return  geom1, geom2, geom3, geom4
 

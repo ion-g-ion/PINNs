@@ -1,10 +1,10 @@
 import pyvista as pv 
 import numpy as np
-from ..geometry import PatchNURBS, PatchNURBSParam
+from ..geometry import Patch
 from ..pinns import FunctionSpaceNN
 from typing import Sequence, Dict, Callable
 
-def plot(geom_patch: PatchNURBS|PatchNURBSParam|Callable, functions: Dict[str, Callable]=dict(), N: Sequence[int]|int=32) -> pv.StructuredGrid:
+def plot(geom_patch: Patch, functions: Dict[str, Callable]=dict(), N: Sequence[int]|int=32) -> pv.StructuredGrid:
     """
     Plot a pyvista object from a geometry patch. 
     The parameter dependence should not appear.

@@ -1,6 +1,6 @@
 import jax.numpy as jnp
 import numpy as np
-from ._geometry import PatchNURBSParam
+from ._geometry import PatchNURBS
 from ..functions import BSplineBasisJAX
 from typing import Tuple, Any
 from ._base import rotation_matrix_3d
@@ -8,7 +8,7 @@ from ._base import rotation_matrix_3d
 
 
 
-def box_patch(size: Tuple[float], rand_key: Any, rotation: Tuple[float] | None = None, position: Tuple[float] | None = None, dtype: np.dtype = np.float64) -> PatchNURBSParam:
+def box_patch(size: Tuple[float], rotation: Tuple[float] | None = None, position: Tuple[float] | None = None, dtype: np.dtype = np.float64) -> PatchNURBS:
     """
     Crete a NURBS box around the origin, i.e. the domain `[-size[0]/2, size[0]/2] x [-size[1]/2, size[1]/2] ... `.
     The domain can be rotated and translated.
@@ -44,6 +44,6 @@ def box_patch(size: Tuple[float], rand_key: Any, rotation: Tuple[float] | None =
         control_pts += np.array(position, dtype=dtype)
     weights = np.ones([2]*d)
 
-    patch = PatchNURBSParam([basis]*d, control_pts, weights, 0, d, rand_key)
+    patch = PatchNURBS([basis]*d, control_pts, weights, 0, d)
 
     return patch
