@@ -419,9 +419,9 @@ class PatchNURBS(Patch):
             
         super(PatchNURBS, self).__init__(d, dembedding, dparam, bounds)
     
-    def __call__(self, y: Array, params: Array | None = None, differential: bool = False) -> Array:
+    def __call__(self, y: Array, params: Array | None = None, derivative: bool = False) -> Array:
 
-        if not differential:
+        if not derivative:
             Bs = [b(y[:, i]).T for i, b in enumerate(self.__basis)]
 
             if self.dparam == 0:

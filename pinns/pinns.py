@@ -201,7 +201,7 @@ class PINN():
             ys = jax.random.uniform(key ,(n,self.__patches[patch_name].d))*(bounds[:, 1]-bounds[:, 0]) + bounds[:, 0]
             Weights = jnp.ones((n,))*np.prod(bounds[selector,1]-bounds[selector,0])/ys.shape[0]
             
-            DG = self.__patches[patch_name].GetJacobian(ys)[...,:,selector]
+            DG = self.__patches[patch_name](ys, derivative=True)[...,:,selector]
             xs = self.__patches[patch_name](ys)
             
             points[label] = IsogeometricForm(self.__patches[patch_name].d-1, self.__patches[patch_name].dembedding, ys, xs, DG, Weights, None, None, 1)

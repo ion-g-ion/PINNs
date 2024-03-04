@@ -95,8 +95,8 @@ def check_match(name1: str, patch1: Patch, vertices1: list  | None,  name2: str,
     middle1 = common[0][0]['point_reference']
     middle2 = common[0][1]['point_reference']
 
-    coordinate1 = np.array(patch1(middle1, differential=True).reshape([de, d]))
-    coordinate2 = np.array(patch2(middle2, differential=True).reshape([de, d])) 
+    coordinate1 = np.array(patch1(middle1, derivative=True).reshape([de, d]))
+    coordinate2 = np.array(patch2(middle2, derivative=True).reshape([de, d])) 
     
     coordinate1 = coordinate1 / np.linalg.norm(coordinate1.T, axis=1)
     coordinate2 = coordinate2 / np.linalg.norm(coordinate2.T, axis=1)
