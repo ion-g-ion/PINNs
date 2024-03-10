@@ -504,7 +504,7 @@ class PatchNURBS(Patch):
                     axes.append(k)
                     B = self.__basis[k](np.array([id])).flatten()
                     s = tuple([None]*k+[slice(None, None, None)] +
-                              [None]*(self.__d-k-1))
+                              [None]*(self.d-k-1))
                     B = B[s]
                     weights_mult = weights_mult*B
                     transform = True

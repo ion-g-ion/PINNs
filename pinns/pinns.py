@@ -41,7 +41,7 @@ class FunctionSpaceNN():
         """
         return self.__bounds
     
-    def init_weights(self, rnd_key: jax.random.KeyArray):
+    def init_weights(self, rnd_key):
         if self.__dparam == 0:
             return self.__init(rnd_key, (self.__d,))[1]
         else:
