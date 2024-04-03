@@ -27,6 +27,14 @@ class FunctionSpaceNN():
         self.__d = len(bounds)
         self.__dparam = nparams
         
+    @property
+    def d(self):
+        return self.__d     
+
+    @property 
+    def dparam(self):
+        return self.__dparam
+    
     @property 
     def neural_network(self) -> callable:
         return self.__nn
@@ -97,18 +105,27 @@ class FunctionSpaceNN():
             
         alpha = scale_other[perm]*scale_self*mask
         beta = offset_other[perm]*scale_self*mask+ offset_self*mask+offset
-
-        fret = lambda ws, x, *args: self.__nn(ws, x[..., perm]*alpha+beta, *args)*jnp.prod(faux(x[...,list(axis_other)]), axis=-1)[...,None]
+        if self.__dparam > 0:
+            fret = lambda ws, x, *args: self.__nn(ws, (x[..., perm]*alpha+beta, *args))*jnp.prod(faux(x[...,list(axis_other)]), axis=-1)[...,None]
+        else:
+            fret = lambda ws, x, *args: self.__nn(ws, x[..., perm]*alpha+beta)*jnp.prod(faux(x[...,list(axis_other)]), axis=-1)[...,None]
         
         return fret
 
 def assemble_function(space_this: FunctionSpaceNN, name_this: str, interfaces: dict) -> Callable:
 
-    def f(ws, x, *args):
-        acc = space_this.neural_network(ws[name_this], x, *args)
-        for c in interfaces:
-            acc += interfaces[c](ws[c], x, *args)
-        return acc
+    if space_this.dparam > 0:
+        def f(ws, x, *args):
+            acc = space_this.neural_network(ws[name_this], (x, *args))
+            for c in interfaces:
+                acc += interfaces[c](ws[c], x, *args)
+            return acc
+    else:
+        def f(ws, x):
+            acc = space_this.neural_network(ws[name_this], x)
+            for c in interfaces:
+                acc += interfaces[c](ws[c], x)
+            return acc
     return f
         
 def connectivity_to_interfaces(spaces: Dict[str, FunctionSpaceNN], connectivity: Sequence[PatchConnectivity], decay_fun: Callable = lambda x: x) -> Dict[str, Callable]:
@@ -248,11 +265,16 @@ def DirichletMask(nn_tuple: Tuple[Callable], out_dims: int | Tuple[int], domain:
         Tuple[Callable, Callable]: resulting initializer and call functions.
     """
     def init_fun(rng, input_shape):
+        print("SHAPE", input_shape)
         return nn_tuple[0](rng, input_shape)
+
 
     def apply_fun(params, inputs, **kwargs):
         res = 1
         for c in conditions:
-            res = res * ((inputs[..., c['dim']]-(domain[c['dim']][0] if c['end'] == 0 else domain[c['dim']][1]))**alpha)[...,None]
+            if isinstance(inputs, tuple):
+                res = res * ((inputs[0][..., c['dim']]-(domain[c['dim']][0] if c['end'] == 0 else domain[c['dim']][1]))**alpha)[...,None]
+            else:
+                res = res * ((inputs[..., c['dim']]-(domain[c['dim']][0] if c['end'] == 0 else domain[c['dim']][1]))**alpha)[...,None]
         return jnp.tile(res, out_dims)*nn_tuple[1](params, inputs, **kwargs)
     return init_fun, apply_fun
