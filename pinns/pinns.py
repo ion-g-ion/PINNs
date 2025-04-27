@@ -50,11 +50,19 @@ class FunctionSpaceNN():
         return self.__bounds
     
     def init_weights(self, rnd_key):
+        """
+        Initialize the weights of the neural network (NN).
+
+        Args:
+            rnd_key (jax.random.PRNGKey): A random key used for initializing the weights.
+
+        Returns:
+            Any: The initialized weights of the neural network. The shape of the weights depends on the number of parameters (dparam).
+        """
         if self.__dparam == 0:
             return self.__init(rnd_key, (self.__d,))[1]
         else:
             return self.__init(rnd_key, ((-1, self.__d), (-1, self.__dparam)))[1]
-    
 
 
     def interface_function(self, axis_self: Tuple[int], end_self: Tuple[int], axis_other: Tuple[int], end_other: Tuple[int], bounds_other: Tuple[Tuple[float]], axis_correspondence: Tuple[int, int], decay_fun: callable=lambda x: x) -> callable:
@@ -265,7 +273,7 @@ def DirichletMask(nn_tuple: Tuple[Callable], out_dims: int | Tuple[int], domain:
         Tuple[Callable, Callable]: resulting initializer and call functions.
     """
     def init_fun(rng, input_shape):
-        print("SHAPE", input_shape)
+        
         return nn_tuple[0](rng, input_shape)
 
 

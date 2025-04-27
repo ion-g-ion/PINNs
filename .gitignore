@@ -133,3 +133,4 @@ dmypy.json
 *.xml
 tmp.geo 
 *.msh
+.codegpt
