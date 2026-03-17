@@ -1,0 +1,147 @@
+% This file was created with matplot2tikz v0.5.3.
+\begin{tikzpicture}
+
+\definecolor{darkgray176}{RGB}{176,176,176}
+\definecolor{darkorange25512714}{RGB}{255,127,14}
+\definecolor{forestgreen4416044}{RGB}{44,160,44}
+\definecolor{lightgray204}{RGB}{204,204,204}
+\definecolor{steelblue31119180}{RGB}{31,119,180}
+
+\begin{axis}[
+legend cell align={left},
+legend style={fill opacity=0.8, draw opacity=1, text opacity=1, draw=lightgray204},
+log basis x={10},
+log basis y={10},
+minor ytick={0.0002,0.0003,0.0004,0.0005,0.0006,0.0007,0.0008,0.0009,0.002,0.003,0.004,0.005,0.006,0.007,0.008,0.009,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,2,3,4,5,6,7,8,9},
+minor yticklabels={
+  \(\displaystyle {2\times10^{-4}}\),
+  \(\displaystyle {3\times10^{-4}}\),
+  \(\displaystyle {4\times10^{-4}}\),
+  ,
+  \(\displaystyle {6\times10^{-4}}\),
+  ,
+  ,
+  ,
+  \(\displaystyle {2\times10^{-3}}\),
+  \(\displaystyle {3\times10^{-3}}\),
+  \(\displaystyle {4\times10^{-3}}\),
+  ,
+  \(\displaystyle {6\times10^{-3}}\),
+  ,
+  ,
+  ,
+  \(\displaystyle {2\times10^{-2}}\),
+  \(\displaystyle {3\times10^{-2}}\),
+  \(\displaystyle {4\times10^{-2}}\),
+  ,
+  \(\displaystyle {6\times10^{-2}}\),
+  ,
+  ,
+  ,
+  \(\displaystyle {2\times10^{-1}}\),
+  \(\displaystyle {3\times10^{-1}}\),
+  \(\displaystyle {4\times10^{-1}}\),
+  ,
+  \(\displaystyle {6\times10^{-1}}\),
+  ,
+  ,
+  ,
+  \(\displaystyle {2\times10^{0}}\),
+  \(\displaystyle {3\times10^{0}}\),
+  \(\displaystyle {4\times10^{0}}\),
+  ,
+  \(\displaystyle {6\times10^{0}}\),
+  ,
+  ,
+  
+},
+tick align=outside,
+tick pos=left,
+title={L2 error vs total points per epoch},
+x grid style={darkgray176},
+xlabel={Total points per epoch},
+xmajorgrids,
+xmin=912838.427458798, xmax=19271960.4206299,
+xminorgrids,
+xmode=log,
+xtick style={color=black},
+y grid style={darkgray176},
+ylabel={Relative L2 error},
+ymajorgrids,
+ymin=0.0022010173804678, ymax=0.0120305611050019,
+yminorgrids,
+ymode=log,
+ytick style={color=black}
+]
+\addplot [draw=steelblue31119180, fill=steelblue31119180, mark=*, only marks, opacity=0.7]
+table{%
+x  y
+16777216 0.00442700367420912
+8388608 0.00446195807307959
+16777216 0.00451347092166543
+8388608 0.0047838925383985
+4194304 0.00513736438006163
+4194304 0.00547583820298314
+8388608 0.00590770924463868
+4194304 0.0061099692247808
+4194304 0.00642399257048965
+2097152 0.00650067487731576
+8388608 0.00664482871070504
+4194304 0.00684797205030918
+2097152 0.00753453420475125
+2097152 0.00774576747789979
+4194304 0.00897652190178633
+1048576 0.00898499228060246
+2097152 0.00960815977305174
+1048576 0.0111366808414459
+};
+\addlegendentry{nl=32}
+\addplot [draw=darkorange25512714, fill=darkorange25512714, mark=*, only marks, opacity=0.7]
+table{%
+x  y
+16777216 0.00269030523486435
+4194304 0.00360007793642581
+8388608 0.00382105191238225
+8388608 0.00409173406660557
+16777216 0.00409784214571118
+8388608 0.00418406771495938
+8388608 0.00447129225358367
+4194304 0.00459596049040556
+4194304 0.00467060087248683
+4194304 0.00523206032812595
+4194304 0.00525314686819911
+2097152 0.00561041943728924
+4194304 0.0058557610027492
+2097152 0.00587204750627279
+2097152 0.00641637854278088
+1048576 0.00686866231262684
+2097152 0.00743446359410882
+1048576 0.0081629166379571
+};
+\addlegendentry{nl=64}
+\addplot [draw=forestgreen4416044, fill=forestgreen4416044, mark=*, only marks, opacity=0.7]
+table{%
+x  y
+16777216 0.00237768096849322
+16777216 0.00283367675729096
+4194304 0.00299582001753151
+8388608 0.00342950620688498
+8388608 0.00372234708629549
+4194304 0.00373211246915162
+4194304 0.00382491131313145
+4194304 0.00387379573658109
+8388608 0.00405035354197025
+4194304 0.00406418135389686
+2097152 0.00434447405859828
+2097152 0.00454510794952512
+2097152 0.00533868232741952
+8388608 0.00543831242248416
+4194304 0.00557919917628169
+1048576 0.00558050675317645
+2097152 0.00660100486129522
+1048576 0.0078135346993804
+};
+\addlegendentry{nl=128}
+\end{axis}
+
+\end{tikzpicture}

@@ -133,7 +133,7 @@ def check_match(name1: str, patch1: Patch, vertices1: list  | None,  name2: str,
     
     perm = [None for i in range(d)]
     for i in axis_first_common:
-        a2 = int(np.where(np.abs(coordinate2[i,:])>0.1)[0])
+        a2 = int(np.where(np.abs(coordinate2[i,:])>0.1)[0][0])
         direction = -1 if coordinate2[i,a2] < 0 else 1
         perm[i] = (a2, direction)
     perm = tuple(perm)
